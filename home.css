@@ -1,0 +1,111 @@
+/* Styles for Home Page (index.html) */
+
+section {
+    width: 100%;
+    min-height: 70vh;
+    padding-top: 120px;
+    padding-bottom: 80px;
+    text-align: center;
+    color: #ffffff;
+}
+
+/* Hero */
+.hero-section {
+    min-height: calc(100vh - 76px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 72px 24px;
+    background: linear-gradient(var(--bg-overlay), var(--bg-overlay));
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    /* uses body background image for visual */
+}
+
+.hero-inner {
+    max-width: var(--max-width);
+    width: 100%;
+    padding: 40px;
+    text-align: center;
+    color: #fff;
+}
+
+/* Headings */
+.hero-inner h1 {
+    color: #fff;
+    margin: 6px 0;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 44px;
+    line-height: 1.05;
+    font-weight: 700;
+    text-shadow: 0 6px 22px rgba(0,0,0,0.45);
+}
+
+.hero-inner .lead {
+    margin: 14px 0;
+    font-size: 18px;
+    color: rgba(255,255,255,0.92);
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Secondary paragraph */
+.hero-inner p {
+    margin: 8px 0;
+    font-size: 16px;
+    color: rgba(255,255,255,0.9);
+}
+
+/* CTA */
+.cta {
+    display: inline-block;
+    padding: 12px 28px;
+    color: #fff;
+    background: linear-gradient(90deg, var(--accent), #c93a3a);
+    border: none;
+    border-radius: 999px;
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+    box-shadow: 0 8px 26px rgba(217,83,79,0.14);
+}
+
+.cta:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 36px rgba(217,83,79,0.18);
+    opacity: 0.98;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero-inner h1 {
+        font-size: 30px;
+    }
+
+    .hero-inner .lead {
+        font-size: 16px;
+    }
+
+    .cta {
+        font-size: 14px;
+        padding: 10px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-inner {
+        padding: 20px;
+    }
+
+    .hero-inner h1 {
+        font-size: 24px;
+    }
+
+    .hero-inner .lead {
+        font-size: 15px;
+    }
+}

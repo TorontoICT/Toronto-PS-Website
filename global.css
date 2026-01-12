@@ -1,0 +1,514 @@
+/* ========== Global Styles ========== */
+@import 'https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap';
+
+:root{
+    --primary: #2058da;
+    --accent: #d9534f;
+    --muted: #6b7280;
+    --bg-overlay: rgba(0,0,0,0.35);
+    --header-height: 76px;
+    --max-width: 1200px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Montserrat', sans-serif;
+}
+
+/* ==========================================================================
+   Responsive Sidebar (for all portals)
+   ========================================================================== */
+
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+        position: fixed;
+        top: 64px; /* Start below the fixed header */
+        left: 0;
+        z-index: 40; /* Above the content wrapper */
+        height: calc(100% - 64px); /* Full viewport height minus header */
+        transition: transform 0.3s ease-in-out;
+    }
+    .sidebar.is-open {
+        transform: translateX(0);
+    }
+    /* Overlay effect when sidebar is open */
+    .portal-content-wrapper.overlay-active::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 35;
+    }
+}
+
+
+/* Body with full-screen background image */
+body {
+    background-image: url(images/4.jpg);
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: #111827;
+    line-height: 1.5;
+}
+
+/* Subtle overlay for improved contrast where needed */
+.hero-section,
+main, footer {
+    backdrop-filter: none;
+}
+
+/* Links & Lists */
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: color 0.22s ease, background-color 0.22s ease;
+}
+
+ul {
+    list-style: none;
+}
+
+/* Header */
+header {
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    height: var(--header-height);
+    background-color: rgba(255,255,255,0.96);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 24px;
+    box-shadow: 0 6px 20px rgba(16,24,40,0.08);
+    transition: background-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Brand */
+header .brand img {
+    height: 56px;
+    display: block;
+}
+
+/* Auth Buttons */
+.auth-buttons {
+    display: flex;
+    gap: 10px;
+    margin-left: auto;
+}
+
+.auth-buttons a {
+    background-color: transparent;
+    color: var(--primary);
+    border: 1px solid rgba(32,88,218,0.12);
+    padding: 8px 14px;
+    font-size: 15px;
+    cursor: pointer;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: background-color 0.18s, color 0.18s, transform 0.12s;
+    font-weight: 600;
+}
+
+.auth-buttons a:hover {
+    background-color: var(--primary);
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Navigation */
+header nav ul {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+header nav ul li {
+    padding: 8px 12px;
+    position: relative; /* ensure the submenu is positioned relative to its parent */
+    border-top: 1px solid rgba(16,24,40,0.03);
+}
+
+header nav ul li a {
+    font-size: 16px;
+    color: #1f2937;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+header nav ul li a:hover {
+    color: var(--accent);
+}
+
+/* Dropdowns */
+header nav ul ul {
+    display: none;
+    position: absolute;
+    /* sit directly below the parent <li> to avoid a hover gap */
+    top: 100%;
+    left: 0;
+    background-color: white;
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 10px;
+    min-width: 220px;
+    padding: 8px 0;
+    box-shadow: 0 8px 28px rgba(15,23,42,0.06);
+    z-index: 1200;
+}
+
+header nav ul li:hover > ul {
+    display: block;
+}
+
+header nav ul ul li {
+    padding: 8px 14px;
+    border-top: 1px solid rgba(16,24,40,0.03);
+}
+
+header nav ul ul li:first-child {
+    border-top: none;
+}
+
+header nav ul ul li a {
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 500;
+}
+
+/* Mobile menu button */
+header label {
+    display: none;
+    cursor: pointer;
+    font-size: 22px;
+    color: #1f2937;
+}
+
+/* Checkbox */
+#menu-bar {
+    display: none;
+}
+
+/* Active link */
+header nav ul li a.active {
+    color: var(--accent);
+}
+
+/* Professional site footer */
+.site-footer {
+    background: linear-gradient(180deg, #072343 0%, #04305a 100%);
+    color: #eef6ff;
+    padding: 40px 22px 18px;
+    margin-top: auto;
+    font-size: 15px;
+}
+
+.site-footer .container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 18px;
+}
+
+/* grid */
+.footer-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr 1fr;
+    gap: 28px;
+    align-items: start;
+}
+
+/* brand */
+.footer-brand .brand img {
+    height: 56px;
+    display: block;
+    margin-bottom: 12px;
+}
+
+.footer-tagline {
+    color: rgba(238,246,255,0.9);
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+/* headings */
+.site-footer h4 {
+    color: #ffffff;
+    font-size: 16px;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+/* links */
+.footer-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-nav li {
+    margin-bottom: 8px;
+}
+
+.site-footer a {
+    color: rgba(238,246,255,0.9);
+    text-decoration: none;
+    transition: color 0.18s ease;
+}
+
+.site-footer a:hover {
+    color: var(--accent);
+    text-decoration: underline;
+}
+
+/* contact */
+.footer-contact address {
+    font-style: normal;
+    color: rgba(238,246,255,0.92);
+    line-height: 1.4;
+    margin-bottom: 8px;
+}
+
+/* newsletter */
+.footer-newsletter .muted {
+    color: rgba(238,246,255,0.85);
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.newsletter-form {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.newsletter-form input[type="email"] {
+    flex: 1;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.04);
+    color: #fff;
+    outline: none;
+    font-size: 14px;
+}
+
+.newsletter-form input::placeholder {
+    color: rgba(255,255,255,0.6);
+}
+
+.btn-subscribe {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 9px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.btn-subscribe:hover {
+    opacity: 0.95;
+}
+
+/* social icons */
+.footer-social {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+}
+
+.social-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+    text-decoration: none;
+}
+
+.social-icon i { font-size: 16px; }
+
+/* bottom bar */
+.footer-bottom {
+    text-align: center;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    margin-top: 18px;
+    padding-top: 12px;
+    color: rgba(238,246,255,0.8);
+    font-size: 13px;
+}
+
+/* Central content wrapper used by all pages */
+.content-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px;
+    background: rgba(255,255,255,0.96); /* card background for readability */
+    color: #0b1220;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(2,6,23,0.06);
+    box-sizing: border-box;
+    overflow: visible;
+}
+
+/* small utility */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* responsive */
+@media (max-width: 980px) {
+    .footer-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .footer-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .newsletter-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .newsletter-form input, .btn-subscribe {
+        width: 100%;
+    }
+}
+
+@media (max-width: 981px) {
+    header {
+        padding: 12px 18px;
+        height: auto;
+        flex-wrap: wrap;
+    }
+
+    header img {
+        height: 52px;
+    }
+
+    header nav {
+        width: 100%;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.28s ease;
+    }
+
+    #menu-bar:checked + label + nav {
+        max-height: 420px;
+        overflow-y: auto;
+    }
+
+    header nav ul {
+        flex-direction: column;
+        align-items: flex-start;
+        padding-top: 8px;
+        gap: 0;
+    }
+
+    header nav ul li {
+        width: 100%;
+        text-align: left;
+        padding: 10px 0;
+        border-top: 1px solid rgba(16,24,40,0.03);
+    }
+
+    header nav ul ul {
+        position: static;
+        display: none;
+        background: transparent;
+        box-shadow: none;
+        border: none;
+        padding-left: 18px;
+    }
+
+    header label {
+        display: block;
+        order: 2;
+        margin-left: 12px;
+    }
+
+    .auth-buttons {
+        order: 1;
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+
+@media (max-width: 500px) {
+    header img {
+        height: 46px;
+    }
+    
+    .auth-buttons a {
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+}
+
+/* ==========================================================================
+   Image Viewer Modal
+   ========================================================================== */
+
+.image-viewer-modal {
+    display: none;
+    position: fixed;
+    z-index: 1001; /* Higher than the header */
+    padding-top: 60px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.9);
+}
+
+.image-viewer-content {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+    animation: zoom 0.6s;
+}
+
+@keyframes zoom {
+    from {transform: scale(0)}
+    to {transform: scale(1)}
+}
+
+.image-viewer-close {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.image-viewer-close:hover,
+.image-viewer-close:focus {
+    color: #bbb;
+}

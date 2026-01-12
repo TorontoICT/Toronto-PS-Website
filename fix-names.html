@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Name Fixer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="./global.css">
+    <style>
+        body { display: flex; justify-content: center; align-items: center; height: 100vh; text-align: center; font-family: sans-serif; }
+        .container { max-width: 600px; padding: 40px; border: 1px solid #ccc; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        button { margin-top: 20px; }
+        #status { margin-top: 20px; font-weight: bold; }
+        .warning { color: #d9534f; font-weight: bold; margin-bottom: 20px; }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Fix Swapped Learner Names</h1>
+        <p>This script will swap the values in the `learnerName` and `learnerSurname` fields for all documents in the `sams_registrations` collection.</p>
+        <p class="warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>WARNING:</strong> Please back up your Firestore database before running this script. This action is irreversible.
+        </p>
+        <button id="run-fix-btn" class="cta-button primary-red">Run Name Fix Script</button>
+        <div id="status">Status: Idle</div>
+    </div>
+
+    <script>
+        // 1. Paste your Firebase project configuration here
+        const firebaseConfig = {
+            apiKey: "AIzaSyAJlr-6eTCCpQtWHkPics3-tbOS_X5xA84",
+            authDomain: "school-website-66326.firebaseapp.com",
+            projectId: "school-website-66326",
+            storageBucket: "school-website-66326.appspot.com",
+            messagingSenderId: "660829781706",
+            appId: "1:660829781706:web:bf447db1d80fc094d9be33"
+        };
+
+        // 2. Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.firestore();
+
+        // 3. The script logic
+        async function fixSwappedNames() {
+            const statusEl = document.getElementById('status');
+            const runBtn = document.getElementById('run-fix-btn');
+
+            if (!confirm("Are you absolutely sure you want to proceed? Have you backed up your database?")) {
+                return;
+            }
+
+            runBtn.disabled = true;
+            runBtn.innerHTML = '<i class="fas fa-sync fa-spin"></i> Processing...';
+            statusEl.textContent = 'Fetching all learner documents...';
+
+            try {
+                const snapshot = await db.collection('sams_registrations').get();
+                if (snapshot.empty) {
+                    statusEl.textContent = 'No documents found in the collection.';
+                    return;
+                }
+
+                let batch = db.batch();
+                let count = 0;
+                let totalProcessed = 0;
+
+                for (const doc of snapshot.docs) {
+                    const data = doc.data();
+                    const originalName = data.learnerName;
+                    const originalSurname = data.learnerSurname;
+
+                    // Swap the values
+                    batch.update(doc.ref, { learnerName: originalSurname, learnerSurname: originalName });
+                    count++;
+                    totalProcessed++;
+
+                    // Firestore batches have a 500 operation limit. Commit every 499.
+                    if (count === 499) {
+                        await batch.commit();
+                        statusEl.textContent = `Processed ${totalProcessed} of ${snapshot.size} documents...`;
+                        batch = db.batch(); // Start a new batch
+                        count = 0;
+                    }
+                }
+
+                // Commit any remaining operations in the last batch
+                if (count > 0) {
+                    await batch.commit();
+                }
+
+                statusEl.textContent = `Success! All ${totalProcessed} documents have been updated.`;
+                runBtn.innerHTML = '<i class="fas fa-check"></i> Complete';
+                alert('Database update complete!');
+
+            } catch (error) {
+                console.error("Error updating documents: ", error);
+                statusEl.textContent = `Error: ${error.message}. Check the console for details.`;
+                runBtn.innerHTML = 'Run Name Fix Script';
+                runBtn.disabled = false;
+            }
+        }
+
+        document.getElementById('run-fix-btn').addEventListener('click', fixSwappedNames);
+    </script>
+
+</body>
+</html>

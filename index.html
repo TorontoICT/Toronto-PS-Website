@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toronto Primary School</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="global.css">
+  <link rel="stylesheet" href="home.css">
+  <style>
+    .hero-section {
+      transition: background-image 1s ease-in-out;
+    }
+  </style>
+  <meta name="theme-color" content="#2058da">
+</head>
+<body>
+<header>
+  <a href="index.html" class="brand"><img src="images/Logo.png" alt="Toronto Primary School Logo"></a>
+  <input type="checkbox" id="menu-bar" aria-hidden="true">
+  <label for="menu-bar" aria-hidden="true"><i class="fas fa-bars"></i></label>
+  <nav aria-label="Main navigation">
+      <ul>
+          <li><a href="index.html" class="active">Home</a></li>
+          <li><a href="html/about/about.html">About</a></li>
+          <li class="has-sub">
+              <a href="#" aria-haspopup="true" aria-expanded="false">Academics <i class="fas fa-caret-down"></i></a>
+              <ul>
+                  <li><a href="html/academics/academics.html#curriculum">Curriculum</a></li>
+                  <li><a href="html/academics/academics.html#departments">Departments</a></li>
+                  <li><a href="html/academics/academics.html#subjects">Subjects</a></li>
+                  <li><a href="html/academics/academics.html#assessments">Assessments</a></li>
+              </ul>
+          </li>
+          <li class="has-sub">
+              <a href="#" aria-haspopup="true" aria-expanded="false">Activities <i class="fas fa-caret-down"></i></a>
+              <ul>
+                  <li><a href="html/activities/activities.html#extracurricular">Extracurricular</a></li>
+                  <li><a href="html/activities/activities.html#sports">Sports</a></li>
+                  <li><a href="html/activities/activities.html#clubs">Clubs</a></li>
+                  <li><a href="html/activities/activities.html#events">Events</a></li>
+              </ul>
+          </li>
+          <li class="has-sub">
+              <a href="#" aria-haspopup="true" aria-expanded="false">Admission <i class="fas fa-caret-down"></i></a>
+              <ul>
+                  <li><a href="html/admission/admission.html#how-to-apply">How to Apply</a></li>
+                  <li><a href="html/admission/application-form.html">Application Form</a></li>
+                  <li><a href="html/admission/admission.html#requirements">Admission Requirements</a></li>
+              </ul>
+          </li>
+          <li class="has-sub">
+              <a href="#" aria-haspopup="true" aria-expanded="false">Parents <i class="fas fa-caret-down"></i></a>
+              <ul>
+                  <li><a href="html/parents/parents.html#sgb">SGB</a></li>
+                  <li><a href="html/parents/parents.html#resources">Resources for Parents</a></li>
+              </ul>
+          </li>
+          <li><a href="html/announcements/announcement.html">Announcements</a></li>
+          <li><a href="html/contact/contact.html">Contact</a></li>
+      </ul>
+  </nav>
+  <div class="auth-buttons">
+      <a href="html/auth/auth.html" class="btn-login">Register / Login</a>
+  </div>
+</header>
+
+  <section class="hero-section">
+    <div class="hero-inner">
+      <h1>Welcome to Toronto Primary School</h1>
+      <p class="lead">Toronto Primary is a Primary School specialising in Ordinary schooling. The school is based in Mankweng, Limpopo, South Africa.</p>
+      <p>We provide quality education to students of all ages.</p>
+      <div class="hero-content">
+        <a href="html/about/about.html" class="cta">Learn More</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer" role="contentinfo" aria-label="Site footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <a href="index.html" class="brand"><img src="images/Logo.png" alt="Toronto Primary School Logo"></a>
+        <p class="footer-tagline">Delivering quality primary education in Mankweng, Limpopo.</p>
+      </div>
+
+      <nav class="footer-nav" aria-label="Footer quick links">
+        <h4>Quick links</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="html/about/about.html">About</a></li>
+          <li><a href="html/admission/admission.html#how-to-apply">Admission</a></li>
+          <li><a href="html/academics/academics.html">Academics</a></li>
+          <li><a href="html/contact/contact.html">Contact</a></li>
+        </ul>
+      </nav>
+
+      <div class="footer-contact" aria-label="Contact details">
+        <h4>Contact</h4>
+        <address>
+          Toronto Primary School<br>
+          389 Unit-B<br>
+          Mankweng, 0727, Limpopo<br>
+          South Africa
+        </address>
+        <p class="contact-lines">
+          <a href="tel:+27763307544">+27 76 330 7544</a><br>
+          <a href="mailto:torontoprimaryschool24@gmail.com">torontoprimaryschool24@gmail.com</a>
+        </p>
+      </div>
+
+      <div class="footer-newsletter">
+        <h4>Stay informed</h4>
+        <p class="muted">Subscribe for news, events and term dates.</p>
+        <form class="newsletter-form" action="#" method="post" aria-label="Subscribe to newsletter">
+          <label for="newsletter-email" class="sr-only">Email address</label>
+          <input id="newsletter-email" type="email" name="email" placeholder="Your email" required>
+          <button type="submit" class="btn-subscribe">Subscribe</button>
+        </form>
+
+        <div class="footer-social" aria-hidden="false">
+          <a href="#" aria-label="Twitter" class="social-icon"><i class="fa-brands fa-x-twitter"></i></a>
+          <a href="#" aria-label="Facebook" class="social-icon"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="#" aria-label="Instagram" class="social-icon"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" aria-label="LinkedIn" class="social-icon"><i class="fa-brands fa-linkedin-in"></i></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <small>&copy; 2025 Toronto Primary School. All rights reserved. School Emis No: 923241498</small>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const heroSection = document.querySelector('.hero-section');
+      // Add your background image paths to this array
+      const backgroundImages = [
+        'images/1.jpg',
+        'images/4.jpg',
+        'images/5.jpg',
+        'images/6.jpg'
+      ];
+      let currentIndex = 0;
+
+      function changeBackground() {
+        currentIndex = (currentIndex + 1) % backgroundImages.length;
+        heroSection.style.backgroundImage = `url('${backgroundImages[currentIndex]}')`;
+      }
+
+      // Change image every 10 seconds (10000 milliseconds)
+      setInterval(changeBackground, 10000);
+    });
+  </script>
+</body>
+</html>
