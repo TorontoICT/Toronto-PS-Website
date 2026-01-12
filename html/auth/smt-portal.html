@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>SMT Portal</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="../../global.css">
+    <link rel="stylesheet" href="../../css/portals/smt-portal/smt-portal.css">
+    <link rel="stylesheet" href="../../css/portals/smt-portal/print-smt-portfolio.css" media="print">
+    <link rel="stylesheet" href="../../css/portals/shared-components.css">
+    <link rel="shortcut icon" href="../../images/44.png" type="image/x-icon">
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
+    <!-- **NEW**: Add SheetJS library for reading/writing Excel files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="../../js/portals/smt-portal/firebase-config.js"></script>
+</head>
+<body>
+
+  <header class="fixed top-0 left-0 w-full bg-indigo-700 text-white shadow-xl z-20">
+    <div class="flex items-center justify-between p-4 max-w-7xl mx-auto">
+      <div class="flex items-center space-x-4">
+        <button id="menu-toggle" class="md:hidden p-1 focus:outline-none focus:ring-2 focus:ring-white rounded-md">
+          <i class="fas fa-bars text-xl"></i>
+        </button>
+        <div class="logo font-bold text-2xl tracking-tight">
+          <a href="../../index.html" class="text-white hover:text-gray-200">TORONTO PRIMARY SCHOOL</a>
+        </div>
+      </div>
+      
+      <div class="relative group">
+        <button class="flex items-center space-x-2 text-white p-2 rounded-full hover:bg-indigo-600 transition duration-150">
+          <i class="fas fa-user-circle text-2xl"></i>
+          <span class="hidden sm:inline">SMT Member</span>
+          <i class="fas fa-chevron-down text-xs ml-1"></i>
+        </button>
+
+        <div class="absolute right-0 top-full mt-1 w-48 bg-white rounded-md shadow-lg py-1 z-30 invisible group-hover:visible opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-200">
+          <a href="#profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onclick="window.location.hash='#profile'; handleNavigation();">Profile</a>
+          <hr class="my-1">
+          <a href="../auth/auth.html" class="btn-logout block px-4 py-2 text-sm text-red-600 hover:bg-red-50"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+ <main class="portal-main-content">
+  <aside class="sidebar">
+   <h2 class="sidebar-title">SMT Dashboard</h2>
+   <ul>
+    <li><a href="#dashboard" class="active"><i class="fas fa-home"></i> Home</a></li>
+    <li><a href="#profile"><i class="fas fa-user-circle"></i> My Profile</a></li>
+    <li><a href="#qms"><i class="fas fa-clipboard-check"></i> QMS</a></li>
+    <li><a href="#portfolio"><i class="fas fa-briefcase"></i> My Portfolio</a></li>
+    <li><a href="#school-calendar"><i class="fas fa-calendar-alt"></i> School Calendar</a></li>
+    <!-- SMT specific links can be added here -->
+    <li class="sidebar-footer-item">
+      <a href="#" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </li>
+   </ul>
+  </aside>
+
+  <section class="portal-content-wrapper">
+   <h1 class="portal-title">Welcome, <span id="smt-name-display">SMT Member!</span></h1>
+
+   <div id="dashboard" class="portal-section active-section">
+    <h2>Dashboard Overview</h2>
+    <div class="grid-container dashboard-cards">
+     <div class="tool-card accent-1">
+      <h3><i class="fas fa-calendar-check"></i> School Analytics</h3>
+      <p>Loading key metrics...</p>
+     </div>
+     <div class="tool-card accent-2">
+      <h3><i class="fas fa-bell"></i> Important Notifications</h3>
+      <p>Loading notifications...</p>
+     </div>
+     <div class="tool-card accent-3">
+      <h3><i class="fas fa-running"></i> Quick Actions</h3>
+      <p>Action links will be here.</p>
+     </div>
+    </div>
+   </div>
+
+   <div id="profile" class="portal-section hidden-section">
+    <h2>My Profile</h2>
+    <div class="profile-card">
+      <div class="profile-pic-container">
+        <img src="../../images/placeholder-profile.png" alt="SMT Profile Picture" class="profile-pic" id="smt-profile-pic">
+        <label for="profile-pic-upload" class="profile-pic-upload-label" title="Upload new profile picture">
+            <i class="fas fa-camera"></i>
+        </label>
+        <input type="file" id="profile-pic-upload" accept="image/jpeg, image/png" style="display: none;">
+        <div id="profile-pic-upload-status" class="upload-status-indicator" style="display: none;"></div>
+      </div>
+     <div class="profile-details">
+      <p class="profile-surname"><strong>Surname:</strong> Loading...</p>
+      <p class="profile-preferred-name"><strong>Preferred Name:</strong> Loading...</p>
+      <p class="profile-email"><strong>Email:</strong> Loading...</p>
+      <p class="profile-contact"><strong>Contact:</strong> Loading...</p>
+      <p class="profile-smt-role"><strong>Role:</strong> Loading...</p>
+      <div id="dh-profile-details" style="display: none;"></div>
+     </div>
+     <a href="#" id="edit-profile-btn" class="cta-button-edit">Edit Profile</a>
+    </div>
+
+    <div id="edit-profile-form-container" class="tool-card" style="display: none; margin-top: 20px;">
+        <h3>Edit My Profile</h3>
+        <form id="edit-profile-form">
+            <div class="grid-container" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+                <div class="form-group">
+                    <label for="edit-profile-preferred-name">Preferred Name</label>
+                    <input type="text" id="edit-profile-preferred-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-profile-surname">Surname</label>
+                    <input type="text" id="edit-profile-surname" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-profile-contact">Contact Number</label>
+                    <input type="tel" id="edit-profile-contact">
+                </div>
+            </div>
+            <p id="edit-profile-status" class="status-message-box" style="display: none;"></p>
+            <button type="submit" class="cta-button"><i class="fas fa-save"></i> Save Changes</button>
+            <button type="button" id="cancel-edit-profile-btn" class="cta-button-secondary" style="margin-left: 10px;">Cancel</button>
+        </form>
+    </div>
+   </div>
+
+   <div id="portfolio" class="portal-section hidden-section">
+    <!-- This view shows the single portfolio link for SMT -->
+    <div id="portfolio-list-view">
+        <h2>My Portfolio</h2>
+        <p>As a member of the School Management Team, you have a central portfolio for your management and administrative evidence.</p>
+        <div id="portfolio-links-container" class="grid-container">
+            <!-- The link to the portfolio will be generated by JS -->
+        </div>
+    </div>
+
+    <!-- This view is for managing a specific portfolio's items -->
+    <div id="portfolio-detail-view" style="display: none;">
+        <button id="back-to-portfolio-list" class="cta-button-secondary" style="margin-bottom: 20px;"><i class="fas fa-arrow-left"></i> Back to Portfolio List</button>
+        <h2 id="portfolio-detail-header">Managing Portfolio</h2>
+        <div class="portfolio-grid">
+            <div class="tool-card">
+                <h3><i class="fas fa-upload"></i> Add New Item</h3>
+                <form id="upload-portfolio-item-form">
+                    <div class="form-group">
+                        <label for="portfolio-item-category">Category</label>
+                        <select id="portfolio-item-category" required>
+                            <option value="">-- Select Category --</option>
+                            <option value="Job Description">Job Description</option>
+                            <option value="Mission and Vision">Mission and Vision</option>
+                            <option value="School Improvement Plan">School Improvement Plan</option>
+                            <option value="Staff Management">Staff Management</option>
+                            <option value="Curriculum Oversight">Curriculum Oversight</option>
+                            <option value="Budget and Finance">Budget and Finance</option>
+                            <option value="Parent and Community">Parent & Community Engagement</option>
+                            <option value="Professional Development">Professional Development Records</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="portfolio-item-description">File Description</label>
+                        <input type="text" id="portfolio-item-description" placeholder="e.g., 'Term 1 Staff Meeting Minutes'" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="portfolio-item-file">Upload File</label>
+                        <input type="file" id="portfolio-item-file" required>
+                    </div>
+                    <p id="portfolio-upload-status" class="status-message-box" style="display: none;"></p>
+                    <button type="submit" class="cta-button"><i class="fas fa-cloud-upload-alt"></i> Upload to Portfolio</button>
+                </form>
+            </div>
+            <div id="portfolio-items-container" class="tool-card">
+                <!-- Portfolio items will be loaded here by JS -->
+            </div>
+        </div>
+        <div class="tool-card" style="margin-top: 20px;">
+            <h3><i class="fas fa-share-alt"></i> Share & Print</h3>
+            <div class="portfolio-actions no-print" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button id="print-portfolio-btn" class="cta-button primary-blue"><i class="fas fa-print"></i> Print / Save as PDF</button>
+                <button id="generate-share-link-btn" class="cta-button"><i class="fas fa-link"></i> Generate Shareable Link</button>
+            </div>
+            <div id="portfolio-print-cover" class="print-only">
+                <h1 id="print-cover-title">Management Portfolio</h1>
+                <h2 id="print-cover-smt-name"></h2>
+                <p id="print-cover-date"></p>
+            </div>
+            <div id="portfolio-link-output-area" style="display: none; margin-top: 15px;">
+                <label for="generated-portfolio-link">Your Sharable Link:</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="generated-portfolio-link" readonly>
+                    <button id="copy-portfolio-link-btn" class="cta-button-secondary"><i class="fas fa-copy"></i> Copy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+   </div>
+
+   <div id="qms" class="portal-section hidden-section">
+    <h2><i class="fas fa-clipboard-check"></i> QMS (Quality Management System)</h2>
+    <div id="loading-indicator" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="flex flex-col items-center p-4 rounded-lg bg-white shadow-xl">
+            <svg class="animate-spin -ml-1 mr-3 h-8 w-8 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="mt-3 text-sm font-medium text-gray-700">Initializing App and Authenticating...</p>
+        </div>
+    </div>
+
+    <div id="qms-app-container" class="max-w-4xl mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-extrabold text-gray-800">Educator QMS Appraisal</h1>
+            <p class="text-xl text-indigo-600 mt-1">Quality Management System Evaluation Instrument</p>
+            <p id="user-info" class="text-sm text-gray-500 mt-2 p-1 bg-gray-100 rounded-lg">User ID: N/A | Status: Connecting...</p>
+        </header>
+
+        <main class="space-y-8">
+            <!-- SECTION A: INFORMATION -->
+            <section class="card bg-white p-6 rounded-xl border border-gray-200">
+                <h2 class="text-2xl font-bold text-indigo-700 mb-4 border-b pb-2">Section A: Educator and School Information</h2>
+                <div class="grid sm:grid-cols-2 gap-4">
+                    <!-- Appraisee Details -->
+                    <div class="col-span-full font-semibold text-gray-700 mt-2">Appraisee Details</div>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700">Full Name</span>
+                        <input type="text" id="appraisee-name" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" placeholder="e.g., Jane Doe" oninput="saveInfo('name', this.value)">
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700">Designation</span>
+                        <input type="text" id="appraisee-designation" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" placeholder="e.g., PL1 Educator" oninput="saveInfo('designation', this.value)">
+                    </label>
+                    <label class="block sm:col-span-2">
+                        <span class="text-sm font-medium text-gray-700">Subjects/Grades Taught</span>
+                        <textarea id="appraisee-subjects" rows="2" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" placeholder="e.g., English Home Language (Grades 10-12), History (Grade 9)" oninput="saveInfo('subjects', this.value)"></textarea>
+                    </label>
+
+                    <!-- School Information -->
+                    <div class="col-span-full font-semibold text-gray-700 mt-4 border-t pt-4">School Information</div>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700">School Name</span>
+                        <input type="text" id="school-name" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" placeholder="e.g., Springfield High" oninput="saveInfo('schoolName', this.value)">
+                    </label>
+                    <label class="block">
+                        <span class="text-sm font-medium text-gray-700">Principal's Name</span>
+                        <input type="text" id="principal-name" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" placeholder="e.g., Skinner E." oninput="saveInfo('principalName', this.value)">
+                    </label>
+                </div>
+            </section>
+
+            <!-- SECTION B: APPRAISAL -->
+            <section class="card bg-white p-6 rounded-xl border border-gray-200">
+                <h2 class="text-2xl font-bold text-indigo-700 mb-4 border-b pb-2">Section B: Performance Appraisal (PL1)</h2>
+                <div class="mb-4 p-4 rounded-lg bg-indigo-50 border border-indigo-200">
+                    <p class="font-bold text-indigo-700">Rating Scale:</p>
+                    <ul class="text-sm text-indigo-600 list-disc list-inside">
+                        <li>**4 - Outstanding:** Performance exceeds expectations (85%-100%)</li>
+                        <li>**3 - Good:** Performance meets expectations (70%-84%)</li>
+                        <li>**2 - Acceptable:** Satisfies minimum expectations (50%-69%)</li>
+                        <li>**1 - Unacceptable:** Requires urgent intervention (0%-49%)</li>
+                    </ul>
+                </div>
+
+                <div id="performance-standards" class="space-y-6">
+                    <!-- Standards will be injected here by JS -->
+                </div>
+
+                <!-- Total Score Display -->
+                <div class="mt-8 pt-4 border-t-4 border-indigo-600 flex justify-between items-center bg-indigo-50 p-4 rounded-lg">
+                    <h3 class="text-2xl font-bold text-indigo-800">Total Appraisal Score:</h3>
+                    <div class="flex items-center space-x-2">
+                         <span id="total-score-value" class="text-4xl font-extrabold text-indigo-600">0</span>
+                         <span class="text-xl text-indigo-600">/ 52 (Max)</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION C: COMMENTS & ACTION -->
+            <section class="card bg-white p-6 rounded-xl border border-gray-200">
+                <h2 class="text-2xl font-bold text-indigo-700 mb-4 border-b pb-2">Section C: Comments and Sign-Off</h2>
+                <label class="block mb-4">
+                    <span class="text-sm font-medium text-gray-700">Appraiser's Comments (Mid-Year)</span>
+                    <textarea id="comments-midyear" rows="4" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" oninput="saveComments('midYear', this.value)"></textarea>
+                </label>
+                <label class="block mb-4">
+                    <span class="text-sm font-medium text-gray-700">Appraiser's Comments (Annual)</span>
+                    <textarea id="comments-annual" rows="4" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border" oninput="saveComments('annual', this.value)"></textarea>
+                </label>
+
+                <div class="text-right mt-4">
+                    <button id="save-button" onclick="saveAppraisal()" class="px-6 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-300 disabled:opacity-50" disabled>
+                        Save Appraisal Data
+                    </button>
+                    <p id="save-status" class="text-sm text-gray-500 mt-2"></p>
+                </div>
+            </section>
+
+        </main>
+    </div>
+   </div>
+
+   <div id="school-calendar" class="portal-section hidden-section">
+    <h2>Official School Calendar</h2>
+    <p>View the school's official term dates and holidays as set by the administration.</p>
+    <div class="tool-card" style="margin-top: 20px;">
+        <div id="smt-official-calendar-container">
+            <p class="info-message">Loading official calendar...</p>
+        </div>
+    </div>
+   </div>
+
+  </section>
+      <!-- Image Viewer Modal -->
+    <div id="image-viewer-modal" class="image-viewer-modal">
+        <span class="image-viewer-close">&times;</span>
+        <img class="image-viewer-content" id="modal-image-content">
+    </div>
+
+ </main>
+ 
+  <footer>
+    <p>© 2023 Toronto Primary School. All rights reserved.</p>
+    <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
+    <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+    <a href="#"><i class="fa-brands fa-instagram"></i></a>
+    <a href="#"><i class="fa-brands fa-linkedin-in"></i></a>
+    <a href="#"><i class="fa-brands fa-square-youtube"></i></a>
+  </footer>
+
+ <script type="module" src="../../js/portals/smt-portal/smt-portal.js"></script>
+ <script type="module" src="../../js/portals/parents-portal/calendar-display.js"></script>
+  <script type="module" src="../../js/auth/auth.js"></script>
+</body>
+</html>

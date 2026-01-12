@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Teachers Portal</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+ <link rel="stylesheet" href="../../global.css">
+ <link rel="stylesheet" href="../../css/portals/teachers-portal/teachers-portal.css">
+ <link rel="stylesheet" href="../../css/portals/teachers-portal/communication.css">
+ <link rel="stylesheet" href="../../css/portals/teachers-portal/portfolio.css">
+ <link rel="stylesheet" href="../../css/portals/teachers-portal/print-teacher-portfolio.css">
+ <link rel="stylesheet" href="../../css/portals/teachers-portal/assessment-programme.css">
+ <link rel="stylesheet" href="../../css/portals/shared-components.css">
+ <link rel="shortcut icon" href="../../images/44.png" type="image/x-icon">
+ <!-- **NEW**: Add styles for the AI Content Generator -->
+ <link rel="stylesheet" href="../../css/portals/teachers-portal/ai-generator.css">
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+ <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+ <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
+  <!-- **NEW**: Add SheetJS library for reading/writing Excel files -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="../../js/portals/teachers-portal/firebase-config.js"></script>
+</head>
+
+<body class="print-container">
+
+  <header class="fixed top-0 left-0 w-full bg-indigo-700 text-white shadow-xl z-20">
+    <div class="flex items-center justify-between p-4 max-w-7xl mx-auto">
+      <div class="flex items-center space-x-4">
+        <button id="menu-toggle" class="md:hidden p-1 focus:outline-none focus:ring-2 focus:ring-white rounded-md">
+          <i class="fas fa-bars text-xl"></i>
+        </button>
+        <div class="logo font-bold text-2xl tracking-tight">
+          <a href="../../index.html" class="text-white hover:text-gray-200">TORONTO PRIMARY SCHOOL</a>
+        </div>
+      </div>
+      
+      <div class="relative group">
+        <button class="flex items-center space-x-2 text-white p-2 rounded-full hover:bg-indigo-600 transition duration-150">
+          <i class="fas fa-user-circle text-2xl"></i>
+          <span class="hidden sm:inline">Teacher</span>
+          <i class="fas fa-chevron-down text-xs ml-1"></i>
+        </button>
+
+        <div class="absolute right-0 top-full mt-1 w-48 bg-white rounded-md shadow-lg py-1 z-30 invisible group-hover:visible opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-200">
+          <a href="#profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onclick="window.location.hash='#profile'; handleNavigation();">Profile</a>
+          <hr class="my-1">
+          <a href="../auth/auth.html" class="btn-logout block px-4 py-2 text-sm text-red-600 hover:bg-red-50"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+ <main class="portal-main-content">
+  <aside class="sidebar">
+   <h2 class="sidebar-title">Teacher Dashboard</h2>
+   <ul>
+    <li><a href="#dashboard" class="active"><i class="fas fa-home"></i> Home</a></li>
+    <li><a href="#portfolio"><i class="fas fa-briefcase"></i> My Portfolio</a></li>
+    <li><a href="#profile"><i class="fas fa-user-circle"></i> My Profile</a></li>
+    <li><a href="#learner-profiles"><i class="fas fa-id-card"></i> Learner Profiles</a></li>
+    <li><a href="#students"><i class="fas fa-users"></i> Learner Management</a></li>
+    <li><a href="#grades-form"><i class="fas fa-edit"></i> Grading & Academics</a></li>
+    <li><a href="#classes"><i class="fas fa-chalkboard-teacher"></i> My Classes</a></li>
+    <li><a href="#quiz-generator"><i class="fas fa-puzzle-piece"></i> Quiz Generator</a></li>
+    <li><a href="#materials"><i class="fas fa-book-open"></i> Course Materials</a></li>
+    <li><a href="#communication"><i class="fas fa-comments"></i> Communication</a></li>
+    <li><a href="#parents-data"><i class="fas fa-handshake"></i> Parent Contacts</a></li>
+    <li><a href="#assessment-programme-mgmt"><i class="fas fa-tasks"></i> Assessment Programme</a></li>
+    <li><a href="#reports"><i class="fas fa-chart-line"></i> Reports & Analytics</a></li>
+    <li><a href="#calendar"><i class="fas fa-calendar-alt"></i> School Calendar</a></li>
+        <li><a href="#announcements"><i class="fas fa-bullhorn"></i> Announcements</a></li>
+    <li><a href="#settings"><i class="fas fa-cog"></i> Settings</a></li>
+    <li class="sidebar-footer-item">
+      <a href="#" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </li>
+   </ul>
+  </aside>
+
+  <section class="portal-content-wrapper">
+   <h1 class="portal-title">Welcome, <span id="teacher-name-display">Teacher!</span></h1>
+
+   <div id="dashboard" class="portal-section active-section">
+    <h2>Dashboard Overview</h2>
+    <div class="grid-container dashboard-cards">
+     <div class="tool-card accent-1">
+      <h3><i class="fas fa-calendar-check"></i> Upcoming Events</h3>
+      <p id="dashboard-events">Loading upcoming events...</p>
+            <a href="#calendar" class="cta-button-small">View Full Calendar</a>
+     </div>
+     <div class="tool-card accent-2">
+      <h3><i class="fas fa-bell"></i> Notifications</h3>
+      <p id="dashboard-notifications">Loading notifications...</p>
+            <a href="#communication" class="cta-button-small">Go to Messages</a>
+     </div>
+     <div class="tool-card accent-3">
+      <h3><i class="fas fa-running"></i> Quick Actions</h3>
+      <a href="#attendance-form" class="cta-button primary-green class-teacher-only" style="display: none;">Mark Attendance</a>
+      <a href="#grades-form" class="cta-button primary-red">Enter Grades</a>
+     </div>
+    </div>
+   </div>
+
+   <div id="profile" class="portal-section hidden-section">
+    <h2>My Profile</h2>
+    <div class="profile-card">
+      <div class="profile-pic-container">
+        <img src="../../images/placeholder-profile.png" alt="Teacher Profile Picture" class="profile-pic" id="teacher-profile-pic">
+        <label for="profile-pic-upload" class="profile-pic-upload-label" title="Upload new profile picture">
+            <i class="fas fa-camera"></i>
+        </label>
+        <input type="file" id="profile-pic-upload" accept="image/jpeg, image/png" style="display: none;">
+        <div id="profile-pic-upload-status" class="upload-status-indicator" style="display: none;"></div>
+      </div>
+     <div class="profile-details">
+      <p class="profile-surname"><strong>Surname:</strong> Loading...</p>
+      <p class="profile-preferred-name"><strong>Preferred Name:</strong> Loading...</p>
+      <p class="profile-email"><strong>Email:</strong> Loading...</p>
+            <p class="profile-contact"><strong>Contact:</strong> Loading...</p>
+            <p class="profile-department"><strong>Department(s):</strong> Loading...</p>
+     </div><button id="edit-profile-btn" class="cta-button-edit">Edit Profile</button>
+    </div>
+
+    <!-- **NEW**: Edit Profile Form (hidden by default) -->
+    <div id="edit-profile-form-container" class="tool-card" style="display: none; margin-top: 20px;">
+        <h3>Edit My Profile</h3>
+        <form id="edit-profile-form">
+            <div class="grid-container" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+                <div class="form-group">
+                    <label for="edit-profile-preferred-name">Preferred Name</label>
+                    <input type="text" id="edit-profile-preferred-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-profile-surname">Surname</label>
+                    <input type="text" id="edit-profile-surname" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-profile-contact">Contact Number</label>
+                    <input type="tel" id="edit-profile-contact">
+                </div>
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label>Department(s) - Select all that apply</label>
+                    <div id="edit-profile-departments-group" class="checkbox-group">
+                        <label><input type="checkbox" name="edit-department" value="Science & Maths"> Science & Maths</label>
+                        <label><input type="checkbox" name="edit-department" value="Languages"> Languages</label>
+                        <label><input type="checkbox" name="edit-department" value="Humanities (SS, LO)"> Humanities (SS, LO)</label>
+                        <label><input type="checkbox" name="edit-department" value="Foundation Phase (All)"> Foundation Phase (All)</label>
+                    </div>
+                </div>
+            </div>
+            <p id="edit-profile-status" class="status-message-box" style="display: none;"></p>
+            <button type="submit" class="cta-button"><i class="fas fa-save"></i> Save Changes</button>
+            <button type="button" id="cancel-edit-profile-btn" class="cta-button-secondary" style="margin-left: 10px;">Cancel</button>
+        </form>
+    </div>
+   </div>
+
+   <div id="learner-profiles" class="portal-section hidden-section">
+    <h2>Learner Profiles</h2>
+    <p>Select one of your classes to view a list of learners. Click on a learner to see their detailed profile.</p>
+
+    <!-- Main View: Class selection and learner list -->
+    <div id="learner-profile-list-view">
+        <div class="tool-card">
+            <div class="form-group" style="max-width: 300px; margin-bottom: 20px;">
+                <label for="profile-class-filter">Select Class:</label>
+                <select id="profile-class-filter">
+                    <option value="">-- Select a Class --</option>
+                </select>
+            </div>
+            <p id="learner-profile-list-status" class="data-status-message">Please select a class to load learners.</p>
+            <div id="learner-profile-list-container" class="data-table-container">
+                <!-- Learner list will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Detail View: A single learner's full profile -->
+    <div id="learner-profile-detail-view" style="display: none;">
+        <button id="back-to-learner-profile-list" class="cta-button-secondary" style="margin-bottom: 20px;">
+            <i class="fas fa-arrow-left"></i> Back to Learner List
+        </button>
+        <div id="learner-profile-content" class="profile-card-full">
+            <!-- Detailed profile content will be injected here by JavaScript -->
+            <p class="data-status-message">Loading learner profile...</p>
+        </div>
+
+        <!-- **NEW**: Add a container for the image viewer modal -->
+        <div id="image-viewer-modal" class="image-viewer-modal">
+            <span class="image-viewer-close">&times;</span>
+            <img class="image-viewer-content" id="modal-image-content">
+        </div>
+
+        <!-- **NEW**: Edit Learner Information Form (hidden by default) -->
+        <div id="edit-learner-info-form-container" class="tool-card" style="display: none; margin-top: 20px;">
+            <h3><i class="fas fa-user-edit"></i> Edit Learner Information</h3>
+            <form id="edit-learner-info-form">
+                <div class="grid-container" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+                    <div class="form-group">
+                        <label for="edit-learner-info-name">First Name</label>
+                        <input type="text" id="edit-learner-info-name">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-learner-info-othername">Other Name(s)</label>
+                        <input type="text" id="edit-learner-info-othername">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-learner-info-surname">Surname</label>
+                        <input type="text" id="edit-learner-info-surname">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-learner-info-id">Learner ID</label>
+                        <input type="text" id="edit-learner-info-id">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-learner-info-dob">Date of Birth</label>
+                        <input type="date" id="edit-learner-info-dob">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-learner-info-gender">Gender</label>
+                        <select id="edit-learner-info-gender"><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-learner-info-nationality">Nationality</label>
+                        <input type="text" id="edit-learner-info-nationality">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-learner-info-race">Race</label>
+                        <select id="edit-learner-info-race"><option value="african">African</option><option value="english">English</option><option value="indian">Indian</option><option value="coloured">Coloured</option><option value="other">Other</option></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-learner-info-language">Home Language</label>
+                        <input type="text" id="edit-learner-info-language">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-learner-info-prev-school">Previous School</label>
+                        <input type="text" id="edit-learner-info-prev-school">
+                    </div>
+                </div>
+                <fieldset style="margin-top: 20px;">
+                    <legend>Parent/Guardian Details</legend>
+                    <div class="grid-container" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+                        <div class="form-group"><label for="edit-parent1-name">Parent 1: Full Name</label><input type="text" id="edit-parent1-name"></div>
+                        <div class="form-group"><label for="edit-parent1-contact">Parent 1: Contact</label><input type="text" id="edit-parent1-contact"></div>
+                        <div class="form-group"><label for="edit-parent1-email">Parent 1: Email</label><input type="email" id="edit-parent1-email"></div>
+                        <div class="form-group" style="grid-column: 1 / -1;"><label for="edit-parent1-address">Parent 1: Address</label><textarea id="edit-parent1-address" rows="2"></textarea></div>
+                    </div>
+                </fieldset>
+                <p id="edit-learner-info-status" class="status-message-box" style="display: none;"></p>
+                <button type="submit" class="cta-button"><i class="fas fa-save"></i> Save Changes</button>
+                <button type="button" id="cancel-edit-learner-info-btn" class="cta-button-secondary" style="margin-left: 10px;">Cancel</button>
+            </form>
+        </div>
+
+        <!-- Behavioral Comments Section -->
+        <div class="tool-card" style="margin-top: 20px;">
+            <h3><i class="fas fa-comments"></i> Behavioral Comments & Observations</h3>
+            <div id="learner-comments-history" class="comments-container scroll-container">
+                <p class="data-status-message">Loading comments...</p>
+            </div>
+            <form id="add-comment-form" style="margin-top: 15px;">
+                <div class="form-group">
+                    <label for="new-comment-text">Add a New Comment</label>
+                    <textarea id="new-comment-text" rows="4" placeholder="Enter your observation about the learner's behavior, progress, or any incidents..." required></textarea>
+                </div>
+                <button type="submit" class="cta-button">
+                    <i class="fas fa-plus-circle"></i> Save Comment
+                </button>
+                <p id="comment-status-message" class="status-message-box" style="display: none;"></p>
+            </form>
+        </div>
+
+        <!-- Documents Section -->
+        <div class="tool-card" style="margin-top: 20px;">
+            <h3><i class="fas fa-folder-open"></i> Learner Documents</h3>
+            <p>The following documents were submitted during the application process.</p>
+            <ul id="learner-document-links" class="resource-list">
+                <!-- Document links will be injected here -->
+                <p class="info-message">No documents found for this learner.</p>
+            </ul>
+        </div>
+
+    </div>
+   </div>
+
+   <div id="students" class="portal-section hidden-section">
+    <h2>Learner Management</h2>
+
+    <!-- Learner Management Dashboard -->
+    <div id="learner-mgmt-dashboard" class="learner-mgmt-view">
+      <p>Select a tool below to manage your learners.</p>
+      <div class="grid-container dashboard-cards">
+        <div class="tool-card accent-3 class-teacher-only" style="display: none;">
+          <h3><i class="fas fa-user-plus"></i> Annual Class Roster Setup</h3>
+          <p>Build your new class list for the start of the year.</p>
+          <a href="#class-setup" class="cta-button-small">Setup Roster</a>
+        </div>
+        <div class="tool-card accent-3 class-teacher-only" style="display: none;">
+          <h3><i class="fas fa-check-square"></i> Mark Attendance</h3>
+          <p>Mark weekly attendance for your responsible class.</p>
+          <a href="#attendance-form" class="cta-button-small">Mark Attendance</a>
+        </div>
+        <div class="tool-card accent-1">
+          <h3><i class="fas fa-edit"></i> Grading</h3>
+          <p>Enter and update grades for assignments and tests.</p>
+          <a href="#grades-form" class="cta-button-small">Manage Grades</a>
+        </div>
+        <div class="tool-card accent-2">
+          <h3><i class="fas fa-address-book"></i> Learner Directory</h3>
+          <p>View learner profiles, contact info, and academic history.</p>
+          <a href="#" class="cta-button-small">View Learners</a>
+        </div>
+      </div>
+     </div>
+   
+    <!-- Nested Attendance Form -->
+    <form id="attendance-form" class="learner-mgmt-view class-teacher-only" style="display: none;">
+     <h2>Mark Attendance</h2>
+     <label for="attendance-class-select">Select Class:</label>
+     <select id="attendance-class-select" name="class">
+      <option value="">-- Select a Class to Load Roster --</option>
+     </select>
+     <p id="attendance-week-display" style="font-weight: 600; margin-top: 15px; text-align: center;"></p>
+     <table class="data-table attendance-weekly-table">
+      <thead>
+       <tr>
+        <th>Admission No.</th>
+        <th>Learner Name</th>
+        <th>Monday</th>
+        <th>Tuesday</th>
+        <th>Wednesday</th>
+        <th>Thursday</th>
+        <th>Friday</th>
+       </tr>
+      </thead>
+      <tbody id="attendance-table-body">
+        <tr><td colspan="7" class="info-message">Please select a class to view the attendance register.</td></tr>
+      </tbody>
+     </table>
+     <p id="attendance-submit-status" class="status-message-box" style="display: none; margin-top: 15px;"></p>
+     <button type="submit" class="cta-button primary-green"><i class="fas fa-save"></i> Submit Attendance</button>    
+    </form>
+   
+    
+    <!-- Nested Class Roster Setup -->
+    <div id="class-setup" class="learner-mgmt-view class-teacher-only" style="display: none;">
+      <h2>Annual Class Roster Setup</h2>
+      <p>Use this tool at the beginning of the year to build your new class list. Search for learners by surname and add them to your class.</p>
+      
+      <!-- **NEW**: Excel Upload Tool -->
+      <div class="tool-card accent-2" style="margin-top: 20px;">
+        <h3><i class="fas fa-file-excel"></i> Upload Roster from Excel</h3>
+        <p>Quickly populate your class by uploading an Excel file (.xlsx, .csv). The file must have columns named: <strong>Admission Number</strong>, <strong>First Name</strong>, and <strong>Last Name</strong>.</p>
+        <div class="form-group">
+            <label for="excel-roster-upload">Select Excel File:</label>
+            <input type="file" id="excel-roster-upload" accept=".xlsx, .xls, .csv">
+        </div>
+        <button id="process-excel-btn" class="cta-button primary-green" style="margin-top: 10px;">
+            <i class="fas fa-cogs"></i> Process File
+        </button>
+        <div id="excel-upload-status" style="margin-top: 15px;"></div>
+      </div>
+
+      <hr style="margin: 30px 0;">
+
+      <div class="tool-card">
+        <div class="form-group" style="max-width: 400px;">
+          <label for="roster-setup-class-select">Select Your Class to Manage:</label>
+          <select id="roster-setup-class-select">
+            <option value="">-- Select Your Responsible Class --</option>
+          </select>
+        </div>
+        <div id="roster-management-area" style="display: none; margin-top: 20px;">
+          <div class="search-and-add-section">
+            <div class="form-group" style="display: flex; gap: 10px;">
+              <label for="roster-learner-search-input" class="sr-only">Search for Learners to Add (from previous grade)</label>
+              <input type="text" id="roster-learner-search-input" placeholder="Enter learner surname...">
+              <button id="learner-search-btn" class="cta-button-small"><i class="fas fa-search"></i> Search</button>
+            </div>
+            <div id="learner-search-results"></div>
+          </div>
+          <!-- Manual Add Section -->
+          <div class="manual-add-section" style="margin-top: 30px; border-top: 1px solid #ccc; padding-top: 20px;">
+            <h4>Or, Manually Add a New Learner to Your Class</h4>
+            <p>If you cannot find a learner by searching, you can add their details here. This will create a new learner record and assign them to your selected class.</p>
+            <form id="manual-add-learner-form" style="margin-top: 15px;">
+                <div class="grid-container" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                    <div class="form-group">
+                        <label for="manual-admission-id">Admission ID (Unique)</label>
+                        <input type="text" id="manual-admission-id" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="manual-learner-name">First Name</label>
+                        <input type="text" id="manual-learner-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="manual-learner-surname">Last Name</label>
+                        <input type="text" id="manual-learner-surname" required>
+                    </div>
+                </div>
+                <p id="manual-add-status" class="status-message-box" style="display: none;"></p>
+                <button type="submit" class="cta-button" style="margin-top: 15px;"><i class="fas fa-user-plus"></i> Add Learner Manually</button>
+            </form>
+          </div>
+          <div id="current-roster-list" style="margin-top: 30px;"></div>
+        </div>
+      </div>
+    </div>
+   </div>
+   <div id="grades-form" class="portal-section hidden-section">
+    <h2>Grading & Academics</h2>
+    <div class="tool-card">
+        <div class="grade-management-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div class="form-group" style="flex: 1; margin-right: 20px;">
+                <label for="grading-class-subject-select">Select Class & Subject to Grade:</label>
+                <select id="grading-class-subject-select">
+                    <option value="">-- Select a Class/Subject --</option>
+                    <!-- Options will be dynamically populated -->
+                </select>
+            </div>
+            <button id="create-new-assignment-btn" class="cta-button-small primary-blue" disabled>
+                <i class="fas fa-plus"></i> Create New Assignment
+            </button>
+        </div>
+
+        <!-- **NEW**: Descriptive card for the gradebook and mark sheet process -->
+        <div id="gradebook-info-card" class="tool-card accent-1" style="margin-bottom: 20px;">
+            <h3><i class="fas fa-book-reader"></i> Gradebook & Mark Sheets</h3>
+            <p>Select a class and subject from the dropdown above to manage grades for your learners. Once the gradebook is loaded, you can:</p>
+            <ul style="list-style-type: disc; padding-left: 20px; margin-top: 10px;">
+                <li>Enter and update scores for assignments.</li>
+                <li>Generate a printable <strong>Mark Sheet</strong> for official records.</li>
+            </ul>
+        </div>
+
+        <div id="gradebook-container" style="display: none;">
+            <div class="gradebook-header-actions">
+                <h3 id="gradebook-header">Gradebook</h3>
+                <button id="generate-marksheet-btn" class="cta-button-small primary-green" style="display: none;">
+                    <i class="fas fa-print"></i> Generate Mark Sheet
+                </button>
+            </div>
+            <div id="gradebook-table-container" class="data-table-container">
+                <!-- Gradebook table will be dynamically generated here -->
+            </div>
+            <p id="gradebook-status" class="data-status-message">Select a class and subject to load the gradebook.</p>
+        </div>
+    </div>
+
+    <!-- Modal for Printable Mark Sheet -->
+    <div id="marksheet-modal" class="modal">
+        <div id="marksheet-modal-content" class="modal-content printable-area">
+        </div>
+    </div>
+
+    <!-- Modal for creating a new assignment -->
+    <div id="create-assignment-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close-btn">&times;</span>
+            <h2>Create New Assignment</h2>
+            <form id="create-assignment-form">
+                <div class="form-group"><label for="assignment-name">Assignment Name</label><input type="text" id="assignment-name" required></div>
+                <div class="form-group"><label for="assignment-total-marks">Total Marks</label><input type="number" id="assignment-total-marks" required></div>
+                <button type="submit" class="cta-button">Create & Add to Gradebook</button>
+            </form>
+        </div>
+    </div>
+   </div>
+   
+   <div id="classes" class="portal-section hidden-section">
+    <h2>My Classes</h2>
+    <p>Below are the rosters for all classes you are currently assigned to.</p>
+
+    <!-- Class Filter Dropdown -->
+    <div class="form-group" style="max-width: 300px; margin-bottom: 20px;">
+        <label for="teacher-class-filter">Filter by Class:</label>
+        <select id="teacher-class-filter">
+            <option value="">Please select a class to show list of names</option>
+        </select>
+    </div>
+
+    <div id="class-rosters-container" class="grid-container class-cards">
+      <p class="info-message">Loading your class rosters...</p>
+    </div>
+   </div>
+
+   <div id="materials" class="portal-section hidden-section">
+    <h2>Course Materials</h2>
+    <div class="grid-container materials-area">
+     <div class="tool-card accent-3">
+      <h3><i class="fas fa-upload"></i> Upload New Materials</h3>
+      <p>Share resources with your learners. Select the subject, grade, and provide a clear description.</p>
+      <form id="upload-material-form">
+        <div class="form-group">
+            <label for="material-subject">Subject</label>
+            <select id="material-subject" required>
+                <option value="">-- Select Subject --</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="material-grade">Grade</label>
+            <select id="material-grade" required>
+                <option value="">-- Select Grade --</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="material-description">File Description</label>
+            <input type="text" id="material-description" placeholder="e.g., Term 3 Maths Exam Paper" required>
+        </div>
+        <div class="form-group">
+            <label for="material-file">Select File (PDF, DOCX, etc.)</label>
+            <input type="file" id="material-file" required>
+        </div>
+        <p id="upload-status-message" class="status-message-box" style="display: none;"></p>
+        <button type="submit" class="cta-button primary-blue"><i class="fas fa-cloud-upload-alt"></i> Upload File</button>
+      </form>
+     </div>
+     <div class="tool-card accent-1">
+      <h3><i class="fas fa-folder-open"></i> View Shared Resources</h3>
+      <ul id="materials-list" class="resource-list">
+        <p class="info-message">Loading materials...</p>
+      </ul>
+     </div>
+    </div>
+   </div>
+
+   <div id="assessment-programme-mgmt" class="portal-section hidden-section">
+    <h2>Assessment Programme Management</h2>
+    <p>Plan, schedule, and manage all your assessments for the academic year.</p>
+
+    <div class="tool-card">
+        <div class="ap-header">
+            <div class="ap-title">
+                <i class="fas fa-calendar-check" style="color: var(--primary-indigo);"></i>
+                <div>
+                    <h3 id="ap-assessment-title">Assessments Overview</h3>
+                    <p>Manage your assessments per term.</p>
+                </div>
+            </div>
+            <div class="ap-actions">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="ap-term-filter" class="sr-only">Filter by Term</label>
+                    <select id="ap-term-filter" class="ap-select-filter">
+                        <option value="1">Term 1</option>
+                        <option value="2">Term 2</option>
+                        <option value="3">Term 3</option>
+                        <option value="4">Term 4</option>
+                    </select>
+                </div>
+                <button id="ap-auto-plan-btn" class="cta-button primary-blue"><i class="fas fa-magic"></i> Auto-Plan Assessments</button>
+                <button id="ap-show-assessment-form-btn" class="cta-button primary-green"><i class="fas fa-plus"></i> Add New Assessment</button>
+            </div>
+        </div>
+
+        <div id="ap-add-assessment-form-container" class="tool-card" style="display: none; margin-top: 1rem;">
+            <h3 id="ap-form-title">New Assessment</h3>
+            <form id="ap-add-assessment-form">
+                <div class="grid-container" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                    <div class="form-group">
+                        <label for="ap-assessment-term">Term</label>
+                        <select id="ap-assessment-term" required>
+                            <option value="1">Term 1</option>
+                            <option value="2">Term 2</option>
+                            <option value="3">Term 3</option>
+                            <option value="4">Term 4</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="ap-assessment-type">Task Type</label>
+                        <input type="text" id="ap-assessment-type" placeholder="e.g., Test, Assignment, Project" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ap-assessment-subject">Subject</label>
+                        <input type="text" id="ap-assessment-subject" placeholder="e.g., Mathematics" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ap-assessment-grade">Grade</label>
+                        <input type="text" id="ap-assessment-grade" placeholder="e.g., 6 or 6A" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ap-assessment-moderation-date">Date of Moderation</label>
+                        <input type="date" id="ap-assessment-moderation-date">
+                    </div>
+                    <div class="form-group">
+                        <label for="ap-assessment-date">Assessment Date</label>
+                        <input type="date" id="ap-assessment-date" required>
+                        <p id="ap-date-conflict-warning" class="status-message-box error" style="display: none; margin-top: 5px;"></p>
+                    </div>
+                    <div class="form-group">
+                        <label for="ap-assessment-total-marks">Total Marks</label>
+                        <input type="number" id="ap-assessment-total-marks" placeholder="e.g., 50" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ap-assessment-target-percentage">Target (%)</label>
+                        <input type="number" id="ap-assessment-target-percentage" placeholder="e.g., 75" min="0" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="ap-assessment-duration">Duration (min)</label>
+                        <input type="number" id="ap-assessment-duration" placeholder="e.g., 60">
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label for="ap-assessment-topics">Topics Covered</label>
+                        <textarea id="ap-assessment-topics" rows="2" placeholder="e.g., Algebra, Geometry, Fractions"></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="cta-button" style="margin-top: 1rem;"><i class="fas fa-plus-circle"></i> Add Assessment</button>
+                <button type="button" id="ap-cancel-assessment-btn" class="cta-button-secondary" style="margin-left: 10px; margin-top: 1rem;">Cancel</button>
+            </form>
+        </div>
+
+        <div class="ap-content-area" style="margin-top: 1rem;">
+            <div id="ap-summary-stats" class="grid-container dashboard-cards" style="margin-bottom: 1rem;">
+                <!-- Summary cards will be rendered here -->
+            </div>
+
+            <div class="data-table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Term</th>
+                            <th>Type</th>
+                            <th>Subject</th>
+                            <th>Grade</th>
+                            <th>Moderation Date</th>
+                            <th>Assessment Date</th>
+                            <th>Marks</th>
+                            <th>Target</th>
+                            <th>Duration</th>
+                            <th>Topics</th>
+                            <th>Action</th>
+
+                        </tr>
+                    </thead>
+                    <tbody id="ap-assessment-table-body">
+                        <!-- Assessments will be rendered here -->
+                    </tbody>
+                </table>
+                <p id="ap-no-assessments-message" class="info-message" style="display: none;">No assessments scheduled for this term.</p>
+            </div>
+            <div class="ap-export-buttons" style="margin-top: 1rem; display: flex; gap: 10px;">
+                <button id="ap-export-excel-btn" class="cta-button primary-green"><i class="fas fa-file-excel"></i> Export to Excel</button>
+                <button id="ap-export-pdf-btn" class="cta-button primary-red"><i class="fas fa-file-pdf"></i> Save as PDF</button>
+                <button id="ap-export-word-btn" class="cta-button"><i class="fas fa-file-word"></i> Export to Word</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW: Modal for selecting which programme to export to PDF -->
+    <div id="ap-pdf-export-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span id="ap-pdf-export-modal-close" class="modal-close-btn">&times;</span>
+            <h3><i class="fas fa-file-pdf"></i> Select Programme to Export</h3>
+            <p>Please select which assessment programme you would like to save as a PDF.</p>
+            <div class="form-group" style="margin-top: 1rem;">
+                <label for="ap-pdf-export-select">Programme:</label>
+                <select id="ap-pdf-export-select">
+                    <option value="">-- Select a Programme --</option>
+                </select>
+            </div>
+            <p id="ap-pdf-export-status" class="status-message-box" style="display: none;"></p>
+            <button id="ap-generate-selected-pdf-btn" class="cta-button primary-red" style="margin-top: 1rem;">
+                <i class="fas fa-cogs"></i> Generate PDF
+            </button>
+        </div>
+    </div>
+
+    <!-- NEW: Modal for selecting which programme to export to Word -->
+    <div id="ap-word-export-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span id="ap-word-export-modal-close" class="modal-close-btn">&times;</span>
+            <h3><i class="fas fa-file-word"></i> Select Programme to Export</h3>
+            <p>Please select which assessment programme you would like to save as a Word document.</p>
+            <div class="form-group" style="margin-top: 1rem;">
+                <label for="ap-word-export-select">Programme:</label>
+                <select id="ap-word-export-select">
+                    <option value="">-- Select a Programme --</option>
+                </select>
+            </div>
+            <p id="ap-word-export-status" class="status-message-box" style="display: none;"></p>
+            <button id="ap-generate-selected-word-btn" class="cta-button" style="margin-top: 1rem;">
+                <i class="fas fa-cogs"></i> Generate Word File
+            </button>
+        </div>
+    </div>
+
+    <!-- NEW: Modal for selecting which programme to export to Excel -->
+    <div id="ap-excel-export-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <span id="ap-excel-export-modal-close" class="modal-close-btn">&times;</span>
+            <h3><i class="fas fa-file-excel"></i> Select Programme to Export</h3>
+            <p>Please select which assessment programme you would like to save as an Excel file.</p>
+            <div class="form-group" style="margin-top: 1rem;">
+                <label for="ap-excel-export-select">Programme:</label>
+                <select id="ap-excel-export-select">
+                    <option value="">-- Select a Programme --</option>
+                </select>
+            </div>
+            <p id="ap-excel-export-status" class="status-message-box" style="display: none;"></p>
+            <button id="ap-generate-selected-excel-btn" class="cta-button primary-green" style="margin-top: 1rem;">
+                <i class="fas fa-cogs"></i> Generate Excel File
+            </button>
+        </div>
+    </div>
+    <!-- Auto-Plan Modal -->
+    <div id="auto-plan-modal" class="modal">
+        <div class="modal-content">
+            <span id="auto-plan-modal-close" class="modal-close-btn">&times;</span>
+            <h3><i class="fas fa-magic"></i> Auto-Plan Assessments</h3>
+            <p>This tool will evenly distribute a set number of assessments across each term, avoiding weekends and holidays.</p>
+            <form id="auto-plan-form" style="margin-top: 1rem;">
+                <div class="form-group">
+                    <label for="auto-plan-class-subject">Select Subject/Class to Plan For:</label>
+                    <select id="auto-plan-class-subject" required>
+                        <option value="">-- Loading your classes... --</option>
+                    </select>
+                </div>
+                <p style="margin-top: 1rem; font-weight: 600;">Number of assessments per term:</p>
+                <div class="grid-container" style="grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label for="auto-plan-term-1">Term 1</label>
+                        <input type="number" id="auto-plan-term-1" value="4" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="auto-plan-term-2">Term 2</label>
+                        <input type="number" id="auto-plan-term-2" value="4" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="auto-plan-term-3">Term 3</label>
+                        <input type="number" id="auto-plan-term-3" value="4" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="auto-plan-term-4">Term 4</label>
+                        <input type="number" id="auto-plan-term-4" value="4" min="0">
+                    </div>
+                </div>
+                <p id="auto-plan-status" class="status-message-box" style="display: none;"></p>
+                <button type="submit" class="cta-button primary-blue" style="margin-top: 1rem;"><i class="fas fa-cogs"></i> Generate Plan</button>
+            </form>
+        </div>
+    </div>
+   </div>
+
+   <div id="parents-data" class="portal-section hidden-section">
+    <h2>Parent Information</h2>
+    <p>View contact information for the parents of learners in your assigned classes.</p>
+
+    <div class="tool-card">
+        <div class="form-group" style="max-width: 300px; margin-bottom: 20px;">
+            <label for="teacher-parent-class-filter">Filter by Your Class:</label>
+            <select id="teacher-parent-class-filter">
+                <option value="">-- Select a Class --</option>
+            </select>
+        </div>
+
+        <p class="data-status-message" id="teacher-parents-data-status">Please select a class to view parent contacts.</p>
+        <div id="teacher-parents-data-container"></div>
+    </div>
+   </div>
+
+   <div id="communication" class="portal-section hidden-section">
+    <h2>Communication Center</h2>
+        <p>Select a parent from the list to start or continue a conversation. You can send messages through the portal, email, or SMS.</p>
+        <div class="chat-container">
+            <div class="chat-sidebar">
+                <div class="chat-sidebar-header">
+                    <h3>Parent Conversations</h3>
+                    <div class="form-group" style="margin-top: 10px;">
+                        <label for="chat-class-filter" style="font-size: 0.85em; opacity: 0.8;">Filter by Class:</label>
+                        <select id="chat-class-filter">
+                            <option value="all">All Classes</option>
+                            <!-- Options will be dynamically populated -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="chat-parent-search" placeholder="Search for a parent...">
+                    </div>
+                </div>
+                <ul id="chat-parent-list" class="chat-parent-list scroll-container">
+                    <p class="info-message">Loading parent contacts...</p>
+                </ul>
+            </div>
+            <div class="chat-main">
+                <div id="chat-welcome-message" class="chat-welcome">
+                    <i class="fas fa-comments"></i>
+                    <p>Select a conversation to start chatting.</p>
+                </div>
+                <div id="chat-window" class="chat-window" style="display: none;"></div>
+                <!-- Modals for Actions will be moved here from the dynamic JS build -->
+                <div id="template-modal" class="modal"><div class="modal-content"><span class="modal-close-btn">&times;</span><h2>Use a Message Template</h2><select id="message-template-select" style="width:100%; margin-top:1rem;"><option value="">-- Select a Template --</option><option value="positive-feedback">Positive Feedback</option><option value="behavior-concern">Behavior Concern</option><option value="homework-reminder">Homework Reminder</option><option value="meeting-request">Request a Meeting</option></select><button id="apply-template-btn" class="cta-button" style="margin-top:1rem;">Apply Template</button></div></div>
+                <div id="schedule-modal" class="modal"><div class="modal-content"><span class="modal-close-btn">&times;</span><h2>Schedule Message</h2><p>Select a time and communication method.</p><input type="datetime-local" id="schedule-send-time" style="width:100%; margin-top:1rem;"><div class="send-button-group" style="margin-top:1rem; justify-content: center;"><button id="send-email-btn" class="cta-button-small" title="Send as Email"><i class="fas fa-envelope"></i> Email</button><button id="send-sms-btn" class="cta-button-small" title="Send as SMS"><i class="fas fa-sms"></i> SMS</button></div></div></div>
+            </div>
+        </div>
+   </div>
+
+   <div id="quiz-generator" class="portal-section hidden-section">
+    <h2><i class="fas fa-robot"></i> Educational Content Generator</h2>
+    <p>Powered by Gemini AI. Create quizzes, assessments, and lesson plans in seconds.</p>
+
+    <!-- Tabs -->
+    <div class="ai-gen-tabs">
+        <button id="ai-tab-quiz" class="ai-gen-tab-btn active"><i class="fas fa-clipboard-list"></i> Quiz Generator</button>
+        <button id="ai-tab-assessment" class="ai-gen-tab-btn"><i class="fas fa-file-alt"></i> Assessment Creator</button>
+        <button id="ai-tab-lesson" class="ai-gen-tab-btn"><i class="fas fa-book-open"></i> Lesson Plan</button>
+    </div>
+
+    <div class="ai-gen-grid">
+        <!-- Input Form -->
+        <div class="tool-card">
+            <h3 id="ai-gen-form-title" class="ai-gen-form-title">Quiz Settings</h3>
+
+            <!-- Quiz Form -->
+            <form id="ai-form-quiz" class="ai-gen-form active">
+                <div class="form-group"><label for="quiz-topic">Topic *</label><input type="text" id="quiz-topic" placeholder="e.g., Photosynthesis, World War II" required></div>
+                <div class="form-group"><label for="quiz-num-questions">Number of Questions</label><input type="number" id="quiz-num-questions" min="5" max="50" value="10"></div>
+                <div class="form-group"><label for="quiz-difficulty">Difficulty Level</label><select id="quiz-difficulty"><option value="easy">Easy</option><option value="medium" selected>Medium</option><option value="hard">Hard</option></select></div>
+                <div class="form-group"><label for="quiz-question-type">Question Type</label><select id="quiz-question-type"><option value="multiple-choice">Multiple Choice</option><option value="true-false">True/False</option><option value="mixed">Mixed</option></select></div>
+                <button type="submit" class="cta-button"><i class="fas fa-cogs"></i> Generate Quiz</button>
+            </form>
+
+            <!-- Assessment Form -->
+            <form id="ai-form-assessment" class="ai-gen-form">
+                <div class="form-group"><label for="assessment-topic">Topic *</label><input type="text" id="assessment-topic" placeholder="e.g., Cell Biology, American History" required></div>
+                <div class="form-group"><label for="assessment-grade-level">Grade Level</label><select id="assessment-grade-level"><option value="elementary">Elementary (K-5)</option><option value="middle-school">Middle School (6-8)</option><option value="high-school" selected>High School (9-12)</option><option value="college">College</option></select></div>
+                <div class="form-group"><label for="assessment-type">Assessment Type</label><select id="assessment-type"><option value="comprehensive">Comprehensive Exam</option><option value="unit-test">Unit Test</option><option value="formative">Formative Assessment</option><option value="project">Project-Based</option></select></div>
+                <div class="form-group"><label for="assessment-duration">Duration (minutes)</label><input type="number" id="assessment-duration" min="15" max="180" value="60"></div>
+                <button type="submit" class="cta-button"><i class="fas fa-cogs"></i> Generate Assessment</button>
+            </form>
+
+            <!-- Lesson Plan Form -->
+            <form id="ai-form-lesson" class="ai-gen-form">
+                <div class="form-group"><label for="lesson-topic">Topic *</label><input type="text" id="lesson-topic" placeholder="e.g., Introduction to Fractions" required></div>
+                <div class="form-group"><label for="lesson-grade-level">Grade Level</label><select id="lesson-grade-level"><option value="elementary">Elementary (K-5)</option><option value="middle-school">Middle School (6-8)</option><option value="high-school" selected>High School (9-12)</option><option value="college">College</option></select></div>
+                <div class="form-group"><label for="lesson-duration">Duration (minutes)</label><input type="number" id="lesson-duration" min="30" max="120" value="45"></div>
+                <div class="form-group"><label for="lesson-objectives">Learning Objectives (optional)</label><textarea id="lesson-objectives" rows="3" placeholder="e.g., Students will be able to identify and compare fractions"></textarea></div>
+                <div class="form-group"><label for="lesson-standards">Standards (optional)</label><input type="text" id="lesson-standards" placeholder="e.g., CCSS.MATH.CONTENT.3.NF.A.1"></div>
+                <button type="submit" class="cta-button"><i class="fas fa-cogs"></i> Generate Lesson Plan</button>
+            </form>
+        </div>
+
+        <!-- Output Area -->
+        <div class="tool-card">
+            <div class="ai-gen-output-header">
+                <h3>Generated Content</h3>
+                <div class="ai-gen-actions" style="display: none;">
+                    <button id="ai-gen-pdf-btn" class="cta-button-small primary-red"><i class="fas fa-file-pdf"></i> Save as PDF</button>
+                    <button id="ai-gen-download-btn" class="cta-button-small"><i class="fas fa-file-alt"></i> Download .txt</button>
+                </div>
+            </div>
+
+            <div id="ai-gen-output-container">
+                <div id="ai-gen-placeholder" class="ai-gen-message">
+                    <i class="fas fa-magic"></i>
+                    <p>Your generated content will appear here</p>
+                </div>
+                <div id="ai-gen-loading" class="ai-gen-message" style="display: none;">
+                    <i class="fas fa-sync fa-spin"></i>
+                    <p>Generating your content...</p>
+                </div>
+                <div id="ai-gen-error" class="ai-gen-message error" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p id="ai-gen-error-text"></p>
+                </div>
+                <!-- The main result text area -->
+                <div id="ai-gen-result" class="ai-gen-result-text scroll-container"></div>
+
+                <!-- **NEW**: Hidden container for professional PDF printing -->
+                <div id="ai-gen-printable-content" style="display: none;">
+                    <img src="../../images/Logo.png" alt="School Logo" style="width: 100px; margin-bottom: 20px;">
+                    <h2 id="printable-title" style="font-size: 1.5em; margin-bottom: 20px;"></h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- **NEW**: Generation History Section -->
+    <div class="tool-card" style="margin-top: 20px;">
+        <h3><i class="fas fa-history"></i> Generation History</h3>
+        <p>Your 10 most recently generated items. Click an item to view its content.</p>
+        <ul id="ai-gen-history-list" class="resource-list" style="margin-top: 15px;">
+            <p class="info-message">No history found. Generate some content to see it here!</p>
+        </ul>
+        <!-- **NEW**: Add a confirmation modal for deletion -->
+        <div id="ai-history-delete-confirm-modal" class="modal">
+            <div class="modal-content" style="max-width: 400px; text-align: center;">
+            </div>
+        </div>
+    </div>
+
+   </div>
+
+   <div id="portfolio" class="portal-section hidden-section">
+    <h2>My Professional Portfolio</h2>
+    <p>Your portfolio is automatically organized by the subjects and grades you teach. Select a portfolio below to manage its contents or generate a shareable link.</p>
+
+    <!-- This container will list the links to each subject-specific portfolio -->
+    <div id="portfolio-subject-list-container" class="tool-card" style="margin-top: 20px;">
+        <h3>My Subject Portfolios</h3>
+        <div id="portfolio-subject-links" class="resource-list">
+            <p class="info-message">Loading your teaching assignments...</p>
+        </div>
+    </div>
+
+    <!-- This view will be shown when a specific portfolio is selected -->
+    <div id="portfolio-detail-view" style="display: none; margin-top: 20px;">
+        <button id="back-to-portfolio-list" class="cta-button-secondary" style="margin-bottom: 20px;">
+            <i class="fas fa-arrow-left"></i> Back to All Portfolios
+        </button>
+        <h2 id="portfolio-detail-header"></h2>
+
+        <div class="portfolio-actions no-print" style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+            <button id="print-portfolio-btn" class="cta-button primary-blue"><i class="fas fa-print"></i> Print / Save as PDF</button>
+            <button id="generate-share-link-btn" class="cta-button"><i class="fas fa-link"></i> Generate Shareable Link</button>
+        </div>
+
+        <div id="portfolio-link-output-area" class="no-print" style="display: none; margin-bottom: 20px;">
+            <h4>Shareable Portfolio Link:</h4>
+            <input type="text" id="generated-portfolio-link" readonly style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; background: #f9f9f9; margin-top: 5px;">
+            <button id="copy-portfolio-link-btn" class="cta-button-small" style="margin-top: 10px;"><i class="fas fa-copy"></i> Copy Link</button>
+        </div>
+
+        <div id="portfolio-print-cover" class="print-only">
+            <h1 id="print-cover-title">Educator's Portfolio File</h1>
+            <h2 id="print-cover-teacher-name"></h2>
+            <p id="print-cover-date"></p>
+        </div>
+
+        <div class="grid-container materials-area">
+            <div class="tool-card accent-3 no-print">
+                <h3><i class="fas fa-upload"></i> Add New Item to this Portfolio</h3>
+                <form id="upload-portfolio-item-form">
+                    <div class="form-group">
+                        <label for="portfolio-item-category">Category</label>
+                        <select id="portfolio-item-category" required>
+                            <option value="">-- Select a Category --</option>
+                            <option value="Table Of Content">Table Of Content</option>
+                            <option value="Job Description">Job Description</option>
+                            <option value="Mission and Vision">Mission and Vision</option>
+                            <option value="School Calender">School Calender</option>
+                            <option value="Personal Time Table">Personal Time Table</option>
+                            <option value="Lesson Plans">Lesson Plans</option>
+                            <option value="Student Assessments">Student Assessments</option>
+                            <option value="Classroom Management">Classroom Management</option>
+                            <option value="Teaching Philosophy">Teaching Philosophy</option>
+                            <option value="Student Work Samples">Student Work Samples</option>
+                            <option value="Professional Development">Professional Development</option>
+                            <option value="Parent Communication">Parent Communication</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="portfolio-item-description">Item Description</label>
+                        <input type="text" id="portfolio-item-description" placeholder="e.g., Grade 5 Fractions Unit Plan" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="portfolio-item-file">Select File (PDF, DOCX, JPG, etc.)</label>
+                        <input type="file" id="portfolio-item-file" required>
+                    </div>
+                    <p id="portfolio-upload-status" class="status-message-box" style="display: none;"></p>
+                    <button type="submit" class="cta-button primary-blue"><i class="fas fa-cloud-upload-alt"></i> Upload to Portfolio</button>
+                </form>
+            </div>
+            <div id="portfolio-items-container" class="tool-card accent-1" style="grid-column: span 2;"></div>
+        </div>
+    </div>
+   </div>
+
+   <div id="reports" class="portal-section hidden-section">
+    <h2>Reports & Analytics</h2>
+    <div class="grid-container dashboard-cards">
+     <div class="tool-card accent-1">
+      <h3><i class="fas fa-graduation-cap"></i> Learner Report Cards</h3>
+      <p>Generate detailed report cards for your learners at the end of each term.</p>
+      <a href="#" class="cta-button-small">Generate Report Card</a>
+     </div>
+     <div class="tool-card accent-2">
+      <h3><i class="fas fa-chart-bar"></i> Class Performance</h3>
+      <p>View performance trends, grade distributions, and attendance statistics for your classes.</p>
+      <a href="#" class="cta-button-small">View Class Analytics</a>
+     </div>
+    </div>
+   </div>
+
+   <div id="calendar" class="portal-section hidden-section">
+    <h2>School Calendar</h2>
+    
+    <div class="tool-card">
+        <h3>Official School Calendar</h3>
+        <p>View the school's official term dates and holidays as set by the administration.</p>
+        <div id="official-calendar-container" style="margin-top: 15px;">
+            <p class="info-message">Loading official calendar...</p>
+        </div>
+    </div>
+
+    <div class="tool-card" style="margin-top: 20px;">
+        <h3>My Personal Term Planner</h3>
+        <p>Plan your term by setting your own exam dates and personal holidays. This is for your reference only.</p>
+        
+        <!-- Term Tabs -->
+        <div id="ap-term-tabs" class="ap-tabs">
+            <p class="info-message">Loading personal calendar editor...</p>
+        </div>
+        <!-- Term Details Container -->
+        <div id="ap-term-details-container">
+            <!-- Term details form will be rendered here by JS -->
+        </div>
+        
+        <!-- File Upload (if needed, though not directly used in current setupTermPlanner logic) -->
+        <!-- <div class="form-group" style="margin-top: 1rem;">
+            <label for="ap-calendar-upload">Upload Calendar File (e.g., iCal)</label>
+            <input type="file" id="ap-calendar-upload" accept=".ics">
+        </div> -->
+    </div>
+   </div>
+   
+      <div id="announcements" class="portal-section hidden-section">
+    <h2>School Announcements</h2>
+    <p>The latest news and updates from the school administration. Check here frequently!</p>
+    <div id="announcements-list">
+     <p>Loading announcements...</p>
+    </div>
+  </div>
+
+   <div id="settings" class="portal-section hidden-section">
+    <h2>Settings</h2>
+    <div class="grid-container dashboard-cards">
+     <div class="tool-card accent-3">
+      <h3><i class="fas fa-lock"></i> Change Password</h3>
+      <p>Update your password to ensure your account security.</p>
+      <form action="#" method="POST">
+       <label for="current-password">Current Password:</label>
+       <input type="password" id="current-password" name="current-password" required>
+       <label for="new-password">New Password:</label>
+       <input type="password" id="new-password" name="new-password" required>
+       <button type="submit" class="cta-button primary-blue">Update Password</button>
+      </form>
+     </div>
+     <div class="tool-card accent-1">
+      <h3><i class="fas fa-sliders-h"></i> Notification Preferences</h3>
+      <p>Customize how you receive notifications for new messages or assignments.</p>
+      <a href="#" class="cta-button-small">Edit Preferences</a>
+     </div>
+    </div>
+   </div>
+  </section>
+
+      <!-- Contact Parent Modal -->
+      <div id="contact-parent-modal" class="modal">
+        <div class="modal-content">
+          <span class="modal-close-btn">&times;</span>
+          <div id="contact-modal-content">
+            <h2 id="contact-modal-title">Contact Parent</h2>
+            <p id="contact-modal-intro">Select a method to contact the parent.</p>
+
+            <div class="contact-method-switcher">
+              <button id="contact-via-email-btn" class="contact-method-btn active"><i class="fas fa-envelope"></i> Email</button>
+              <button id="contact-via-sms-btn" class="contact-method-btn"><i class="fas fa-mobile-alt"></i> SMS</button>
+            </div>
+
+            <!-- Email Form -->
+            <form id="contact-email-form" class="contact-form">
+              <p><strong>To:</strong> <span id="email-parent-name"></span> (<span id="email-parent-email"></span>)</p>
+              <p><strong>Regarding:</strong> <span id="email-learner-name"></span></p>
+              <div class="form-group">
+                <label for="email-subject">Subject</label>
+                <input type="text" id="email-subject" name="email-subject" value="Update regarding your child">
+              </div>
+              <div class="form-group">
+                <label for="email-message">Message</label>
+                <textarea id="email-message" name="email-message" rows="6" placeholder="Write your message here..."></textarea>
+              </div>
+              <button type="submit" class="cta-button primary-blue"><i class="fas fa-paper-plane"></i> Send Email</button>
+            </form>
+
+            <!-- SMS Form -->
+            <form id="contact-sms-form" class="contact-form" style="display: none;">
+              <p><strong>To:</strong> <span id="sms-parent-name"></span> (<span id="sms-parent-contact"></span>)</p>
+              <p><strong>Regarding:</strong> <span id="sms-learner-name"></span></p>
+              <div class="form-group">
+                <label for="sms-message">Message (SMS)</label>
+                <textarea id="sms-message" rows="6" placeholder="Write your SMS message here..."></textarea>
+              </div>
+              <button type="submit" class="cta-button primary-green"><i class="fas fa-sms"></i> Send SMS</button>
+            </form>
+          </div>
+        </div>
+      </div>
+ </main>
+ 
+  <footer>
+    <p>© 2023 Toronto Primary School. All rights reserved.</p>
+    <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
+    <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+    <a href="#"><i class="fa-brands fa-instagram"></i></a>
+    <a href="#"><i class="fa-brands fa-linkedin-in"></i></a>
+    <a href="#"><i class="fa-brands fa-square-youtube"></i></a>
+  </footer>
+  <script src="../../js/portals/teachers-portal/sorting-utils.js"></script>
+  <!-- Refactored Teacher Portal Scripts -->
+ <script src="../../js/portals/teachers-portal/profile.js"></script>
+ <script src="../../js/portals/teachers-portal/dashboard.js"></script>
+ <script src="../../js/portals/teachers-portal/classes.js"></script>
+ <script src="../../js/portals/teachers-portal/attendance.js"></script>
+ <script src="../../js/portals/teachers-portal/roster-management.js"></script>
+ <script src="../../js/portals/teachers-portal/grading.js"></script>
+ <script src="../../js/portals/teachers-portal/materials.js"></script>
+ <script type="module" src="../../js/portals/teachers-portal/portfolio.js"></script>
+ <script type="module" src="../../js/portals/teachers-portal/learner-profiles.js"></script>
+ <script src="../../js/portals/teachers-portal/communication.js"></script>
+ <script src="../../js/portals/teachers-portal/ai-generator.js"></script>
+ <script type="module" src="../../js/portals/teachers-portal/assessment-programme.js"></script>
+ <script type="module" src="../../js/portals/teachers-portal/teachers-portal.js"></script>
+ <script type="module" src="../../js/portals/teachers-portal/calendar.js"></script>
+ <script type="module" src="../../js/auth/auth.js"></script>
+ <script type="module" src="../../js/announcements/announcements.js"></script>
+</body>
+</html>

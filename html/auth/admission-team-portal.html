@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admissions Team Portal</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="../../global.css">
+    <link rel="stylesheet" href="../../css/portals/admins-portal/admins-portal.css">
+    <link rel="shortcut icon" href="../../images/44.png" type="image/x-icon">
+    <!-- **FIX**: Load Firebase compat libraries BEFORE firebase-config.js -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="../../js/portals/admission-team-portal/firebase-config.js"></script>
+
+</head>
+<style>
+    /* Styles for the Applicant Details Modal */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1000; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgba(0,0,0,0.6); /* Black w/ opacity */
+        padding-top: 60px;
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 5% auto; /* 5% from the top and centered */
+        padding: 25px;
+        border: 1px solid #888;
+        width: 80%; /* Could be more or less, depending on screen size */
+        max-width: 900px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+        animation: animatetop 0.4s;
+    }
+
+    /* Add Animation */
+    @keyframes animatetop {
+        from {top: -300px; opacity: 0}
+        to {top: 0; opacity: 1}
+    }
+
+</style>
+<body>
+
+    <header class="fixed top-0 left-0 w-full bg-indigo-700 text-white shadow-xl z-20">
+        <div class="flex items-center justify-between p-4 max-w-7xl mx-auto">
+          <div class="flex items-center space-x-4">
+            <button id="menu-toggle" class="md:hidden p-1 focus:outline-none focus:ring-2 focus:ring-white rounded-md">
+              <i class="fas fa-bars text-xl"></i>
+            </button>
+            <div class="logo font-bold text-2xl tracking-tight">
+              <a href="../../index.html" class="text-white hover:text-gray-200">TORONTO PRIMARY SCHOOL</a>
+            </div>
+          </div>
+          
+          <div class="relative group">
+            <button class="flex items-center space-x-2 text-white p-2 rounded-full hover:bg-indigo-600 transition duration-150">
+              <i class="fas fa-user-circle text-2xl"></i>
+              <span class="hidden sm:inline">Admissions</span>
+              <i class="fas fa-chevron-down text-xs ml-1"></i>
+            </button>
+    
+            <div class="absolute right-0 top-full mt-1 w-48 bg-white rounded-md shadow-lg py-1 z-30 invisible group-hover:visible opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-200">
+              <a href="#settings" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onclick="window.location.hash='#settings'; handleNavigation();">Settings</a>
+              <hr class="my-1">
+              <a href="../auth/auth.html" class="btn-logout block px-4 py-2 text-sm text-red-600 hover:bg-red-50"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+    <main class="portal-main-content">
+        <aside class="sidebar">
+            <h3 class="sidebar-title">Admissions Menu</h3>
+            <ul>
+                <li><a href="#dashboard"><i class="fas fa-chart-line"></i> Overview</a></li>
+                <li><a href="#manual-application"><i class="fas fa-edit"></i> Manual Application</a></li>
+                <li><a href="#new-applicants"><i class="fas fa-file-invoice"></i> New Submissions</a></li>
+                <li><a href="#review-in-progress"><i class="fas fa-tasks"></i> In Review</a></li>
+                <li><a href="#offers-extended"><i class="fas fa-check-circle"></i> Offers/Accepted</a></li>
+                <li><a href="#waitlist-pool"><i class="fas fa-hourglass-half"></i> Waitlisted</a></li>
+                <li><a href="#rejected-applications"><i class="fas fa-times-circle"></i> Rejected</a></li>
+                <li><a href="#settings"><i class="fas fa-cog"></i> Settings</a></li>
+                <li class="sidebar-footer-item">
+                    <a href="auth.html" class="btn-logout" style="color: var(--primary-red);"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </li>
+            </ul>
+        </aside>
+
+        <section class="portal-content-wrapper">
+            <h1 class="portal-title">Admissions Portal Dashboard</h1>
+        
+            <div id="dashboard" class="portal-section active-section">
+                <h2>Admissions Overview</h2>
+                <div class="grid-container dashboard-cards">
+                    <div class="tool-card card-admissions-1">
+                        <h3><i class="fas fa-inbox"></i> New Submissions</h3>
+                        <p class="metric-number" id="metric-new-count">0</p>
+                        <a href="#new-applicants" class="cta-button-small">Review Now</a>
+                    </div>
+                    <div class="tool-card card-admissions-2">
+                        <h3><i class="fas fa-users"></i> Total Applicants</h3>
+                        <p class="metric-number" id="metric-total-count">0</p>
+                        <a onclick="loadAllApplications()" class="cta-button-small">Refresh Data</a>
+                    </div>
+                    <div class="tool-card card-admissions-3">
+                        <h3><i class="fas fa-check-circle"></i> Offers Extended</h3>
+                        <p class="metric-number" id="metric-offers-count">0</p>
+                        <a href="#offers-extended" class="cta-button-small">View Offers</a>
+                    </div>
+                </div>
+            </div>
+
+            <div id="manual-application" class="portal-section hidden-section">
+                <h2>Manual Application Form</h2>
+                <p class="form-intro" style="max-width:900px;margin:8px auto 18px;color:#6b7280;">
+                    Use this form to capture an application on behalf of a parent. All fields should be completed as per the physical application form.
+                </p>
+                <div class="tool-card">
+                    <form id="manual-application-form" method="POST" class="application-form">
+                        <fieldset>
+                            <legend>Learner Details</legend>
+                            <div class="form-grid">
+                                <div class="form-group"><label for="manual-learner-name">First Name</label><input type="text" id="manual-learner-name" name="learner-name" required></div>
+                                <div class="form-group"><label for="manual-learner-othername">Other Name(s)</label><input type="text" id="manual-learner-othername" name="learner-othername"></div>
+                                <div class="form-group"><label for="manual-learner-surname">Surname</label><input type="text" id="manual-learner-surname" name="learner-surname" required></div>
+                                <div class="form-group"><label for="manual-learner-id">ID Number / Birth Certificate No.</label><input type="text" id="manual-learner-id" name="learner-id" required></div>
+                                <div class="form-group"><label for="manual-learner-dob">Date of Birth</label><input type="date" id="manual-learner-dob" name="learner-dob" required></div>
+                                <div class="form-group">
+                                    <label for="manual-learner-gender">Gender</label>
+                                    <select id="manual-learner-gender" name="learner-gender" required>
+                                        <option value="" disabled selected>Select Gender</option>
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="form-group"><label for="manual-learner-nationality">Nationality</label><input type="text" id="manual-learner-nationality" name="learner-nationality" required></div>
+                                <div class="form-group">
+                                    <label for="manual-learner-race">Race</label>
+                                    <select id="manual-learner-race" name="learner-race" required>
+                                        <option value="" disabled selected>Select Race</option>
+                                        <option value="african">African</option>
+                                        <option value="english">English</option>
+                                        <option value="indian">Indian</option>
+                                        <option value="coloured">Coloured</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="form-group"><label for="manual-learner-language">Home Language</label><input type="text" id="manual-learner-language" name="learner-language" required></div>
+                            </div>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="manual-grade">Grade Applying For</label>
+                                    <select id="manual-grade" name="grade" required>
+                                        <option value="">-- Select Grade --</option>
+                                        <option value="R">Grade R (Reception)</option>
+                                        <option value="1">Grade 1</option>
+                                        <option value="2">Grade 2</option>
+                                        <option value="3">Grade 3</option>
+                                        <option value="4">Grade 4</option>
+                                        <option value="5">Grade 5</option>
+                                        <option value="6">Grade 6</option>
+                                        <option value="7">Grade 7</option>
+                                    </select>
+                                </div>
+                                <div class="form-group"><label for="manual-prev-school">Previous School (if applicable)</label><input type="text" id="manual-prev-school" name="prev-school"></div>
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <legend>Parent/Guardian Details</legend>
+                            <div class="form-grid">
+                                <div class="form-group"><label for="manual-parent1-name">Full Name</label><input type="text" id="manual-parent1-name" name="parent1-name" required></div>
+                                <div class="form-group"><label for="manual-parent1-id">ID Number</label><input type="text" id="manual-parent1-id" name="parent1-id" required></div>
+                                <div class="form-group"><label for="manual-parent1-relationship">Relationship to Learner</label><input type="text" id="manual-parent1-relationship" name="parent1-relationship" required></div>
+                                <div class="form-group"><label for="manual-parent1-contact">Contact Number</label><input type="tel" id="manual-parent1-contact" name="parent1-contact" required></div>
+                                <div class="form-group"><label for="manual-parent1-email">Email Address</label><input type="email" id="manual-parent1-email" name="parent1-email" required></div>
+                                <div class="form-group"><label for="manual-parent1-address">Residential Address</label><textarea id="manual-parent1-address" name="parent1-address" required></textarea></div>
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <legend>Second Parent/Guardian (Optional)</legend>
+                            <div class="form-grid">
+                                <div class="form-group"><label for="manual-parent2-name">Full Name</label><input type="text" id="manual-parent2-name" name="parent2-name"></div>
+                                <div class="form-group"><label for="manual-parent2-id">ID Number</label><input type="text" id="manual-parent2-id" name="parent2-id"></div>
+                                <div class="form-group"><label for="manual-parent2-relationship">Relationship to Learner</label><input type="text" id="manual-parent2-relationship" name="parent2-relationship"></div>
+                                <div class="form-group"><label for="manual-parent2-contact">Contact Number</label><input type="tel" id="manual-parent2-contact" name="parent2-contact"></div>
+                                <div class="form-group"><label for="manual-parent2-email">Email Address</label><input type="email" id="manual-parent2-email" name="parent2-email"></div>
+                                <div class="form-group"><label for="manual-parent2-address">Residential Address</label><textarea id="manual-parent2-address" name="parent2-address"></textarea></div>
+                            </div>
+                        </fieldset>
+                        <hr>
+                        <div class="documents-upload">
+                            <legend>Supporting Documents</legend>
+                            <p>Remember to upload supporting documents separately using the standard document upload link.</p>
+                        </div>
+                        <hr>
+                        <div id="manual-submission-status" class="status-message-box" style="display: none; margin-bottom: 15px;"></div>
+                        <button type="submit" class="cta-button">Submit Application</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="new-applicants" class="portal-section hidden-section">
+                <h2>Unprocessed Applications</h2>
+                <p>Applicants currently awaiting initial screening. Click the button below to fetch the latest data from the sheet.</p>
+                
+                <button id="load-data-btn" class="btn-primary update-btn" onclick="loadAllApplications()">
+                    <i class="fas fa-database"></i> Load Latest Applications Data
+                </button>
+
+                <div id="applicant-list-new" class="data-table-container">
+                    <p class="info-message">Click 'Load Latest Applications Data' to view submissions.</p>
+                </div>
+            </div>
+            
+            <div id="review-in-progress" class="portal-section hidden-section">
+                <h2>Applications in Review</h2>
+                <p>Applications currently in the detailed documentation review or interview stage.</p>
+                <div id="applicant-list-review" class="data-table-container">
+                    <p class="info-message">Load data on the 'New Applications' tab to populate this section.</p>
+                </div>
+            </div>
+
+            <div id="offers-extended" class="portal-section hidden-section">
+                <h2>Offers Extended/Accepted</h2>
+                <p>Applicants who have received and/or accepted an offer.</p>
+                <div id="applicant-list-offers" class="data-table-container">
+                    <p class="info-message">Load data on the 'New Applications' tab to populate this section.</p>
+                </div>
+            </div>
+
+            <div id="waitlist-pool" class="portal-section hidden-section">
+                <h2>Waitlisted Applications</h2>
+                <p>Applicants placed in the waiting pool.</p>
+                <div id="applicant-list-waitlist" class="data-table-container">
+                    <p class="info-message">Load data on the 'New Applications' tab to populate this section.</p>
+                </div>
+            </div>
+
+            <div id="rejected-applications" class="portal-section hidden-section">
+                <h2>Rejected Applications</h2>
+                <p>Applications that did not meet the admissions criteria.</p>
+                <div id="applicant-list-rejected" class="data-table-container">
+                    <p class="info-message">Load data on the 'New Applications' tab to populate this section.</p>
+                </div>
+            </div>
+            <div id="settings" class="portal-section hidden-section">
+                <h2>Settings</h2>
+                <p>Manage admission criteria, form fields, and user roles.</p>
+            </div>
+        </section>
+    <!-- Image Viewer Modal -->
+    <div id="image-viewer-modal" class="image-viewer-modal">
+        <span class="image-viewer-close">&times;</span>
+        <img class="image-viewer-content" id="modal-image-content">
+    </div>
+
+    </main>
+    
+    <footer>
+        <p>© 2023 Toronto Primary School. All rights reserved.</p>
+        <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
+        <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+        <a href="#"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#"><i class="fa-brands fa-linkedin-in"></i></a>
+        <a href="#"><i class="fa-brands fa-square-youtube"></i></a>
+    </footer>
+    
+    <div id="applicant-details-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close-btn">&times;</span>
+            <div id="applicant-modal-content">
+            </div>
+        </div>
+    </div>
+
+    <script src="../../js/portals/admission-team-portal/admission-team-portal.js"></script>
+    <script type="module" src="../../js/auth/auth.js"></script>    
+</body>
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Form</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="../../global.css">
+    <link rel="stylesheet" href="../../home.css">
+    <link rel="stylesheet" href="../../css/admission/application-form.css">
+    <link rel="stylesheet" href="../../css/admission/admission.css">
+
+    <!-- **FIX**: Add Firebase SDKs required by application-form.js -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
+
+  </head>
+  <body>
+<header>
+    <a href="../../index.html"><img src="../../images/Logo.png" alt="Toronto Primary School Logo"></a>
+    <input type="checkbox" id="menu-bar">
+    <label for="menu-bar"><i class="fas fa-bars"></i></label>
+    <nav>
+        <ul>
+            <li><a href="../../index.html" class="active">Home</a></li>
+            <li><a href="../../html/about/about.html">About</a></li>
+            <li>
+                <a href="#">Academics <i class="fas fa-caret-down"></i></a>
+                <ul>
+                    <li><a href="../../html/academics/academics.html#curriculum">Curriculum</a></li>
+                    <li><a href="../../html/academics/academics.html#departments">Departments</a></li>
+                    <li><a href="../../html/academics/academics.html#subjects">Subjects</a></li>
+                    <li><a href="../../html/academics/academics.html#assessments">Assessments</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#">Activities <i class="fas fa-caret-down"></i></a>
+                <ul>
+                    <li><a href="../../html/activities/activities.html#extracurricular">Extracurricular Activities</a></li>
+                    <li><a href="../../html/activities/activities.html#sports">Sports</a></li>
+                    <li><a href="../../html/activities/activities.html#clubs">Clubs</a></li>
+                    <li><a href="../../html/activities/activities.html#events">Events</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#">Admission <i class="fas fa-caret-down"></i></a>
+                <ul>
+                    <li><a href="../../html/admission/admission.html#how-to-apply">How to Apply</a></li>
+                    <li><a href="../../html/admission/application-form.html">Application Form</a></li>
+                    <li><a href="../../html/admission/admission.html#requirements">Admission Requirements</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#">Parents <i class="fas fa-caret-down"></i></a>
+                <ul>
+                    <li><a href="../../html/parents/parents.html#sgb">SGB</a></li>
+                    <li><a href="../../html/parents/parents.html#resources">Resources for Parents</a></li>
+                </ul>
+            </li>
+            <li><a href="../../html/announcements/announcement.html">Announcements</a></li>
+            <li><a href="../../html/contact/contact.html">Contacts</a></li>
+        </ul>
+    </nav>
+    <div class="auth-buttons">
+        <a href="../../html/auth/auth.html" class="btn-login">Register/Login</a> 
+    </div>
+</header>
+    
+    <section id="main-content" class="page-content">
+      <h1>Application Form</h1>
+      <p class="form-intro" style="max-width:900px;margin:8px auto 18px;color:#6b7280;">
+        Please complete all required fields below. Supporting documents can be uploaded via the secure link — submit the form once all details are correct.
+      </p>
+      <div class="content-container">
+        <form id="application-form" method="POST" class="application-form">
+          <fieldset>
+            <legend>Learner Details</legend>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="learner-name">First Name</label>
+                <input type="text" id="learner-name" name="learner-name" required>
+              </div>
+              <div class="form-group">
+                <label for="learner-othername">Other Name(s)</label>
+                <input type="text" id="learner-othername" name="learner-othername">
+              </div>
+              <div class="form-group">
+                <label for="learner-surname">Surname</label>
+                <input type="text" id="learner-surname" name="learner-surname" required>
+              </div>
+              <div class="form-group">
+                <label for="learner-id">ID Number / Birth Certificate No.</label>
+                <input type="text" id="learner-id" name="learner-id" required>
+              </div>
+              <div class="form-group">
+                <label for="learner-dob">Date of Birth</label>
+                <input type="date" id="learner-dob" name="learner-dob" required>
+              </div>
+              <div class="form-group">
+                <label for="learner-gender">Gender</label>
+                <select id="learner-gender" name="learner-gender" required>
+                  <option value="" disabled selected>Select Gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="learner-nationality">Nationality</label>
+                <input type="text" id="learner-nationality" name="learner-nationality" required>
+              </div>
+              <div class="form-group">
+                <label for="learner-race">Race</label>
+                <select id="learner-race" name="learner-race" required>
+                  <option value="" disabled selected>Select Race</option>
+                  <option value="african">African</option>
+                  <option value="english">English</option>
+                  <option value="indian">Indian</option>
+                  <option value="coloured">Coloured</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="learner-language">Home Language</label>
+                <input type="text" id="learner-language" name="learner-language" required>
+              </div>
+            </div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="grade">Grade Applying For</label>
+                <select id="grade" name="grade" required>
+                  <option value="">-- Select Grade --</option>
+                  <option value="R">Grade R (Reception)</option>
+                  <option value="1">Grade 1</option>
+                  <option value="2">Grade 2</option>
+                  <option value="3">Grade 3</option>
+                  <option value="4">Grade 4</option>
+                  <option value="5">Grade 5</option>
+                  <option value="6">Grade 6</option>
+                  <option value="7">Grade 7</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="prev-school">Previous School (if applicable)</label>
+                <input type="text" id="prev-school" name="prev-school">
+              </div>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>Parent/Guardian Details</legend>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="parent1-name">Full Name</label>
+                <input type="text" id="parent1-name" name="parent1-name" required>
+              </div>
+              <div class="form-group">
+                <label for="parent1-id">ID Number</label>
+                <input type="text" id="parent1-id" name="parent1-id" required>
+              </div>
+              <div class="form-group">
+                <label for="parent1-relationship">Relationship to Learner</label>
+                <input type="text" id="parent1-relationship" name="parent1-relationship" required>
+              </div>
+              <div class="form-group">
+                <label for="parent1-contact">Contact Number</label>
+                <input type="tel" id="parent1-contact" name="parent1-contact" required>
+              </div>
+              <div class="form-group">
+                <label for="parent1-email">Email Address</label>
+                <input type="email" id="parent1-email" name="parent1-email" required>
+              </div>
+              <div class="form-group">
+                <label for="parent1-address">Residential Address</label>
+                <textarea id="parent1-address" name="parent1-address" required></textarea>
+              </div>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>Second Parent/Guardian (Optional)</legend>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="parent2-name">Full Name</label>
+                <input type="text" id="parent2-name" name="parent2-name">
+              </div>
+              <div class="form-group">
+                <label for="parent2-id">ID Number</label>
+                <input type="text" id="parent2-id" name="parent2-id">
+              </div>
+              <div class="form-group">
+                <label for="parent2-relationship">Relationship to Learner</label>
+                <input type="text" id="parent2-relationship" name="parent2-relationship">
+              </div>
+              <div class="form-group">
+                <label for="parent2-contact">Contact Number</label>
+                <input type="tel" id="parent2-contact" name="parent2-contact">
+              </div>
+              <div class="form-group">
+                <label for="parent2-email">Email Address</label>
+                <input type="email" id="parent2-email" name="parent2-email">
+              </div>
+              <div class="form-group">
+                <label for="parent2-address">Residential Address</label>
+                <textarea id="parent2-address" name="parent2-address"></textarea>
+              </div>
+            </div>
+          </fieldset>
+          <hr>
+          <fieldset class="documents-upload">
+            <legend>Supporting Documents</legend>
+            <p>Please upload clear copies of the following documents. Required documents are marked with *. Accepted formats: PDF, JPG, PNG.</p>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="doc-birth-cert">Learner's Birth Certificate *</label>
+                    <input type="file" id="doc-birth-cert" name="doc-birth-cert" accept=".pdf,.jpg,.jpeg,.png" required>
+                </div>
+                <div class="form-group">
+                    <label for="doc-parent-id">Parent/Guardian ID *</label>
+                    <input type="file" id="doc-parent-id" name="doc-parent-id" accept=".pdf,.jpg,.jpeg,.png" required>
+                </div>
+                <div class="form-group">
+                    <label for="doc-proof-residence">Proof of Residence *</label>
+                    <input type="file" id="doc-proof-residence" name="doc-proof-residence" accept=".pdf,.jpg,.jpeg,.png" required>
+                </div>
+                <div class="form-group">
+                    <label for="doc-report-card">Latest School Report (if applicable)</label>
+                    <input type="file" id="doc-report-card" name="doc-report-card" accept=".pdf,.jpg,.jpeg,.png">
+                </div>
+            </div>
+          </fieldset>
+          <hr>
+          <div id="submission-status" class="status-message-box" style="display: none;"></div>
+          <button type="submit" class="cta-button">Submit Application</button>
+        </form>
+      </div>
+    </section>
+
+    <footer class="site-footer" role="contentinfo" aria-label="Site footer">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <a href="../../index.html" class="brand"><img src="../../images/Logo.png" alt="Toronto Primary School Logo"></a>
+      <p class="footer-tagline">Delivering quality primary education in Mankweng, Limpopo.</p>
+    </div>
+
+    <nav class="footer-nav" aria-label="Footer quick links">
+      <h4>Quick links</h4>
+      <ul>
+        <li><a href="../../index.html">Home</a></li>
+        <li><a href="../../html/about/about.html">About</a></li>
+        <li><a href="../../html/admission/admission.html#how-to-apply">Admission</a></li>
+        <li><a href="../../html/academics/academics.html">Academics</a></li>
+        <li><a href="../../html/contact/contact.html">Contact</a></li>
+      </ul>
+    </nav>
+
+      <div class="footer-contact" aria-label="Contact details">
+        <h4>Contact</h4>
+        <address>
+          Toronto Primary School<br>
+          389 Unit-B<br>
+          Mankweng, 0727, Limpopo<br>
+          South Africa
+        </address>
+        <p class="contact-lines">
+          <a href="tel:+27763307544">+27 76 330 7544</a><br>
+          <a href="mailto:torontoprimaryschool24@gmail.com">torontoprimaryschool24@gmail.com</a>
+        </p>
+      </div>
+
+      <div class="footer-newsletter">
+        <h4>Stay informed</h4>
+        <p class="muted">Subscribe for news, events and term dates.</p>
+        <form class="newsletter-form" action="#" method="post" aria-label="Subscribe to newsletter">
+          <label for="newsletter-email" class="sr-only">Email address</label>
+          <input id="newsletter-email" type="email" name="email" placeholder="Your email" required>
+          <button type="submit" class="btn-subscribe">Subscribe</button>
+        </form>
+
+        <div class="footer-social" aria-hidden="false">
+          <a href="#" aria-label="Twitter" class="social-icon"><i class="fa-brands fa-x-twitter"></i></a>
+          <a href="#" aria-label="Facebook" class="social-icon"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="#" aria-label="Instagram" class="social-icon"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" aria-label="LinkedIn" class="social-icon"><i class="fa-brands fa-linkedin-in"></i></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <small>&copy; 2025 Toronto Primary School. All rights reserved. School Emis No: 923241498</small>
+    </div>
+  </footer>
+
+    <script src="../../js/admission/application-form.js"></script>
+  </body>
+</html>

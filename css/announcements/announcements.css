@@ -1,0 +1,215 @@
+/* Styles for Announcement Page */
+
+header img {
+    height: 56px;
+    display: block;
+}
+
+/* Enhanced Announcement Card Styling */
+.announcement-item {
+    border: 1px solid #ddd;
+    border-left: 5px solid crimson;
+    padding: 20px;
+    margin-bottom: 25px;
+    background-color: #ffffff; /* Change to white for better contrast */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add a more prominent shadow */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Add transition for hover effect */
+    color: #333; /* Set a default text color for readability */
+}
+
+.announcement-item:hover {
+    transform: translateY(-5px); /* Move the card up slightly on hover */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhance the shadow on hover */
+}
+
+.announcement-item h2 {
+    color: goldenrod;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.announcement-date {
+    font-size: 14px;
+    color: #666;
+    margin: -10px 0 15px;
+    font-style: italic;
+}
+
+.announcement-item p {
+    color: #555; /* Ensure paragraph text is readable */
+}
+
+/* Styles for Announcement Form (Admin Portal) - Included here for coherence */
+.announcement-form-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#new-announcement-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#new-announcement-form label {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+#new-announcement-form input,
+#new-announcement-form textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box;
+    color: #000;
+}
+
+#new-announcement-form button.cta-button {
+    width: auto;
+    align-self: flex-start;
+}
+
+/* Styles for General Content Pages (e.g., Academics, Activities) */
+
+/* ========== Page Content Styling ========== */
+.page-content {
+    padding: 120px 20px 100px;
+    color: #fff;
+    background-color: rgba(46, 43, 43, 0.9);
+    flex-grow: 1;
+    width: 100%;
+    min-height: calc(100vh - 200px); /* Adjust based on header/footer height */
+}
+
+.content-container {
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.content-item {
+    padding: 20px;
+    margin-bottom: 30px;
+    border-left: 5px solid goldenrod;
+}
+
+.content-item h2 {
+    color: crimson;
+    margin-bottom: 10px;
+}
+
+.content-item ul {
+    list-style-type: disc;
+    padding-left: 20px;
+    margin-top: 10px;
+}
+
+.content-item li {
+    margin-bottom: 5px;
+}
+
+/* ========== Call-to-Action Button (General) ========== */
+.cta-button {
+    display: inline-block;
+    padding: 12px 25px;
+    margin-top: 20px;
+    background-color: goldenrod;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.cta-button:hover {
+    background-color: #e6b800;
+}
+
+/* Carousel (horizontal card slider) - show only one announcement at a time */
+.carousel-container {
+    max-width: 100%;
+    margin: 28px auto 12px;
+    overflow: hidden; /* hide other slides so only one shows */
+    position: relative;
+    padding-bottom: 6px;
+}
+
+.carousel-container::-webkit-scrollbar { height: 8px; }
+.carousel-container::-webkit-scrollbar-thumb {
+    background: rgba(2,6,23,0.12);
+    border-radius: 6px;
+}
+
+/* track and slides */
+.carousel-track {
+    display: flex;
+    gap: 20px;
+    align-items: stretch;
+    padding: 6px 6px;
+    /* transition applied so moving the track with transform is smooth */
+    transition: transform 600ms cubic-bezier(.22,.98,.38,.99);
+    will-change: transform;
+}
+
+.carousel-slide {
+    flex: 0 0 100%; /* one slide occupies full container width */
+    scroll-snap-align: start;
+    display: flex;
+    align-items: stretch;
+}
+
+/* make announcement card fill the slide */
+.carousel-slide .announcement-item {
+    margin: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* remove multi-per-view responsive rules so only one at a time is visible */
+/* ...existing code... */
+
+/* Carousel indicators (dots) */
+.carousel-indicators {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 12px;
+    user-select: none;
+}
+
+.carousel-indicators button {
+    width: 12px;
+    height: 12px;
+    padding: 0;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0,0,0,0.18);
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.12s ease;
+}
+
+.carousel-indicators button:hover { transform: scale(1.08); }
+.carousel-indicators button:focus {
+    outline: 2px solid rgba(255,255,255,0.9);
+    outline-offset: 3px;
+}
+
+.carousel-indicators button.active,
+.carousel-indicators button[aria-current="true"] {
+    background: goldenrod;
+    box-shadow: 0 0 0 6px rgba(218,165,32,0.08);
+}
+
+/* keep indicators readable on dark backgrounds */
+@media (prefers-contrast: more) {
+    .carousel-indicators button { background: rgba(0,0,0,0.36); }
+}

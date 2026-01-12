@@ -1,0 +1,254 @@
+/* ==========================================================================
+   Chat Engine Styles
+   ========================================================================== */
+
+.chat-container {
+    display: flex;
+    height: 70vh;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.chat-sidebar {
+    width: 320px;
+    border-right: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    background-color: #f9fafb;
+}
+
+.chat-sidebar-header {
+    padding: 15px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.chat-sidebar-header h3 {
+    margin: 0 0 15px 0;
+    font-size: 1.1em;
+    color: var(--color-text);
+}
+
+.chat-parent-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.chat-parent-list li {
+    padding: 15px;
+    cursor: pointer;
+    border-bottom: 1px solid var(--color-border);
+    transition: background-color 0.2s;
+    position: relative;
+}
+
+.chat-parent-list li:hover {
+    background-color: #eef2ff;
+}
+
+.chat-parent-list li.active {
+    background-color: var(--primary-indigo);
+    color: white;
+}
+
+.chat-parent-list li.active .parent-name,
+.chat-parent-list li.active .learner-name {
+    color: white;
+}
+
+.parent-name {
+    font-weight: 600;
+    display: block;
+}
+
+.learner-name {
+    font-size: 0.9em;
+    color: #6b7280;
+    display: block;
+}
+
+.unread-badge {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    background-color: var(--primary-red);
+    color: white;
+    font-size: 0.75em;
+    font-weight: bold;
+    padding: 3px 8px;
+    border-radius: 12px;
+}
+
+.chat-main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-welcome {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    color: #9ca3af;
+    text-align: center;
+}
+
+.chat-welcome i {
+    font-size: 4em;
+    margin-bottom: 20px;
+}
+
+.chat-window {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.chat-messages {
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column; /* Newest messages at the bottom */
+}
+
+.message {
+    max-width: 70%;
+    padding: 10px 15px;
+    border-radius: 18px;
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+/* Styles for sent message bubbles */
+.message.sent {
+    background-color: #dcf8c6; /* Light green background */
+    color: var(--color-text); /* Ensure dark text for readability */
+    border-radius: 8px 8px 0 8px;
+    align-self: flex-end;
+}
+
+/* Styles for received message bubbles */
+.message.received {
+    background-color: white; /* White background */
+    color: var(--color-text);
+    border-radius: 8px 8px 8px 0;
+    align-self: flex-start;
+}
+
+.message.sent, .message.received {
+    display: flex;
+    flex-direction: column;
+    /* Ensure padding is inside the bubble, not affecting content width */
+    padding: 8px 12px; 
+}
+
+.message-info .timestamp {
+   color: black
+   ; /* No specific styling needed beyond parent .message-info */
+}
+
+
+.message p {
+    margin: 0; /* Remove default paragraph margin */
+    word-wrap: break-word; /* Ensure long words break */
+    white-space: pre-wrap; /* Preserve whitespace and line breaks */
+}
+
+.message-info {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Align info to the right within the bubble */
+    gap: 5px;
+    margin-top: 4px; /* Small space between text and info */
+    font-size: 0.75em; /* Smaller font for timestamp/status */
+    color: rgba(0, 0, 0, 0.5); /* Lighter color for info */
+}
+
+.message.sent .message-info { /* Changed to ensure visibility on light green background */
+    color: var(--color-text);
+}
+
+.message-meta {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.message-status {
+    font-size: 0.9em;
+}
+
+.message-status .fa-check {
+    color: #9ca3af; /* Light gray for sent/delivered */
+}
+
+.message-status .fa-check-double {
+    color: #3b82f6; /* Blue for read */
+}
+
+.message-info .message-status {
+    font-size: 1em; /* Keep icon size relative to .message-info */
+}
+
+.message-info .message-status .fa-check {
+    color: inherit; /* Inherit color from .message-info */
+}
+
+.message-info .message-status .fa-check-double {
+    color: #3b82f6; /* Blue for read, overrides inherited color */
+}
+
+.chat-input-area input {
+    padding: 15px;
+    flex-grow: 1;
+}
+
+/* Styles for the chat background pattern */
+.chat-bg {
+    /* Base background color */
+    background-color: #efeae2;
+    /* Creates a subtle geometric pattern using multiple linear gradients */
+    background-image: 
+        linear-gradient(45deg, #f0f0f0 25%, transparent 25%),
+        linear-gradient(-45deg, #f0f0f0 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #f0f0f0 75%),
+        linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
+    /* Size of the repeating pattern unit */
+    background-size: 20px 20px;
+    /* Positions the gradient layers to form the final pattern */
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
+
+/* Custom scrollbar styles for containers */
+.scroll-container {
+    /* For Firefox: sets a thin scrollbar with specific colors for thumb and track */
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e0 #f7fafc;
+}
+
+/* For WebKit browsers (Chrome, Safari, Edge): sets the scrollbar width */
+.scroll-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+/* For WebKit browsers: styles the track of the scrollbar */
+.scroll-container::-webkit-scrollbar-track {
+    background: #f7fafc;
+}
+
+/* For WebKit browsers: styles the thumb (the draggable part) of the scrollbar */
+.scroll-container::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 3px;
+}

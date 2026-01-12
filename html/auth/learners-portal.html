@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learner Portal - Toronto Primary School</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="../../global.css">
+    <link rel="stylesheet" href="../../css/portals/learners-portal/learners-portal.css">
+    <link rel="stylesheet" href="../../css/portals/shared-components.css">
+    <link rel="shortcut icon" href="../../images/44.png" type="image/x-icon">
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
+</head>
+<body>
+
+    <header class="fixed top-0 left-0 w-full bg-indigo-700 text-white shadow-xl z-20">
+        <div class="flex items-center justify-between p-4 max-w-7xl mx-auto">
+            <div class="flex items-center space-x-4">
+                <button id="menu-toggle" class="md:hidden p-1 focus:outline-none focus:ring-2 focus:ring-white rounded-md">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+                <div class="logo font-bold text-2xl tracking-tight">
+                    <a href="../../index.html" class="text-white hover:text-gray-200">TORONTO PRIMARY SCHOOL</a>
+                </div>
+            </div>
+            <div class="relative group">
+                <button class="flex items-center space-x-2 text-white p-2 rounded-full hover:bg-indigo-600 transition duration-150">
+                    <i class="fas fa-user-circle text-2xl"></i>
+                    <span class="hidden sm:inline">Learner</span>
+                    <i class="fas fa-chevron-down text-xs ml-1"></i>
+                </button>
+                <div class="absolute right-0 top-full mt-1 w-48 bg-white rounded-md shadow-lg py-1 z-30 invisible group-hover:visible opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-200">
+                    <a href="#profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+                    <hr class="my-1">
+                    <a href="../auth/auth.html" class="btn-logout block px-4 py-2 text-sm text-red-600 hover:bg-red-50"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a>
+                </div>
+            </div>
+        </div>
+      </header>
+ 
+ <main class="portal-main-content">
+  <aside class="sidebar">
+   <h2 class="sidebar-title">Learner Menu</h2>
+   <ul>
+    <li><a href="#dashboard" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+    <li><a href="#profile"><i class="fas fa-user-circle"></i> My Profile</a></li>
+    <li><a href="#academics"><i class="fas fa-graduation-cap"></i> Academics</a></li>
+    <li><a href="#grades"><i class="fas fa-book-reader"></i> My Grades</a></li>
+    <li><a href="#assignments"><i class="fas fa-clipboard-list"></i> Assignments</a></li>
+    <li><a href="#attendance"><i class="fas fa-calendar-check"></i> Attendance</a></li>
+    <li><a href="#school-calendar"><i class="fas fa-calendar-alt"></i> School Calendar</a></li>
+    <li><a href="#announcements"><i class="fas fa-bullhorn"></i> Announcements</a></li>
+    <li class="sidebar-footer-item">
+      <a href="#" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </li>
+   </ul>
+  </aside>
+
+  <div class="portal-content-wrapper">
+   <h1 class="portal-title">Hello, <span id="learner-name-display">Learner</span>! Ready to Learn? ✨</h1>
+
+   <section id="dashboard" class="portal-section active-section">
+    <h2>Quick Overview</h2>
+    <div class="grid-container dashboard-cards">
+     <div class="tool-card accent-1">
+      <h3><i class="fas fa-bell"></i> New Alerts</h3>
+      <p id="dashboard-notifications">Loading...</p>
+     </div>
+     <div class="tool-card accent-2">
+      <h3><i class="fas fa-clock"></i> Upcoming Due Date</h3>
+      <p id="dashboard-assignments">Loading...</p>
+     </div>
+     <div class="tool-card accent-3">
+      <h3><i class="fas fa-chart-bar"></i> Term Average</h3>
+      <p id="dashboard-latest-grade">Loading...</p>
+     </div>
+    </div>
+   </section>
+   
+   <section id="profile" class="portal-section">
+    <h2>My Personal Details</h2>
+    <div class="profile-card">
+        <div class="profile-pic-container">
+            <img src="../../images/placeholder-profile.png" alt="Learner Profile Picture" class="profile-pic" id="learner-profile-pic">
+            <label for="learner-profile-pic-upload" class="profile-pic-upload-label" title="Upload new profile picture">
+                <i class="fas fa-camera"></i>
+            </label>
+            <input type="file" id="learner-profile-pic-upload" accept="image/jpeg, image/png" style="display: none;">
+            <div id="learner-profile-pic-upload-status" class="upload-status-indicator" style="display: none;"></div>
+        </div>
+        <div class="profile-details">
+            <p id="profile-surname"><strong>Surname:</strong></p>
+            <p id="profile-name"><strong>Name:</strong></p>
+            <p id="profile-email"><strong>Email:</strong></p>
+            <p id="profile-admission-no"><strong>Admission No:</strong></p>
+            <p id="profile-grade"><strong>Current Grade:</strong></p>
+        </div>
+        <a href="#" id="edit-learner-profile-btn" class="cta-button-edit"><i class="fas fa-pencil-alt"></i> Edit Details</a>
+    </div>
+
+    <!-- Edit Profile Form (hidden by default) -->
+    <div id="edit-learner-profile-form-container" class="tool-card" style="display: none; margin-top: 20px;">
+        <h3>Edit My Profile</h3>
+        <form id="edit-learner-profile-form">
+            <div class="form-group">
+                <label for="edit-learner-name">First Name</label>
+                <input type="text" id="edit-learner-name" required>
+            </div>
+            <div class="form-group">
+                <label for="edit-learner-surname">Surname</label>
+                <input type="text" id="edit-learner-surname" required>
+            </div>
+            <p id="edit-learner-profile-status" class="status-message-box" style="display: none;"></p>
+            <button type="submit" class="cta-button"><i class="fas fa-save"></i> Save Changes</button>
+            <button type="button" id="cancel-edit-learner-profile-btn" class="cta-button-secondary" style="margin-left: 10px;">Cancel</button>
+        </form>
+    </div>
+   </section>
+
+   <section id="academics" class="portal-section">
+    <h2>Academics</h2>
+    <p>Explore your subjects, find study materials, and check your timetable.</p>
+    <div class="grid-container">
+     <div class="tool-card accent-1">
+      <h3><i class="fas fa-book"></i> My Subjects</h3>
+      <p>View details and resources for the subjects you are enrolled in.</p>
+      <a href="#subjects" class="cta-button-small view-subjects-btn">View Subjects</a>
+     </div>
+     <div class="tool-card accent-2">
+      <h3><i class="fas fa-file-alt"></i> Study Materials</h3>
+      <p>Access notes, past papers, and other resources provided by your teachers.</p>
+      <a href="#" class="cta-button-small">Find Resources</a>
+     </div>
+     <div class="tool-card accent-3">
+      <h3><i class="fas fa-calendar-day"></i> My Timetable</h3>
+      <p>Check your weekly class schedule to stay organized.</p>
+      <a href="#" class="cta-button-small">View Timetable</a>
+     </div>
+     <div class="tool-card accent-4">
+        <h3><i class="fas fa-tasks"></i> Weekly Work Output</h3>
+        <p>Log your weekly class and home activities for each subject.</p>
+        <a href="#work-output" class="cta-button-small view-work-output-btn">Update Output</a>
+       </div>
+    </div>
+   </section>
+
+   <section id="subjects" class="portal-section">
+    <button id="back-to-academics-btn" class="cta-button-secondary" style="margin-bottom: 20px;"><i class="fas fa-arrow-left"></i> Back to Academics</button>
+    <h2>My Subjects</h2>
+    <div id="subjects-content">
+        <!-- Subject list or selection form will be populated here by JS -->
+    </div>
+   </section>
+
+   <section id="work-output" class="portal-section">
+    <button id="back-to-academics-from-work-output-btn" class="cta-button-secondary" style="margin-bottom: 20px;"><i class="fas fa-arrow-left"></i> Back to Academics</button>
+    <h2>Weekly Work Output</h2>
+    <div class="work-output-switcher">
+        <button id="work-output-log-btn" class="work-output-switcher-btn active">Log Output</button>
+        <button id="work-output-history-btn" class="work-output-switcher-btn">View History</button>
+    </div>
+    <div id="work-output-log-view" class="work-output-view active">
+        <!-- Work output form will be populated here by JS -->
+    </div>
+    <div id="work-output-history-view" class="work-output-view" style="display: none;">
+        <!-- Work output history table will be populated here by JS -->
+    </div>
+   </section>
+
+   <!-- Placeholder sections for future features -->
+   <section id="grades" class="portal-section"><p>Grades section coming soon.</p></section>
+   <section id="assignments" class="portal-section"><p>Assignments section coming soon.</p></section>
+   <section id="attendance" class="portal-section"><p>Attendance section coming soon.</p></section>
+
+   <section id="school-calendar" class="portal-section hidden-section">
+    <h2>Official School Calendar</h2>
+    <p>View the school's official term dates and holidays.</p>
+    <div class="tool-card" style="margin-top: 20px;">
+        <div id="learner-official-calendar-container">
+            <p class="info-message">Loading official calendar...</p>
+        </div>
+    </div>
+   </section>
+   <section id="announcements" class="portal-section"><p>Announcements section coming soon.</p></section>
+  </div>
+
+    <!-- Image Viewer Modal -->
+    <div id="image-viewer-modal" class="image-viewer-modal">
+        <span class="image-viewer-close">&times;</span>
+        <img class="image-viewer-content" id="modal-image-content">
+    </div>
+ </main>
+
+  <footer>
+    <p>© 2023 Toronto Primary School. All rights reserved.</p>
+    <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
+    <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+    <a href="#"><i class="fa-brands fa-instagram"></i></a>
+    <a href="#"><i class="fa-brands fa-linkedin-in"></i></a>
+    <a href="#"><i class="fa-brands fa-youtube"></i></a>
+  </footer>
+
+    <script type="module" src="../../js/auth/auth.js"></script>
+    <script type="module" src="../../js/portals/learners-portal/learners-portal.js"></script>
+    <script type="module" src="../../js/portals/parents-portal/calendar-display.js"></script>
+</body>
+</html>

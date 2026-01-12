@@ -1,0 +1,748 @@
+/* ==========================================================================
+   Global Imports & Variables (Based on New Request)
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        
+:root {
+    --primary-red: #ef4444; /* Tailwind red-500 */
+    --primary-green: #10b981; /* Tailwind green-500 */
+    --primary-blue: #3b82f6; /* Tailwind blue-500 */
+    --primary-indigo: #4f46e5; /* Tailwind indigo-600 */
+    
+    /* Re-mapping for consistency with the new palette */
+    --color-background: #f3f4f6; /* Light gray background */
+    --color-surface: #ffffff; /* Card/Content background */
+    --color-text: #343a40; /* Dark text */
+    --color-border: #e5e7eb; /* Light border */
+    --sidebar-bg: #1f2937; /* Tailwind gray-800 for dark sidebar */
+    --sidebar-width: 250px;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--color-background);
+    color: var(--color-text);
+}
+
+/* ==========================================================================
+   Layout Styles
+   ========================================================================== */
+
+/* Adjust main content for the fixed header (h-16 = 64px) */
+.portal-main-content {
+    display: flex;
+    min-height: 100vh; 
+    padding-top: 64px; /* Ensure content starts below a fixed header if it's 64px tall */
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+   Header & Navigation
+   ========================================================================== */
+
+header {
+    background-color: var(--color-surface);
+    border-bottom: 3px solid var(--primary-indigo);
+    padding: 8px 30px; /* Adjusted padding */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    position: fixed; /* Fixed header */
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 30; /* Ensure header is above everything */
+    height: 64px; /* Fixed height for header */
+}
+
+.logo img {
+    height: 48px; 
+}
+
+.auth-buttons .btn-logout {
+    background-color: var(--primary-red); /* Using new red for logout */
+    color: white;
+    padding: 8px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color 0.3s;
+}
+
+.auth-buttons .btn-logout:hover {
+    background-color: #dc2626; /* Darker red */
+}
+
+.auth-buttons .btn-logout i {
+    margin-right: 8px;
+}
+
+/* ==========================================================================
+   Sidebar (Admin Menu)
+   ========================================================================== */
+
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--sidebar-bg); 
+    padding: 20px 0;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+    flex-shrink: 0; 
+    transition: transform 0.3s ease-in-out; /* Transition for responsive design */
+    height: calc(100vh - 64px); /* Sidebar height below the header */
+    position: sticky;
+    top: 64px;
+    overflow-y: auto;
+}
+
+.sidebar-title {
+    color: white;
+    text-align: center;
+    margin-bottom: 20px;
+    padding: 0 15px;
+    text-transform: uppercase;
+    font-size: 1em;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    opacity: 0.7;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar ul li a {
+    display: flex; /* Use flex for alignment */
+    align-items: center;
+    padding: 12px 20px;
+    color: #9ca3af; /* Light grey text */
+    text-decoration: none;
+    font-size: 0.95em;
+    transition: background-color 0.2s, color 0.2s, border-left 0.2s;
+    border-left: 4px solid transparent;
+}
+
+.sidebar ul li a i {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+}
+
+.sidebar ul li a:hover {
+    background-color: #374151; /* Darker hover */
+    color: white;
+    border-left-color: var(--primary-indigo);
+}
+
+/* Style for active sidebar link (New) */
+.sidebar a.active-link {
+    background-color: rgba(67, 56, 202, 0.2); /* Indigo-700 with opacity */
+    border-left: 4px solid var(--primary-indigo); /* Indigo-600 accent */
+    color: #ffffff !important;
+}
+
+/* Sub-menu styling for SA-SAMS */
+.sub-menu {
+    list-style: none;
+    padding-left: 0;
+    background-color: #374151; /* Slightly different shade for sub-menu container */
+    border-left: 3px solid var(--primary-blue); /* Blue accent line */
+}
+
+.sub-menu li a {
+    padding-left: 40px; /* Indent sub-items */
+    font-size: 0.9em;
+    color: #9ca3af;
+}
+
+.sub-menu li a:hover {
+    background-color: #4b5563;
+    color: white;
+}
+
+/* ==========================================================================
+   Sidebar Logout Footer Styling (New)
+   ========================================================================== */
+
+/* This helps push the logout button to the bottom if the content doesn't fill the sidebar */
+
+
+/* Specific styling for the logout item to make it visually distinct */
+.sidebar-footer-item {
+    margin-top: auto; /* Pushes this list item to the bottom of the flex container */
+    border-top: 1px solid #374151; /* Separator line */
+    padding-top: 10px;
+}
+
+.sidebar-footer-item a {
+    color: var(--primary-red) !important; /* Force red text color */
+}
+
+.sidebar-footer-item a:hover {
+    background-color: var(--primary-red); /* Red background on hover */
+    color: white !important; /* White text on hover */
+}
+
+/* ==========================================================================
+   Responsive Sidebar (New)
+   ========================================================================== */
+
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%);
+        position: fixed;
+        top: 64px; /* Start below the fixed header */
+        left: 0;
+        z-index: 40; /* Above the content wrapper */
+        height: calc(100% - 64px); /* Full viewport height minus header */
+    }
+    .sidebar.is-open {
+        transform: translateX(0);
+    }
+    /* Overlay effect when sidebar is open */
+    .portal-content-wrapper.overlay-active::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 35;
+    }
+}
+
+/* ==========================================================================
+   Main Content Area
+   ========================================================================== */
+
+.portal-content-wrapper {
+    flex-grow: 1;
+    padding: 30px;
+}
+
+.portal-title {
+    color: var(--primary-indigo);
+    border-bottom: 2px solid var(--color-border);
+    padding-bottom: 10px;
+    margin-bottom: 30px;
+    font-weight: 700; /* Bolder font */
+    font-size: 2em;
+}
+
+.portal-section {
+    background-color: var(--color-surface);
+    padding: 25px;
+    margin-bottom: 30px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1); /* Subtle shadow */
+    border-top: 5px solid transparent;
+}
+
+.portal-section:not(.active-section) {
+    display: none; 
+}
+
+.portal-section h2 {
+    color: var(--color-text);
+    font-size: 1.5em;
+    margin-top: 0;
+    margin-bottom: 15px;
+    border-bottom: 1px dashed #e0e0e0;
+    padding-bottom: 10px;
+    font-weight: 600;
+}
+
+/* Highlight section borders using new colors */
+#profile.active-section { border-top-color: var(--primary-indigo); }
+#sams-mgmt-dashboard.active-section { border-top-color: var(--primary-blue); }
+#sams-applications.active-section { border-top-color: var(--primary-blue); }
+#sams-learners.active-section { border-top-color: var(--primary-blue); }
+#grade-assignment.active-section { border-top-color: var(--primary-blue); }
+#finance.active-section { border-top-color: var(--primary-green); }
+#announcements-mgmt.active-section { border-top-color: var(--primary-red); }
+#other-tools.active-section { border-top-color: var(--color-text); }
+
+
+/* ==========================================================================
+   Tool Cards & Grid Layout
+   ========================================================================== */
+
+.tool-card {
+    background-color: #f9fafb; /* Lighter background for card content */
+    padding: 20px;
+    border-radius: 6px;
+    border: 1px solid var(--color-border);
+    transition: box-shadow 0.3s;
+}
+
+.tool-card:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.tool-card h3 {
+    color: var(--primary-indigo);
+    margin-top: 0;
+    font-size: 1.25em;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+/* Generic CTA Button Style (Updated) */
+.cta-button {
+    padding: 10px 20px;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    display: inline-block;
+    background-color: var(--primary-indigo);
+    color: white;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+}
+.cta-button:hover {
+    background-color: #4338ca; /* Slightly darker indigo */
+}
+
+.cta-button-small {
+    padding: 8px 16px;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    display: inline-block;
+    background-color: var(--primary-indigo); /* Default small button color */
+    color: white;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+}
+
+.cta-button-small.danger {
+    background-color: var(--primary-red);
+    border-color: var(--primary-red);
+}
+
+
+.cta-button-small:hover {
+    background-color: #4338ca;
+}
+
+/* Secondary/Back button style used in JS (New) */
+.cta-button-secondary {
+    background-color: #e5e7eb;
+    color: #374151;
+    padding: 8px 16px;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    display: inline-block;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+}
+.cta-button-secondary:hover {
+    background-color: #d1d5db;
+}
+
+/* Specific styling for the Class Assignment View Switcher */
+.assignment-view-switcher .cta-button-small {
+    background-color: #9ca3af; /* Gray for inactive view */
+    margin-right: 10px;
+}
+
+.assignment-view-switcher .cta-button-small:hover {
+    background-color: #6b7280;
+}
+
+.assignment-view-switcher .cta-button-small.active-view {
+    background-color: var(--primary-indigo);
+}
+.assignment-view-switcher .cta-button-small.active-view:hover {
+    background-color: #4338ca;
+}
+
+
+/* ==========================================================================
+   Profile Card
+   ========================================================================== */
+
+.profile-card {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    padding: 20px;
+    border-radius: 6px;
+    background-color: #f9fafb;
+    border: 1px solid var(--color-border);
+}
+
+.profile-pic {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--primary-blue);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile-details p {
+    margin: 5px 0;
+    font-size: 1.05em;
+}
+
+.profile-details strong {
+    color: var(--primary-indigo);
+    font-weight: 600;
+    min-width: 80px;
+    display: inline-block;
+}
+.role-tag {
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: 600;
+    color: white;
+}
+.role-tag.class-teacher { background-color: var(--primary-indigo); }
+.role-tag.subject-teacher { background-color: var(--primary-green); }
+
+
+/* ==========================================================================
+   Tables (Updated)
+   ========================================================================== */
+
+.data-table, #sams-data-table, #active-learners-table, #unassigned-learners-table, #assigned-learners-table, #teachers-data-table, #grade-section-learners-table, #parents-data-table, #attendance-records-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background-color: var(--color-surface);
+    border-radius: 8px;
+    overflow: hidden; /* Ensures borders/shadows look clean */
+}
+
+.data-table th, #sams-data-table th, #active-learners-table th, #unassigned-learners-table th, #assigned-learners-table th, #teachers-data-table th, #grade-section-learners-table th, #parents-data-table th, #attendance-records-table th {
+    padding: 12px 16px;
+    background-color: #eef2ff; /* Light indigo header */
+    color: #1e3a8a; /* Dark blue text */
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid #c7d2fe;
+    text-transform: uppercase;
+    font-size: 0.85em;
+    letter-spacing: 0.5px;
+}
+
+.data-table td, #sams-data-table td, #active-learners-table td, #unassigned-learners-table td, #assigned-learners-table td, #teachers-data-table td, #grade-section-learners-table td, #parents-data-table td, #attendance-records-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--color-border);
+    vertical-align: middle;
+    font-size: 0.9em;
+}
+
+#sams-data-table tbody tr:nth-child(even),
+#active-learners-table tbody tr:nth-child(even),
+#unassigned-learners-table tbody tr:nth-child(even),
+#assigned-learners-table tbody tr:nth-child(even),
+#teachers-data-table tbody tr:nth-child(even),
+#grade-section-learners-table tbody tr:nth-child(even),
+#attendance-records-table tbody tr:nth-child(even),
+#parents-data-table tbody tr:nth-child(even) {
+    background-color: #f9fafb; /* Light stripe */
+}
+
+.data-table tbody tr:hover, #sams-data-table tbody tr:hover,
+#active-learners-table tbody tr:hover,
+#unassigned-learners-table tbody tr:hover,
+#assigned-learners-table tbody tr:hover,
+#teachers-data-table tbody tr:hover,
+#grade-section-learners-table tbody tr:hover,
+#attendance-records-table tbody tr:hover,
+#parents-data-table tbody tr:hover{
+    background-color: #f1f5f9; /* Subtle hover color */
+}
+
+.data-status-message {
+    text-align: center;
+    padding: 15px;
+    color: #6b7280;
+    font-style: italic;
+    border-top: 1px solid var(--color-border);
+    margin-top: 0;
+    background-color: #f9fafb;
+    border-radius: 0 0 8px 8px;
+}
+
+/* Status Badge Styling (from admissions portal) */
+.status-badge {
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: 600;
+    color: white;
+    text-transform: capitalize;
+}
+
+.status-badge.status-absent {
+    background-color: var(--primary-red);
+}
+
+
+
+/* ==========================================================================
+   Forms (Announcements & Filters)
+   ========================================================================== */
+
+.form-group {
+    margin-bottom: 15px; /* Default margin for forms */
+}
+
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.announcement-form-container input[type="text"],
+.announcement-form-container textarea,
+.announcement-form-container input[type="date"],
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    box-sizing: border-box; 
+    font-size: 1em;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background-color: var(--color-surface);
+}
+
+.announcement-form-container input:focus,
+.announcement-form-container textarea:focus,
+select:focus {
+    border-color: var(--primary-indigo);
+    box-shadow: 0 0 0 1px var(--primary-indigo);
+    outline: none;
+}
+
+.announcement-form-container button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+}
+
+/* ==========================================================================
+   Kebab Menu (New)
+   ========================================================================== */
+
+.kebab-menu-container {
+    position: relative;
+    display: inline-block;
+}
+.kebab-menu-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    font-size: 1.1em;
+    color: #6b7280;
+    transition: color 0.2s;
+}
+.kebab-menu-btn:hover {
+    color: var(--primary-indigo);
+}
+.kebab-menu-dropdown {
+    position: absolute;
+    right: 0;
+    z-index: 10;
+    background-color: white;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    min-width: 150px;
+    display: none;
+}
+.kebab-menu-dropdown a {
+    display: block;
+    padding: 8px 12px;
+    color: #374151;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+.kebab-menu-dropdown a:hover {
+    background-color: #f3f4f6;
+}
+.kebab-menu-container.active .kebab-menu-dropdown {
+    display: block;
+}
+/* New class for when the dropdown is moved to the body */
+.kebab-menu-global {
+    position: fixed; /* Position relative to the viewport */
+    display: block;
+    /* top and left will be set by JavaScript */
+}
+.kebab-menu-dropdown.open-up {
+    bottom: 100%; /* Position above the button */
+    margin-bottom: 5px; /* Small gap between button and dropdown */
+}
+.kebab-menu-dropdown .menu-option-red {
+    color: var(--primary-red);
+}
+.kebab-menu-dropdown .menu-option-red:hover {
+    background-color: #fee2e2; /* Light red background on hover */
+}
+
+/* ==========================================================================
+   Status Message Box (New)
+   ========================================================================== */
+
+.status-message-box {
+    padding: 12px;
+    border-radius: 6px;
+    font-weight: 500;
+    margin-top: 15px;
+    display: none; 
+}
+.status-message-box.success {
+    background-color: #d1fae5;
+    color: #065f46;
+    border: 1px solid #34d399;
+}
+.status-message-box.error {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #f87171;
+}
+
+/* ==========================================================================
+   Bulk Action Bar (New)
+   ========================================================================== */
+
+.bulk-action-bar {
+    position: fixed;
+    bottom: 0;
+    left: var(--sidebar-width); /* Start after the sidebar */
+    right: 0;
+    background-color: var(--sidebar-bg);
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+    z-index: 20;
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.bulk-action-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Make the label inside the bulk action bar white and readable */
+.bulk-action-controls .form-group label {
+    color: white;
+    font-weight: 500;
+}
+
+/* Remove bottom margin specifically for the form group inside the action bar */
+.bulk-action-controls .form-group {
+    margin-bottom: 0;
+}
+
+/* Fix dropdown text color inside the dark bulk action bar */
+.bulk-action-controls select {
+    color: var(--color-text); /* Use the default dark text color */
+    background-color: var(--color-surface); /* Ensure a white background */
+}
+
+
+@media (max-width: 768px) {
+    .bulk-action-bar {
+        left: 0; /* Full width on mobile */
+    }
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+
+footer {
+    background-color: var(--sidebar-bg);
+    color: #d1d5db;
+    padding: 15px 30px;
+    text-align: center;
+    font-size: 0.9em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    flex-shrink: 0;
+}
+
+footer a {
+    color: white;
+    font-size: 1.2em;
+    transition: color 0.2s;
+}
+
+footer a:hover {
+    color: var(--primary-indigo);
+}
+
+/* ==========================================================================
+   Mark Sheet Specific Styles (Copied from Teacher's Portal)
+   ========================================================================== */
+
+.marksheet-header {
+    text-align: center;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #333;
+    padding-bottom: 15px;
+}
+.marksheet-header .school-logo {
+    max-height: 80px;
+    margin: 0 auto 10px;
+}
+.marksheet-header h1 {
+    margin: 0;
+    font-size: 1.8em;
+    font-weight: 700;
+}
+.marksheet-header h2 {
+    margin: 5px 0;
+    font-size: 1.4em;
+    font-weight: 600;
+    color: #333;
+}
+.marksheet-header p {
+    margin: 2px 0;
+    font-size: 1em;
+    color: #555;
+}
+
+.marksheet-table th, .marksheet-table td {
+    text-align: center;
+    padding: 10px 8px; /* Adjust padding for compactness */
+}
+.marksheet-table td:nth-child(2) { /* Learner Name column */
+    text-align: left;
+}
+.marksheet-table tbody tr:nth-child(even) {
+    background-color: #f9fafb; /* Light gray for even rows */
+}
+.marksheet-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #ccc;
+}

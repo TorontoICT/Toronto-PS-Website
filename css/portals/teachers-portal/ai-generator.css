@@ -1,0 +1,126 @@
+/* css/portals/teachers-portal/ai-generator.css */
+
+.ai-gen-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    background-color: #f3f4f6;
+    padding: 8px;
+    border-radius: var(--border-radius);
+    flex-wrap: wrap;
+}
+
+.ai-gen-tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px;
+    border-radius: var(--border-radius-small);
+    font-weight: 600;
+    transition: all 0.3s ease;
+    background-color: transparent;
+    color: #4b5563;
+    border: none;
+    cursor: pointer;
+}
+
+.ai-gen-tab-btn:hover {
+    background-color: #e5e7eb;
+}
+
+.ai-gen-tab-btn.active {
+    background-color: var(--primary-blue);
+    color: white;
+    box-shadow: var(--shadow-md);
+}
+
+.ai-gen-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+@media (min-width: 1024px) {
+    .ai-gen-grid {
+        grid-template-columns: 1fr 1.5fr;
+    }
+}
+
+.ai-gen-form {
+    display: none;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.ai-gen-form.active {
+    display: flex;
+}
+
+.ai-gen-output-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.ai-gen-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+    color: #6b7280;
+    border: 2px dashed #d1d5db;
+    border-radius: var(--border-radius);
+}
+
+.ai-gen-message i {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+}
+
+.ai-gen-result-text {
+    background-color: #f9fafb;
+    border-radius: var(--border-radius);
+    padding: 20px;
+    white-space: pre-wrap; /* This is key to preserving formatting */
+    font-family: monospace;
+    font-size: 0.9em;
+    max-height: 600px;
+    overflow-y: auto;
+    border: 1px solid #e5e7eb;
+}
+
+/* **NEW**: Ensure history list items can contain a delete button */
+.resource-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+/* This stylesheet is only applied when printing. */
+@media print {
+    /* Hide everything on the page by default */
+    body * {
+        visibility: hidden;
+    }
+
+    /* 
+     * Make the printable container and everything inside it visible.
+     * The '!' is important to override any inline styles.
+     */
+    #ai-gen-printable-content, #ai-gen-printable-content * {
+        visibility: visible !important;
+        display: block !important; /* Ensure it's a block element */
+    }
+
+    /* Position the printable content at the top-left of the page */
+    #ai-gen-printable-content {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+}

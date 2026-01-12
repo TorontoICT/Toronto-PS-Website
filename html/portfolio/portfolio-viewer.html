@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Educator's Portfolio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="../../css/portals/teachers-portal/print-teacher-portfolio.css">
+    <link rel="shortcut icon" href="../../images/44.png" type="image/x-icon">
+    <style>
+        /* Enhanced styles for a professional document look */
+        body {
+            background-color: #f3f4f6;
+            font-family: 'Inter', sans-serif;
+            color: #1f2937;
+        }
+        .portfolio-container {
+            max-width: 8.5in;
+            margin: 30px auto;
+            padding: 1in;
+            background: white;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            min-height: 11in;
+            position: relative;
+        }
+        .portfolio-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 40px;
+        }
+        .portfolio-header img {
+            height: 50px;
+        }
+        .portfolio-header span {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #4f46e5;
+        }
+        .cover-page {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            min-height: 40vh;
+            border: 1px solid #e5e7eb;
+            padding: 40px;
+            border-radius: 8px;
+            background-color: #f9fafb;
+            page-break-after: always;
+        }
+        .cover-page h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #374151;
+            margin: 0;
+        }
+        .cover-page h2 {
+            font-size: 1.8rem;
+            font-weight: 500;
+            color: #4f46e5;
+            margin: 20px 0;
+        }
+        .cover-page p {
+            font-size: 1.1rem;
+            color: #6b7280;
+            margin-top: 10px;
+        }
+        .portfolio-category-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #4f46e5;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 10px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        .resource-list { list-style: none; padding-left: 0; }
+        .resource-list li { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px dashed #eee; }
+        .resource-list li i { color: #3b82f6; }
+        .resource-list li a { color: #1f2937; text-decoration: none; }
+        .resource-list li a:hover { text-decoration: underline; }
+        .portfolio-footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+            font-size: 0.9rem;
+            color: #9ca3af;
+        }
+        .status-message { text-align: center; padding: 40px; font-size: 1.2rem; color: #6b7280; }
+        #print-page-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 56px;
+            height: 56px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <button id="print-page-btn" class="no-print" title="Print or Save as PDF"><i class="fas fa-print"></i></button>
+
+    <div class="portfolio-container">
+        <div class="portfolio-header no-print">
+            <img src="../../images/Logo.png" alt="School Logo">
+            <span>Toronto Primary School</span>
+        </div>
+
+        <!-- Cover Page -->
+        <div id="portfolio-print-cover" class="cover-page">
+            <h1 id="print-cover-title">Educator's Portfolio File</h1>
+            <h2 id="print-cover-teacher-name">Loading...</h2>
+            <h3 id="print-cover-subject-grade" style="font-size: 1.5rem; color: #6b7280; font-weight: 400;"></h3>
+            <p id="print-cover-date"></p>
+        </div>
+
+        <!-- Portfolio Items -->
+        <div id="portfolio-items-container">
+            <p class="status-message"><i class="fas fa-sync fa-spin"></i> Loading portfolio contents...</p>
+        </div>
+
+        <!-- Footer -->
+        <div class="portfolio-footer">
+            <p>Last Updated: <span id="last-updated-date">Not yet available</span></p>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="../../js/portals/teachers-portal/portfolio-viewer.js"></script>
+</body>
+</html>

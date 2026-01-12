@@ -1,0 +1,128 @@
+/* Styles for General Content Pages (e.g., Academics, Activities) */
+
+header img {
+    height: 56px;
+    display: block;
+}
+
+/* ========== Page Content Styling ========== */
+.page-content {
+    padding: 120px 20px 100px;
+    color: #fff;
+    background-color: rgba(46, 43, 43, 0.9);
+    flex-grow: 1;
+    width: 100%;
+    /* MINIMAL CHANGE: Allow height to adjust for carousel, hide overflow */
+    min-height: auto; 
+    overflow: hidden;
+}
+
+/* REMOVED: .content-container styles */
+
+/* NEW: CAROUSEL CONTAINER (VIEWPORT) */
+.carousel-container {
+    max-width: 900px;
+    margin: 0 auto;
+    overflow-x: scroll; /* Enables horizontal scrolling */
+    scroll-snap-type: x mandatory; /* Snap to slides horizontally */
+    scroll-behavior: smooth; /* Smooth scrolling when using anchor links */
+    -webkit-overflow-scrolling: touch; /* Smoother scrolling on iOS */
+    padding-bottom: 20px; 
+    
+    /* Hide scrollbar for a cleaner look */
+    scrollbar-width: none; /* Firefox */
+}
+
+.carousel-container::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
+/* NEW: CAROUSEL TRACK (ROW) */
+.carousel-track {
+    display: flex; /* Arranges slides in a row */
+    flex-wrap: nowrap;
+    width: max-content; /* Allows content to take up the full width of all slides */
+}
+
+.content-item {
+    /* Updated .content-item to act as a slide */
+    flex: 0 0 900px; /* Force each slide to take up the max-width of the container */
+    scroll-snap-align: center; /* Ensures the slide snaps to the center of the viewport */
+    
+    padding: 20px;
+    margin-bottom: 0; /* Remove vertical margin */
+    margin-right: 30px; /* Use right margin as spacing between slides */
+    border-left: 5px solid goldenrod;
+}
+
+.content-item:last-child {
+    margin-right: 0; /* No margin on the last item */
+}
+
+.content-item h2 {
+    color: crimson;
+    margin-bottom: 10px;
+}
+
+.content-item ul {
+    list-style-type: disc;
+    padding-left: 20px;
+    margin-top: 10px;
+}
+
+.content-item li {
+    margin-bottom: 5px;
+}
+
+/* NEW: Responsive adjustments for smaller screens */
+@media (max-width: 900px) {
+    .content-item {
+        /* Make slide take full width of the screen on smaller devices */
+        flex: 0 0 calc(100vw - 40px); /* 100vw minus the section padding (20px left, 20px right) */
+    }
+}
+
+/* ========== Call-to-Action Button (General) ========== */
+.cta-button {
+    display: inline-block;
+    padding: 12px 25px;
+    margin-top: 20px;
+    background-color: goldenrod;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.cta-button:hover {
+    background-color: #e6b800;
+}
+
+/* ========== Dot Indicators Styling (NEW) ========== */
+.dot-indicators {
+    text-align: center;
+    margin-top: 30px;
+    z-index: 10;
+    position: relative;
+}
+
+.dot {
+    display: inline-block;
+    height: 12px;
+    width: 12px;
+    margin: 0 8px;
+    background-color: #bbb;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    /* Hide the anchor link text */
+    text-indent: -9999px; 
+    overflow: hidden;
+    line-height: 0;
+}
+
+.dot.active {
+    background-color: goldenrod;
+    transform: scale(1.2);
+}

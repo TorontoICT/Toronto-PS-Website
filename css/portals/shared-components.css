@@ -1,0 +1,11 @@
+/* Styles for shared components like the official calendar display */
+
+.calendar-term-card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 1.25rem; margin-bottom: 1.25rem; background-color: #fff; box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1); }
+.calendar-term-title { font-size: 1.25rem; font-weight: 600; color: var(--primary-indigo); margin-bottom: 0.5rem; }
+.calendar-term-dates { font-size: 0.9rem; color: #4b5563; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.calendar-term-dates strong { color: #1f2937; }
+.calendar-holidays-title { font-weight: 600; margin-bottom: 0.75rem; border-top: 1px solid #f3f4f6; padding-top: 1rem; font-size: 1.1rem; color: #374151;}
+.calendar-holidays-list { list-style: none; padding-left: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+.calendar-holidays-list li { display: flex; align-items: center; gap: 0.75rem; background-color: #f9fafb; padding: 0.5rem 0.75rem; border-radius: 4px; border-left: 3px solid var(--primary-blue); }
+.calendar-holidays-list .holiday-date-range { margin-left: auto; font-weight: 500; font-size: 0.85rem; color: var(--primary-red); background-color: #fee2e2; padding: 2px 6px; border-radius: 12px; }
+.calendar-no-holidays { font-style: italic; color: #6b7280; font-size: 0.9rem; }

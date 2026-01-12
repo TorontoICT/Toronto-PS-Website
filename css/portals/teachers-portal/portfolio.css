@@ -1,0 +1,115 @@
+/* c:/Users/ICT/Desktop/Websites/tnt/css/portals/teachers-portal/portfolio.css */
+
+/* --- Portfolio Subject List View --- */
+#portfolio-subject-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    padding: 0; /* Override default list padding */
+}
+
+.portfolio-subject-link {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 1.5rem;
+    background-color: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+    text-decoration: none;
+    color: var(--text-primary);
+}
+
+.portfolio-subject-link:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-blue);
+    color: var(--primary-blue);
+}
+
+.portfolio-subject-link i {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--primary-blue);
+    transition: color 0.3s ease;
+}
+
+.portfolio-subject-link:hover i {
+    color: var(--primary-indigo);
+}
+
+.portfolio-subject-link strong {
+    font-weight: 600;
+}
+
+/* --- Portfolio Detail View --- */
+#portfolio-detail-header {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.portfolio-actions {
+    margin-bottom: 1.5rem;
+}
+
+#portfolio-items-container {
+    padding: 1.5rem;
+}
+
+.portfolio-category-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.portfolio-category-title:first-of-type {
+    margin-top: 0;
+}
+
+#portfolio-items-container .resource-list {
+    padding-left: 0;
+    list-style: none;
+}
+
+#portfolio-items-container .resource-list li {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--border-radius-small);
+    transition: background-color 0.2s ease;
+}
+
+#portfolio-items-container .resource-list li:hover {
+    background-color: #f9fafb; /* A very light grey */
+}
+
+#portfolio-items-container .resource-list li a {
+    flex-grow: 1;
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+#portfolio-items-container .resource-list li a:hover {
+    color: var(--primary-blue);
+    text-decoration: underline;
+}
+
+#portfolio-items-container .resource-list li .cta-button-small {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+#portfolio-items-container .resource-list li:hover .cta-button-small {
+    opacity: 1;
+}

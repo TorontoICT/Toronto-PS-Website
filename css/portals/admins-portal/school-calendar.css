@@ -1,0 +1,126 @@
+/* ========================================================= */
+/* === OFFICIAL CALENDAR MANAGER STYLES === */
+/* ========================================================= */
+
+/* Re-using styles from assessment-programme.css for consistency */
+.ap-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.ap-title {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.ap-title i {
+    font-size: 2rem;
+    color: var(--primary-blue);
+    margin-top: 0.25rem;
+}
+
+.ap-title h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.ap-title p {
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+}
+
+.ap-tabs { display: flex; border-bottom: 1px solid #e5e7eb; margin-bottom: 1rem; }
+.ap-tab-btn { padding: 0.75rem 1.25rem; border: none; background: transparent; cursor: pointer; border-bottom: 3px solid transparent; color: var(--text-muted); font-weight: 500; transition: all 0.2s ease-in-out; }
+.ap-tab-btn:hover { background-color: #f9fafb; }
+.ap-tab-btn.active { border-bottom-color: var(--primary-indigo); font-weight: 600; color: var(--primary-indigo); }
+
+.ap-term-details {
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease-in-out;
+    margin-bottom: 1rem;
+}
+
+.ap-term-details:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-color: var(--primary-indigo);
+}
+
+.ap-term-details h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--primary-indigo);
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.ap-term-details p {
+    margin: 0.5rem 0;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.ap-term-details strong {
+    color: var(--text-dark);
+}
+
+.ap-holidays-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.ap-holiday-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr auto;
+    gap: 1rem;
+    align-items: center;
+    padding: 0.75rem;
+    background-color: #fff;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+    transition: all 0.2s ease-in-out;
+}
+
+.ap-holiday-row:hover {
+    background-color: #f9fafb;
+    border-color: var(--primary-indigo);
+}
+
+.ap-holiday-row input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    transition: border-color 0.2s ease-in-out;
+}
+
+.ap-holiday-row input:focus {
+    outline: none;
+    border-color: var(--primary-indigo);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.ap-holiday-row .danger {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+.ap-holiday-row .danger:focus {
+    box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.1);
+}

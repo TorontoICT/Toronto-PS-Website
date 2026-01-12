@@ -1,0 +1,226 @@
+/* Enhanced and Professional Styles for Application Form */
+
+:root{
+    --form-bg: #f8f9fa;
+    --form-card-bg: #ffffff;
+    --form-text-color: #212529;
+    --form-muted-text: #6c757d;
+    --form-accent-color: #c01b2b; /* Crimson-ish red */
+    --form-accent-dark: #9f141e;
+    --form-border-color: #dee2e6;
+    --form-input-bg: #ffffff;
+    --form-radius: 8px;
+    --form-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --form-gap: 22px;
+    --form-max-width: 980px;
+    --form-padding: 40px;
+}
+
+body {
+    background-color: var(--form-bg);
+    color: var(--form-text-color);
+}
+
+header img {
+    height: 56px;
+    display: block;
+}
+
+/* Main Form Container */
+.application-form {
+    max-width: var(--form-max-width);
+    margin: 28px auto;
+    background: var(--form-card-bg);
+    padding: var(--form-padding);
+    border-radius: var(--form-radius);
+    box-shadow: var(--form-shadow);
+    border: 1px solid var(--form-border-color);
+    box-sizing: border-box;
+}
+
+/* Fieldset & Legend Styling */
+.application-form fieldset {
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 28px;
+}
+
+.application-form legend {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--form-accent-color);
+    padding: 0 8px;
+    margin-left: 8px;
+}
+
+/* CSS Grid for form fields */
+.form-grid {
+    display: grid;
+    gap: var(--form-gap);
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 720px){
+    .form-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Form Group & Labels */
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.application-form .form-group label {
+    font-weight: 600;
+    color: var(--form-text-color);
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+/* Input, Select, Textarea Styling */
+.application-form input[type="text"],
+.application-form input[type="date"],
+.application-form input[type="tel"],
+.application-form input[type="email"],
+.application-form input[type="file"],
+.application-form select,
+.application-form textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--form-border-color);
+    border-radius: var(--form-radius);
+    box-sizing: border-box;
+    font-size: 0.95rem;
+    color: var(--form-text-color);
+    background-color: var(--form-input-bg);
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    outline: none;
+}
+
+.application-form textarea { min-height: 110px; resize: vertical; }
+
+.application-form input::placeholder,
+.application-form textarea::placeholder {
+    color: var(--form-muted-text);
+    opacity: 0.8;
+}
+
+/* Focus state */
+.application-form input:focus,
+.application-form textarea:focus,
+.application-form select:focus {
+    border-color: var(--form-accent-color);
+    box-shadow: 0 0 0 3px rgba(192, 27, 43, 0.1);
+}
+
+/* Select styling */
+.application-form select {
+    appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, var(--form-muted-text) 50%),
+                      linear-gradient(135deg, var(--form-muted-text) 50%, transparent 50%);
+    background-position: calc(100% - 18px) calc(1em + 2px), calc(100% - 13px) calc(1em + 2px);
+    background-size: 6px 6px, 6px 6px;
+    background-repeat: no-repeat;
+    padding-right: 36px;
+}
+
+/* File Input Styling */
+.application-form input[type="file"] {
+    padding: 8px;
+    background-color: #f8f9fa;
+}
+.application-form input[type="file"]::file-selector-button {
+    background-color: var(--form-accent-color);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    margin-right: 12px;
+    transition: background-color 0.2s ease;
+}
+.application-form input[type="file"]::file-selector-button:hover {
+    background-color: var(--form-accent-dark);
+}
+
+
+
+/* Submit button */
+.application-form button[type="submit"] {
+    width: 100%;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    background: linear-gradient(90deg, var(--form-accent-color), var(--form-accent-dark));
+    color: #fff;
+    padding: 14px;
+    border-radius: 10px;
+    font-weight: 700;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    margin-top: 12px;
+}
+
+.application-form button[type="submit"]:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(192, 27, 43, 0.15);
+}
+
+.application-form button[type="submit"]:disabled {
+    background: #adb5bd;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Small helper text */
+.form-note, .muted {
+    font-size: 0.9rem;
+    color: var(--form-muted-text);
+}
+
+/* Submission confirmation message */
+.confirmation-message {
+  text-align: center;
+  padding: 50px 20px;
+}
+
+.confirmation-message h2 {
+  color: #198754; /* Bootstrap success green */
+  font-size: 2.5em;
+  margin-bottom: 20px;
+}
+
+.confirmation-message p {
+  font-size: 1.2em;
+  line-height: 1.6;
+}
+
+.confirmation-message a {
+  display: inline-block;
+  margin-top: 30px;
+  padding: 14px 28px;
+  background-color: crimson;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.confirmation-message a:hover {
+  background-color: darkred;
+}
+
+/* Footer spacing specific to form area */
+@media (min-width: 1024px){
+    .application-form { padding: 50px; }
+}
+
+/* Responsive Tweaks */
+@media (max-width: 420px){
+    .application-form { padding: 20px; border-radius: 8px; }
+}

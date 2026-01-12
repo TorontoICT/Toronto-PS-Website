@@ -1,0 +1,414 @@
+/* Styles for Login and Registration Pages */
+
+/* Root variables for theming */
+:root{
+  --bg: #f4f6f9;
+  --card: #ffffff;
+  --muted: #6b7280;
+  --text: #0f1724;
+  --accent: #b71c2c; /* school crimson */
+  --accent-2: #0f4c81; /* deep blue for contrast */
+  --radius: 12px;
+  --shadow: 0 8px 28px rgba(16,24,40,0.08);
+  --gap: 14px;
+  --max-width: 920px;
+  --card-width: 520px;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+html,body{
+  height:100%;
+  margin:0;
+  background: linear-gradient(180deg,#f7f9fc 0%,var(--bg) 100%);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+header img {
+    height: 56px;
+    display: block;
+}
+
+/* Fixed incorrect custom tag selector (was auth-container without dot) */
+.auth-container {
+  max-width: var(--max-width);
+  margin: 48px auto;
+  padding: 24px;
+  display: flex;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+/* Card */
+.form-container {
+  width: 100%;
+  max-width: var(--card-width);
+  background: linear-gradient(180deg,#ffffff 0%, #fbfdff 100%);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 2rem;
+  border: 1px solid rgba(15,20,36,0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Heading */
+.form-container h2 {
+  margin: 0 0 1rem 0;
+  font-weight: 700;
+  color: var(--accent-2);
+  font-size: 1.5rem;
+  letter-spacing: -0.2px;
+}
+
+/* Top note */
+.form-note {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+
+/* Forms layout
+   - default: hide forms, show only the one with .active-form
+   - transitions keep interactions smooth and accessible
+*/
+.form {
+  display: none;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.28s ease, transform 0.28s ease, visibility 0.28s;
+  width: 100%;
+  position: relative;
+  pointer-events: none;
+  visibility: hidden;
+  margin-top: 0.5rem;
+}
+
+/* visible/active form */
+.form.active-form {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  visibility: visible;
+}
+
+/* legacy hidden class still supported */
+.form.hidden {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+/* Inputs */
+.form input[type="email"],
+.form input[type="password"],
+.form input[type="text"],
+.form input[type="tel"],
+.form select,
+.form input[type="date"] {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(15,20,36,0.08);
+  background: #fff;
+  color: var(--text);
+  font-size: 1rem;
+  box-sizing: border-box;
+  transition: box-shadow .12s ease, border-color .12s ease, transform .06s ease;
+}
+
+/* placeholders & focus */
+.form input::placeholder { color: #9aa4b2; }
+.form input:focus, .form select:focus {
+  outline: none;
+  border-color: rgba(183,28,44,0.9);
+  box-shadow: 0 6px 20px rgba(183,28,44,0.06);
+  transform: translateY(-1px);
+}
+
+/* Buttons */
+button[type="submit"], #registerSubmit, #loginSubmit {
+  display:block;
+  width:100%;
+  padding: 12px 14px;
+  background: linear-gradient(90deg,var(--accent),#8f1620);
+  color:#fff;
+  border:none;
+  border-radius:8px;
+  font-weight:700;
+  font-size:1rem;
+  cursor:pointer;
+  transition: transform .12s ease, box-shadow .12s ease;
+  margin-top: .5rem;
+}
+
+button[type="submit"]:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px rgba(15,20,36,0.08);
+}
+
+/* Role select & small controls */
+#role-select, #login-role-select {
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+/* Role-specific groups */
+.role-fields {
+  display: none; /* JS toggles; CSS supports aria-hidden attribute */
+  gap: var(--gap);
+  margin-bottom: 1rem;
+}
+
+/* when JS sets aria-hidden="false" show as grid */
+.role-fields[aria-hidden="false"] {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: var(--gap);
+}
+
+/* single column on small screens */
+@media (max-width: 720px) {
+  .role-fields[aria-hidden="false"] {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Fieldsets */
+fieldset {
+  border: 1px solid rgba(15,20,36,0.06);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  background: rgba(250,251,255,0.6);
+}
+
+/* Legends */
+legend {
+  color: var(--accent);
+  font-weight:700;
+  padding: 0 6px;
+}
+
+/* Switch links (Register / Log in) - styled as subtle segmented control */
+.form-links {
+  display:flex;
+  justify-content:center;
+  gap: 8px;
+  margin-top: 14px;
+  align-items:center;
+}
+
+/* basic link styles */
+.form-links a {
+  color: var(--accent-2);
+  text-decoration: none;
+  font-weight: 700;
+  cursor:pointer;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  transition: background-color .15s ease, color .15s ease, box-shadow .12s ease;
+}
+
+/* active tab appearance */
+.form-links a.active,
+.form-links a:hover,
+.form-links a:focus {
+  background: linear-gradient(90deg,var(--accent-2), #0b3a63);
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(11,58,99,0.08);
+  outline: none;
+}
+
+/* accessible focus ring */
+.form-links a:focus {
+  box-shadow: 0 0 0 3px rgba(11,58,99,0.12);
+}
+
+/* small muted separator */
+.form-links span { color: var(--muted); }
+
+/* Responsive */
+@media (max-width: 560px){
+  .form-container { padding: 1.25rem; margin: 24px; }
+  .auth-container { margin: 24px 12px; }
+  .form-links { gap: 6px; flex-wrap:wrap; }
+  .form-links a { flex: 1 1 auto; text-align:center; }
+}
+
+/* small helpers */
+.sr-only {
+  position:absolute !important;
+  height:1px; width:1px;
+  overflow:hidden; clip:rect(1px,1px,1px,1px);
+  white-space:nowrap; border:0; padding:0; margin:-1px;
+}
+
+/* Minor polish for inputs/selects */
+.form select {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, #6b7280 50%),
+                    linear-gradient(135deg, #6b7280 50%, transparent 50%);
+  background-position: calc(100% - 18px) calc(1em + 2px), calc(100% - 13px) calc(1em + 2px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 36px;
+}
+
+/* ensure login/register switching links are visible even if HTML initially empty */
+#show-register, #show-login {
+  display: inline-block;
+  min-width: 84px;
+  text-align: center;
+}
+
+.role-specific-fieldset {
+    border: 1px solid #e5e7eb;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+    grid-column: 1 / -1; /* Make it span all columns in the grid */
+}
+
+.checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    background-color: #f9fafb;
+    padding: 15px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.checkbox-item input[type="checkbox"] {
+    width: auto; /* Override the default 100% width */
+    accent-color: var(--primary-indigo);
+    height: 18px;
+    width: 18px;
+}
+
+.assignment-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 2fr auto;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.remove-assignment-btn {
+    background-color: transparent;
+    border: none;
+    color: var(--primary-red);
+    cursor: pointer;
+    font-size: 1.2em;
+    padding: 5px;
+}
+.remove-assignment-btn:hover {
+    color: #991b1b; /* Darker red */
+}
+
+.forgot-password-link-container {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.forgot-password-link-container a {
+    color: var(--primary-indigo);
+    font-size: 0.9em;
+    text-decoration: none;
+}
+
+.forgot-password-link-container a:hover {
+    text-decoration: underline;
+}
+
+
+.password-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.password-wrapper .toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #6b7280; /* gray-500 */
+}
+.password-wrapper .toggle-password:hover {
+    color: var(--primary-indigo);
+}
+
+#forgot-password-form input[type="email"] {
+    width: 100%;
+}
+
+/* =================================
+   --- Password Change Modal ---
+   ================================= */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 30px 40px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 450px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #1f2937;
+}
+
+.modal-content .form-note {
+  margin-bottom: 25px;
+}
+
+#force-password-change-form .password-wrapper {
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+#force-password-change-form label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 0.9rem;
+  color: #4b5563;
+  font-weight: 600;
+}
+
+#force-password-change-form input {
+  width: 100%; /* Ensure input takes full width of its container */
+}
+
+#force-password-change-form button {
+  width: 100%;
+  margin-top: 10px;
+}

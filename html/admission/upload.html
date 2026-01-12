@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+  </head>
+  <body>
+    <div class="message"></div>
+    <form id="file-upload-form">
+      <label for="file1">File 1:</label>
+      <input name="upFile1" id="file1" type="file"><br><br>
+      
+      <label for="file2">File 2:</label>
+      <input name="upFile2" id="file2" type="file"><br><br>
+      
+      <label for="file3">File 3:</label>
+      <input name="upFile3" id="file3" type="file"><br><br>
+      
+      <label for="file4">File 4:</label>
+      <input name="upFile4" id="file4" type="file"><br><br>
+      
+      <label for="file5">File 5:</label>
+      <input name="upFile5" id="file5" type="file"><br><br>
+      
+      <input type="submit" value="Submit">
+    </form>
+
+    <a href="../../html/admission/application-form.html" class="back-link">Back to Application Form</a>
+
+    <script>
+      const myForm = document.querySelector('form');
+      const message = document.querySelector('.message');
+      
+      myForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        message.textContent = 'Form Submitted...';
+        
+        const fileInputs = document.querySelectorAll('input[type="file"]');
+        const filesToUpload = [];
+
+        // Collect all files from the input fields
+        fileInputs.forEach(input => {
+          if (input.files.length > 0) {
+            filesToUpload.push(input.files[0]);
+          }
+        });
+
+        if (filesToUpload.length === 0) {
+          message.textContent = 'Please select at least one file.';
+          return;
+        }
+
+        // Read each file and convert to a base64 object
+        const readFilePromises = filesToUpload.map(file => {
+          return new Promise((resolve, reject) => {
+            const fileR = new FileReader();
+            fileR.onload = function(e) {
+              resolve({
+                filename: file.name,
+                mimeType: file.type,
+                data: e.target.result // Base64 encoded file data
+              });
+            };
+            fileR.onerror = reject;
+            fileR.readAsDataURL(file);
+          });
+        });
+
+        // Wait for all files to be read before sending
+        Promise.all(readFilePromises)
+          .then(fileObjects => {
+            google.script.run
+              .withSuccessHandler(myResult)
+              .adderFiles(fileObjects); // Call a new server-side function
+          })
+          .catch(error => {
+            message.textContent = 'Error reading files: ' + error.message;
+          });
+      });
+
+      function myResult(val) {
+        message.innerHTML = 'Files uploaded successfully! ' + val;
+      }
+    </script>
+
+    <script src="upload.js"></script>
+  </body>
+</html>

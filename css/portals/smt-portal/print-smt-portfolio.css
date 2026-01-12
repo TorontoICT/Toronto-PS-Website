@@ -1,0 +1,60 @@
+/* css/portals/smt-portal/print-smt-portfolio.css */
+
+@media print {
+    /* Hide everything by default when printing from the portal */
+    body * {        
+        visibility: hidden;
+    }
+
+    /* Make the portfolio section and its contents visible */
+    #portfolio-detail-view, #portfolio-detail-view * {
+        visibility: visible;
+    }
+
+    /* Re-position the portfolio section to take up the whole page */
+    #portfolio-detail-view {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 20px;
+        border: none;
+        box-shadow: none;
+    }
+
+    /* Hide elements we don't want to print */
+    .no-print, .no-print *, .sidebar, header, footer, #edit-profile-form-container, #back-to-portfolio-list, #upload-portfolio-item-form, #portfolio-list-view, #portfolio-detail-header {
+        display: none !important;
+        visibility: hidden !important;
+    }
+
+    /* Style the cover page (which is normally hidden) */
+    .print-only {
+        display: block !important;
+        visibility: visible !important;
+        page-break-after: always; /* Start the next content on a new page */
+    }
+
+    #portfolio-print-cover {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 90vh;
+        text-align: center;
+    }
+
+    #print-cover-title {
+        font-size: 2.5rem;
+        font-weight: bold;
+        border-bottom: 2px solid #333;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+
+    #print-cover-teacher-name, #print-cover-subject-grade {
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+    }
+}

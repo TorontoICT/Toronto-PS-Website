@@ -1,0 +1,106 @@
+/* Styles for Contact Page */
+
+header img {
+    height: 56px;
+    display: block;
+}
+
+.contact-page {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+    justify-content: center;
+}
+
+.contact-info, .contact-form-container {
+    flex: 1 1 45%;
+    max-width: 500px;
+    background-color: #f0f0f0;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.contact-info h2, .contact-form-container h2 {
+    color: crimson;
+    border-bottom: 2px solid goldenrod;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+/* ========== Page Content Styling ========== */
+.page-content {
+    padding: 120px 20px 100px;
+    flex-grow: 1;
+    width: 100%;
+    min-height: auto;
+    overflow: visible;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    gap: 15px;
+}
+
+.info-item i {
+    color: goldenrod;
+    font-size: 20px;
+    min-width: 25px;
+}
+
+.info-item p {
+    margin: 0;
+    font-size: 16px;
+    color: #555;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.form-group input, .form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus, .form-group textarea:focus {
+    border-color: goldenrod;
+    outline: none;
+}
+
+.contact-form .cta-button {
+    width: 100%;
+    text-align: center;
+    padding: 15px;
+    border: none;
+    cursor: pointer;
+}
+
+.map-container {
+    width: 100%;
+    margin-top: 40px;
+    border: 1px solid #ddd;
+    box-shadow: 0 4x 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive adjustments for the contact page */
+@media (max-width: 768px) {
+    .contact-page {
+        flex-direction: column;
+        gap: 20px;
+    }
+}

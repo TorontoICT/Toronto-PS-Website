@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Parent Portal</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+ <link rel="stylesheet" href="../../global.css">
+ <link rel="stylesheet" href="../../css/portals/parents-portal/parents-portal.css">
+<link rel="stylesheet" href="../../css/portals/shared-components.css">
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+ <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+ <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
+</head>
+<body>
+  <header class="fixed top-0 left-0 w-full bg-indigo-700 text-white shadow-xl z-20">
+    <div class="flex items-center justify-between p-4 max-w-7xl mx-auto">
+      <div class="flex items-center space-x-4">
+        <button id="menu-toggle" class="md:hidden p-1 focus:outline-none focus:ring-2 focus:ring-white rounded-md">
+          <i class="fas fa-bars text-xl"></i>
+        </button>
+        <div class="logo font-bold text-2xl tracking-tight">
+          <a href="../../index.html" class="text-white hover:text-gray-200">TORONTO PRIMARY SCHOOL</a>
+        </div>
+      </div>
+      
+      <div class="relative group">
+        <button class="flex items-center space-x-2 text-white p-2 rounded-full hover:bg-indigo-600 transition duration-150">
+          <i class="fas fa-user-circle text-2xl"></i>
+          <span class="hidden sm:inline">Parent</span>
+          <i class="fas fa-chevron-down text-xs ml-1"></i>
+        </button>
+
+        <div class="absolute right-0 top-full mt-1 w-48 bg-white rounded-md shadow-lg py-1 z-30 invisible group-hover:visible opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-200">
+          <a href="#profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</a>
+          <hr class="my-1">
+          <a href="../auth/auth.html" class="btn-logout block px-4 py-2 text-sm text-red-600 hover:bg-red-50"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+ <main class="portal-main-content">
+  <aside class="sidebar">
+   <h2 class="sidebar-title">Parent Menu</h2>
+   <ul>
+    <li><a href="#dashboard" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+    <li><a href="#profile"><i class="fas fa-user-circle"></i> My Profile</a></li>
+    <li><a href="#learner-section"><i class="fas fa-child"></i> Learner Section</a></li>
+    <li><a href="#communication"><i class="fas fa-comments"></i> Communication</a></li>
+    <li><a href="#resources"><i class="fas fa-book-open"></i> Useful Resources</a></li>
+    <li><a href="#school-calendar"><i class="fas fa-calendar-alt"></i> School Calendar</a></li>
+    <li><a href="#announcements"><i class="fas fa-bullhorn"></i> Announcements</a></li>
+    <li class="sidebar-footer-item">
+      <a href="#" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </li>
+   </ul>
+  </aside>
+
+  <div class="portal-content-wrapper">
+   <h1 class="portal-title">Welcome, Parent!</h1>
+      
+      <section id="dashboard" class="portal-section active-section">
+    <h2>Quick Summary for <span id="learner-name-display">Your Child</span></h2>
+        <div class="dashboard-cards grid-container">
+          <div class="tool-card accent-1">
+            <h3><i class="fas fa-exclamation-circle"></i> Overdue Tasks</h3>
+            <p id="dashboard-overdue">0 (Excellent!)</p>
+            <a href="#learner-section" class="cta-button-small">Check Assignments</a>
+          </div>
+          <div class="tool-card accent-2">
+            <h3><i class="fas fa-chart-line"></i> Latest Grade</h3>
+            <p id="dashboard-grade">85% (Maths)</p>
+            <a href="#learner-section" class="cta-button-small">View Report</a>
+          </div>
+          <div class="tool-card accent-3">
+            <h3><i class="fas fa-calendar-alt"></i> School Event</h3>
+            <p id="dashboard-event">Sports Day 01 Dec</p>
+            <a href="#resources" class="cta-button-small">View Calendar</a>
+          </div>
+        </div>
+      </section>
+    <section id="profile" class="portal-section hidden-section">
+    <h2>My Profile</h2>
+    <div class="profile-card">
+        <div class="profile-pic-container">
+            <img src="../../images/placeholder-profile.png" alt="Parent Profile Picture" class="profile-pic" id="parent-profile-pic">
+            <label for="parent-profile-pic-upload" class="profile-pic-upload-label" title="Upload new profile picture">
+                <i class="fas fa-camera"></i>
+            </label>
+            <input type="file" id="parent-profile-pic-upload" accept="image/jpeg, image/png" style="display: none;">
+            <div id="parent-profile-pic-upload-status" class="upload-status-indicator" style="display: none;"></div>
+        </div>
+        <div class="profile-details">
+            <p class="profile-name"><strong>Name:</strong> Loading...</p>
+            <p class="profile-email"><strong>Email:</strong> Loading...</p>
+            <p class="profile-contact"><strong>Contact:</strong> Loading...</p>
+        </div>
+        <a href="#" id="edit-parent-profile-btn" class="cta-button-edit">Edit Profile</a>
+    </div>
+    <!-- Edit Profile Form (hidden by default) -->
+    <div id="edit-parent-profile-form-container" class="tool-card" style="display: none; margin-top: 20px;">
+        <h3>Edit My Profile</h3>
+        <form id="edit-parent-profile-form">
+            <div class="form-group">
+                <label for="edit-parent-contact">Contact Number</label>
+                <input type="tel" id="edit-parent-contact" placeholder="e.g., 0812345678">
+            </div>
+            <p id="edit-parent-profile-status" class="status-message-box" style="display: none;"></p>
+            <button type="submit" class="cta-button"><i class="fas fa-save"></i> Save Changes</button>
+            <button type="button" id="cancel-edit-parent-profile-btn" class="cta-button-secondary" style="margin-left: 10px;">Cancel</button>
+        </form>
+    </div>
+    </section>   
+   <section id="learner-section" class="portal-section hidden-section">
+    <h2>Learner Progress &amp; Files</h2>
+    <div class="grid-container dashboard-cards">
+     <div class="tool-card accent-1">
+      <h3><i class="fas fa-graduation-cap"></i> Academics Summary</h3>
+      <p>View your child's academic performance at a glance. </p>
+      <a href="#" class="cta-button-small">View Summary</a>
+      <div id="learner-info-display">
+             </div>
+     </div>
+     <div class="tool-card accent-2">
+      <h3><i class="fas fa-file-pdf"></i> Report Card</h3>
+      <p>Access and download your child's full report cards from previous terms.</p>
+      <a href="#" class="cta-button-small">Download Report</a>
+     </div>
+     <div class="tool-card accent-3">
+      <h3><i class="fas fa-user-edit"></i> Learner Details</h3>
+      <p>Review and update your child's personal and medical information on file with the school.</p>
+      <a href="#" class="cta-button-small">Edit Details</a>
+     </div>
+    </div>
+   </section>
+
+   <section id="communication" class="portal-section hidden-section">
+        <h2>Communication Center</h2>
+        <p>Select a conversation from the list to view messages or reply to a teacher.</p>
+        <div class="chat-container">
+            <div class="chat-sidebar">
+                <div class="chat-sidebar-header">
+                    <h3>Teacher Conversations</h3>
+                </div>
+                <ul id="parent-chat-list" class="chat-parent-list scroll-container">
+                    <!-- Teacher conversation list will be dynamically populated here -->
+                    <p class="info-message">Loading your conversations...</p>
+                </ul>
+            </div>
+            <div class="chat-main">
+                <div id="parent-chat-welcome-message" class="chat-welcome">
+                    <i class="fas fa-comments"></i>
+                    <p>You have no messages yet.</p>
+                    <p style="font-size: 0.9em; color: #9ca3af; margin-top: 10px;">When a teacher sends you a message, the conversation will appear here.</p>
+                </div>
+                <div id="parent-chat-window" class="chat-window" style="display: none;"></div>
+            </div>
+        </div>
+   </section>
+
+   <section id="resources" class="portal-section hidden-section">
+    <h2>Useful Resources</h2>
+    <p>Quick links to essential school documents and financial information.</p>
+    <div class="resource-list-container">
+          <ul class="resource-list">
+            <li>
+              <i class="fas fa-calendar-alt accent-1"></i> 
+              <div>
+                <h3>School Calendar (2025/2026)</h3>
+                <p>Stay updated on school holidays, events, and important dates.</p>
+              </div>
+              <a href="#" class="cta-button-small">View Calendar</a>
+            </li>
+            <li>
+              <i class="fas fa-money-check-alt accent-2"></i> 
+              <div>
+                <h3>Fee Payments & Statements</h3>
+                <p>View your current fee statement and payment history.</p>
+              </div>
+              <a href="#" class="cta-button-small">View Financials</a>
+            </li>
+            <li>
+              <i class="fas fa-handshake accent-3"></i> 
+              <div>
+                <h3>Parent Handbook</h3>
+                <p>Download the latest version of the school rules and policies.</p>
+              </div>
+              <a href="#" class="cta-button-small">Download PDF</a>
+            </li>
+          </ul>
+    </div>
+   </section>
+
+   <section id="school-calendar" class="portal-section hidden-section">
+    <h2>Official School Calendar</h2>
+    <p>View the school's official term dates and holidays as set by the administration.</p>
+    <div class="tool-card" style="margin-top: 20px;">
+        <div id="parent-official-calendar-container">
+            <p class="info-message">Loading official calendar...</p>
+        </div>
+    </div>
+   </section>
+
+    <section id="announcements" class="portal-section hidden-section">
+    <h2>School Announcements</h2>
+    <p>The latest news and updates from the school administration.</p>
+    <div id="announcements-list">
+     <p>Loading announcements...</p>
+    </div>
+    </section>
+  </div>
+    <!-- Image Viewer Modal -->
+    <div id="image-viewer-modal" class="image-viewer-modal">
+        <span class="image-viewer-close">&times;</span>
+        <img class="image-viewer-content" id="modal-image-content">
+    </div>
+
+ </main>
+
+ <footer>
+  <p>© 2023 Toronto Primary School. All rights reserved.</p>
+  <a href="#"><i class="fa-brands fa-x-twitter"></i></a>
+  <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+  <a href="#"><i class="fa-brands fa-instagram"></i></a>
+  <a href="#"><i class="fa-brands fa-linkedin-in"></i></a>
+  <a href="#"><i class="fa-brands fa-square-youtube"></i></a>
+ </footer>
+  <script src="../../js/portals/parents-portal/parent-profile.js"></script>
+  <script type="module" src="../../js/auth/auth.js"></script>
+  <script type="module" src="../../js/portals/parents-portal/parents-portal.js"></script>
+  <script type="module" src="../../js/portals/parents-portal/calendar-display.js"></script>
+  <script type="module" src="../../js/announcements/announcements.js"></script>
+</body>
+</html>
