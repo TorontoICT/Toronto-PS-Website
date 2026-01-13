@@ -6,6 +6,9 @@
 // and UI functions (e.g., showSamsDetails, createKebabMenu, createTeacherKebabMenu, 
 // handleNavigation, displayLearnerAssignmentTool) being defined in ui-handlers.js.
 
+// **FIX**: Define PAGE_SIZE locally to prevent reference errors.
+const PAGE_SIZE = 20;
+
 // =========================================================
 // === SA-SAMS MANAGEMENT FUNCTIONS (ACCEPTED APPLICATIONS) ===
 // =========================================================

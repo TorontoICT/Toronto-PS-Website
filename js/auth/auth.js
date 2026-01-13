@@ -27,6 +27,13 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app); // Get the auth service instance
 const db = getFirestore(app); // Get the Firestore service instance
 
+// Helper function to validate strong passwords (moved to module scope for reuse)
+function isStrongPassword(password) {
+  // At least 8 characters, 1 uppercase, 1 lowercase, 1 number, 1 special character
+  const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+  return regex.test(password);
+}
+
 // =========================================================
 // === DOM-DEPENDENT LOGIC - initialize on DOMContentLoaded ===
 // =========================================================
@@ -47,13 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // *** NEW: Get reference for learner self-registration button ***
   const findMyDetailsBtn = document.getElementById('find-my-details-btn');
-
-  // Helper function to validate strong passwords
-  function isStrongPassword(password) {
-    // At least 8 characters, 1 uppercase, 1 lowercase, 1 number, 1 special character
-    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
-    return regex.test(password);
-  }
 
   // Get references to elements for the Register form
   const registerRoleSelect = document.getElementById('role-select');
@@ -987,6 +987,11 @@ onAuthStateChanged(auth, (user) => {
             // For stability, we let the user stay but can add a check if needed.
             // A full logout is handled by the logout button which clears sessionStorage.
         }
+
+        // Initialize settings handlers if the user is logged in
+        if (user) {
+            setupSettingsHandlers(user);
+        }
     }
 });
 
@@ -1011,3 +1016,123 @@ function handleLogout() {
 
 // make the function available to non-module scripts
 window.handleLogout = handleLogout;
+
+// =========================================================
+// === SETTINGS SECTION HANDLERS ===
+// =========================================================
+
+function setupSettingsHandlers(user) {
+    // Handle Password Change from Settings Section
+    const changePasswordForm = document.getElementById('settings-change-password-form');
+    if (changePasswordForm) {
+        // Use a flag to prevent attaching multiple listeners if onAuthStateChanged fires multiple times
+        if (changePasswordForm.dataset.listenerAttached) return;
+        changePasswordForm.dataset.listenerAttached = "true";
+
+        // *** NEW: Dynamic Password Requirements UI for Settings ***
+        const newPasswordInput = document.getElementById('new-password');
+        if (newPasswordInput) {
+            const reqList = document.createElement('ul');
+            reqList.id = 'settings-password-requirements-list';
+            reqList.style.listStyle = 'none';
+            reqList.style.padding = '0';
+            reqList.style.marginTop = '8px';
+            reqList.style.marginBottom = '15px';
+            reqList.style.fontSize = '0.9rem';
+            reqList.style.color = '#6b7280';
+
+            const requirements = [
+                { regex: /.{8,}/, text: 'At least 8 characters' },
+                { regex: /[A-Z]/, text: 'One uppercase letter' },
+                { regex: /[a-z]/, text: 'One lowercase letter' },
+                { regex: /\d/, text: 'One number' },
+                { regex: /[\W_]/, text: 'One special character' }
+            ];
+
+            requirements.forEach((req, index) => {
+                const li = document.createElement('li');
+                li.id = `settings-pwd-req-${index}`;
+                li.innerHTML = `<i class="far fa-circle" style="margin-right: 8px; width: 16px; text-align: center;"></i> ${req.text}`;
+                li.style.display = 'flex';
+                li.style.alignItems = 'center';
+                li.style.marginBottom = '4px';
+                li.style.transition = 'color 0.2s ease';
+                reqList.appendChild(li);
+            });
+
+            // Insert after the new password input
+            newPasswordInput.parentNode.insertBefore(reqList, newPasswordInput.nextSibling);
+
+            newPasswordInput.addEventListener('input', function() {
+                const val = this.value;
+                requirements.forEach((req, index) => {
+                    const li = document.getElementById(`settings-pwd-req-${index}`);
+                    const icon = li.querySelector('i');
+                    if (req.regex.test(val)) {
+                        li.style.color = 'var(--primary-green, #10b981)';
+                        icon.className = 'fas fa-check-circle';
+                        icon.style.color = 'var(--primary-green, #10b981)';
+                    } else {
+                        li.style.color = '#6b7280';
+                        icon.className = 'far fa-circle';
+                        icon.style.color = '#6b7280';
+                    }
+                });
+            });
+        }
+
+        changePasswordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const currentPassword = document.getElementById('current-password').value;
+            const newPassword = document.getElementById('new-password').value;
+            const submitBtn = changePasswordForm.querySelector('button[type="submit"]');
+
+            if (!isStrongPassword(newPassword)) {
+                // alert("New password must be at least 8 characters long and include an uppercase letter, a lowercase letter, a number, and a special character.");
+                if (newPasswordInput) {
+                    newPasswordInput.focus();
+                    newPasswordInput.dispatchEvent(new Event('input'));
+                }
+                return;
+            }
+
+            const originalBtnText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Updating...';
+
+            try {
+                // Re-authenticate the user before changing password
+                const credential = EmailAuthProvider.credential(user.email, currentPassword);
+                await reauthenticateWithCredential(user, credential);
+
+                // Update password
+                await updatePassword(user, newPassword);
+                
+                alert("Password updated successfully!");
+                changePasswordForm.reset();
+            } catch (error) {
+                console.error("Error updating password:", error);
+                if (error.code === 'auth/wrong-password') {
+                    alert("The current password you entered is incorrect.");
+                } else {
+                    alert("Failed to update password: " + error.message);
+                }
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
+            }
+        });
+    }
+
+    // Handle Notification Preferences (Placeholder)
+    const prefBtn = document.getElementById('edit-preferences-btn');
+    if (prefBtn) {
+        if (prefBtn.dataset.listenerAttached) return;
+        prefBtn.dataset.listenerAttached = "true";
+
+        prefBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            alert("Notification preferences management is coming soon.");
+        });
+    }
+}

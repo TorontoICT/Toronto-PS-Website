@@ -7,6 +7,15 @@
 
 // Assume global state variables are defined (e.g., selectedTeacherData = null; activeAssignmentView = 'unassigned';)
 
+// **FIX**: Define activeAssignmentView locally to prevent ReferenceError
+var activeAssignmentView = 'unassigned';
+var selectedLearnerData = null;
+var selectedTeacherData = null;
+var lastVisibleAll = null;
+var lastVisibleUnassigned = null;
+var lastVisibleAssigned = null;
+var lastVisibleTeachers = null;
+
 // =========================================================
 // === LEARNER KEBAB MENU GENERATION AND HANDLERS ===
 // =========================================================

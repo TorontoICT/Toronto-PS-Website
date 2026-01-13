@@ -65,10 +65,10 @@ function setupTermPlanner(db, userData) {
                     <button class="cta-button primary-green ap-save-calendar-btn"><i class="fas fa-save"></i> Save My Calendar</button>
                 </div>
                 <div class="grid-container" style="grid-template-columns: 1fr 1fr;">
-                    <div class="form-group"><label>Term Start Date</label><input type="date" class="ap-term-input" data-field="startDate" value="${term.startDate}"></div>
-                    <div class="form-group"><label>Term End Date</label><input type="date" class="ap-term-input" data-field="endDate" value="${term.endDate}"></div>
-                    <div class="form-group"><label>Exam Period Start</label><input type="date" class="ap-term-input" data-field="examStart" value="${term.examStart}"></div>
-                    <div class="form-group"><label>Exam Period End</label><input type="date" class="ap-term-input" data-field="examEnd" value="${term.examEnd}"></div>
+                    <div class="form-group"><label>Term Start Date</label><input type="date" class="ap-term-input" data-field="startDate" value="${term.startDate || ''}"></div>
+                    <div class="form-group"><label>Term End Date</label><input type="date" class="ap-term-input" data-field="endDate" value="${term.endDate || ''}"></div>
+                    <div class="form-group"><label>Exam Period Start</label><input type="date" class="ap-term-input" data-field="examStart" value="${term.examStart || ''}"></div>
+                    <div class="form-group"><label>Exam Period End</label><input type="date" class="ap-term-input" data-field="examEnd" value="${term.examEnd || ''}"></div>
                 </div>
                 <div style="margin-top: 1rem;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
@@ -78,9 +78,9 @@ function setupTermPlanner(db, userData) {
                     <div class="ap-holidays-list">
                         ${term.holidays.map((h, i) => `
                             <div class="ap-holiday-row" data-index="${i}">
-                                <input type="text" class="ap-holiday-input" data-field="name" placeholder="Holiday Name" value="${h.name}">
-                                <input type="date" class="ap-holiday-input" data-field="start" value="${h.start}">
-                                <input type="date" class="ap-holiday-input" data-field="end" value="${h.end}">
+                                <input type="text" class="ap-holiday-input" data-field="name" placeholder="Holiday Name" value="${h.name || ''}">
+                                <input type="date" class="ap-holiday-input" data-field="start" value="${h.start || ''}">
+                                <input type="date" class="ap-holiday-input" data-field="end" value="${h.end || ''}">
                                 <button class="cta-button-small danger ap-remove-holiday-btn"><i class="fas fa-trash-alt"></i></button>
                             </div>
                         `).join('')}
