@@ -48,6 +48,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // *** NEW: Get reference for learner self-registration button ***
   const findMyDetailsBtn = document.getElementById('find-my-details-btn');
 
+  // Helper function to validate strong passwords
+  function isStrongPassword(password) {
+    // At least 8 characters, 1 uppercase, 1 lowercase, 1 number, 1 special character
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+    return regex.test(password);
+  }
 
   // Get references to elements for the Register form
   const registerRoleSelect = document.getElementById('role-select');
@@ -60,6 +66,62 @@ document.addEventListener('DOMContentLoaded', () => {
   const registerPasswordInput = document.getElementById('registerPassword');
   const confirmPasswordInput = document.getElementById('confirmPassword');
   const registerSubmitButton = document.getElementById('registerSubmit');
+
+  // *** NEW: Dynamic Password Requirements UI for Registration ***
+  if (registerPasswordInput) {
+    const reqList = document.createElement('ul');
+    reqList.id = 'password-requirements-list';
+    reqList.style.listStyle = 'none';
+    reqList.style.padding = '0';
+    reqList.style.marginTop = '8px';
+    reqList.style.marginBottom = '15px';
+    reqList.style.fontSize = '0.9rem';
+    reqList.style.color = '#6b7280';
+
+    const requirements = [
+        { regex: /.{8,}/, text: 'At least 8 characters' },
+        { regex: /[A-Z]/, text: 'One uppercase letter' },
+        { regex: /[a-z]/, text: 'One lowercase letter' },
+        { regex: /\d/, text: 'One number' },
+        { regex: /[\W_]/, text: 'One special character' }
+    ];
+
+    requirements.forEach((req, index) => {
+        const li = document.createElement('li');
+        li.id = `pwd-req-${index}`;
+        li.innerHTML = `<i class="far fa-circle" style="margin-right: 8px; width: 16px; text-align: center;"></i> ${req.text}`;
+        li.style.display = 'flex';
+        li.style.alignItems = 'center';
+        li.style.marginBottom = '4px';
+        li.style.transition = 'color 0.2s ease';
+        reqList.appendChild(li);
+    });
+
+    // Insert after the password input's container (likely .password-wrapper)
+    const wrapper = registerPasswordInput.closest('.password-wrapper');
+    if (wrapper) {
+        wrapper.parentNode.insertBefore(reqList, wrapper.nextSibling);
+    } else {
+        registerPasswordInput.parentNode.insertBefore(reqList, registerPasswordInput.nextSibling);
+    }
+
+    registerPasswordInput.addEventListener('input', function() {
+        const val = this.value;
+        requirements.forEach((req, index) => {
+            const li = document.getElementById(`pwd-req-${index}`);
+            const icon = li.querySelector('i');
+            if (req.regex.test(val)) {
+                li.style.color = 'var(--primary-green, #10b981)';
+                icon.className = 'fas fa-check-circle';
+                icon.style.color = 'var(--primary-green, #10b981)';
+            } else {
+                li.style.color = '#6b7280';
+                icon.className = 'far fa-circle';
+                icon.style.color = '#6b7280';
+            }
+        });
+    });
+  }
 
   // Get references to elements for the Login form
   const loginRoleSelect = document.getElementById('login-role-select');
@@ -479,6 +541,16 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
+      // Enforce strong password for manual registrations (non-learners)
+      if (role !== 'learner' && !isStrongPassword(password)) {
+        // alert('Password must be at least 8 characters long and include an uppercase letter, a lowercase letter, a number, and a special character.');
+        if (registerPasswordInput) {
+            registerPasswordInput.focus();
+            registerPasswordInput.dispatchEvent(new Event('input')); // Ensure UI reflects current state
+        }
+        return;
+      }
+
       // validate role-specific required inputs
       const roleForm = document.getElementById(`${role}-fields`);
       const requiredInputs = roleForm ? roleForm.querySelectorAll('[required]') : [];
@@ -684,8 +756,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      if (newPassword.length < 6) {
-        alert("New password must be at least 6 characters long.");
+      if (!isStrongPassword(newPassword)) {
+        alert("New password must be at least 8 characters long and include an uppercase letter, a lowercase letter, a number, and a special character.");
         return;
       }
 

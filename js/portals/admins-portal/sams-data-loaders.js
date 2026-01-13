@@ -93,7 +93,7 @@ async function createUserAccount(regId, learnerData, button) {
     const email = learnerData.parent1Email;
     const learnerName = `${learnerData.learnerName} ${learnerData.learnerSurname}`;
     // A simple, temporary password. The user should be forced to change it on first login.
-    const tempPassword = `Password${learnerData.admissionId}`;
+    const tempPassword = `Password@${learnerData.admissionId}`;
 
     if (!confirm(`This will create a user account for ${learnerName} with email ${email} and a temporary password. Proceed?`)) {
         return;
