@@ -159,7 +159,7 @@ function setupContactModalListeners() {
         submitButton.disabled = true;
         submitButton.innerHTML = '<i class="fas fa-sync fa-spin"></i> Sending...';
 
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbyELV81r6M6MeGdclMhKKFBAvFVucm1WQC10YgqkCZSfbrK-JGM4wmTFGBa8-iUtRy1AA/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxilXQACgk8ct2odukNdRIumsgiatJ187daQwdaWx_i8_KB9Y-ygUw3yegkXi92rAbs/exec';
         const formData = new FormData(emailForm);
         formData.append('teacherEmail', teacherData.email);
         formData.append('parentEmail', parentData.parent1Email);

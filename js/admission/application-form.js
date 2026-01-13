@@ -1,15 +1,4 @@
-// This config must match your main project's config
-const firebaseConfig = {
-    apiKey: "AIzaSyAJlr-6eTCCpQtWHkPics3-tbOS_X5xA84",
-    authDomain: "school-website-66326.firebaseapp.com",
-    projectId: "school-website-66326",
-    storageBucket: "school-website-66326.firebasestorage.app", // Ensure this is correct
-};
-
-// Initialize Firebase
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
+// Firebase config moved to js/shared/firebase-config.js
 const storage = firebase.storage();
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -79,7 +68,7 @@ async function handleFormSubmit(e) {
         statusMessage.textContent = 'Documents uploaded. Submitting application details...';
 
         // 3. Submit all data to Google Apps Script
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbyYCBiHB7oaAchC--LfvJhpAOqOOqVNYtsd90-2g4gHp1LHzkz_7lhrMMvVaD41Pmyr3g/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbxjKn5yqyc19tRMcN4vFp8gAv4bXqE_UpJTXZn4FjwsZBSG1ljCoi4agtkWjF5DJeQP/exec';
         const response = await fetch(scriptURL, {
             method: 'POST',
             body: formData

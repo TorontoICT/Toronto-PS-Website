@@ -44,9 +44,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Initialize Firebase only if the user is potentially logged in
         // This check prevents errors if firebase is already initialized by another script.
         if (!firebase.apps.length) {
-            // This is a fallback. Your `firebase-config.js` should ideally handle this.
-            // If firebaseConfig is not global, you might need to define it here.
-            firebase.initializeApp(firebaseConfig);
+            // Fallback: only initialize if a firebaseConfig object exists.
+            if (typeof firebaseConfig !== 'undefined') {
+                firebase.initializeApp(firebaseConfig);
+            } else {
+                console.warn('Firebase not initialized. Ensure js/shared/firebase-config.js is included before portal scripts.');
+            }
         } else {
             // If already initialized, get the default app
             firebase.app();

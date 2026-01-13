@@ -6,18 +6,7 @@ import { initializeProfileSection } from './profile.js';
 import { setupAcademicsSection } from './subjects.js';
 import { setupWorkOutputSection } from './work-output.js';
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize Firebase
-    const firebaseConfig = {
-        apiKey: "AIzaSyAJlr-6eTCCpQtWHkPics3-tbOS_X5xA84",
-        authDomain: "school-website-66326.firebaseapp.com",
-        projectId: "school-website-66326",
-        storageBucket: "school-website-66326.appspot.com",
-        messagingSenderId: "660829781706",
-        appId: "1:660829781706:web:bf447db1d80fc094d9be33"
-    };
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
+    // Firebase config moved to js/shared/firebase-config.js
     const db = firebase.firestore();
 
     const userData = JSON.parse(sessionStorage.getItem('currentUser'));

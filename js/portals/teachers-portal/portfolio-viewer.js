@@ -1,17 +1,7 @@
 // js/portals/teachers-portal/portfolio-viewer.js
 
 document.addEventListener('DOMContentLoaded', () => {
-    // This config must match your main project's config
-    const firebaseConfig = {
-        apiKey: "AIzaSyAJlr-6eTCCpQtWHkPics3-tbOS_X5xA84",
-        authDomain: "school-website-66326.firebaseapp.com",
-        projectId: "school-website-66326",
-    };
-
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
-    
+    // Firebase config moved to js/shared/firebase-config.js
     const db = firebase.firestore();
 
     const params = new URLSearchParams(window.location.search);

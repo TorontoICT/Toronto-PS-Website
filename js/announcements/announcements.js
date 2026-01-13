@@ -1,21 +1,6 @@
 // announcements.js
 
-// You must replace this with your actual Firebase project config.
-const firebaseConfig = {
- apiKey: "AIzaSyAJlr-6eTCCpQtWHyPics3-tbOS_X5xA84",
- authDomain: "school-website-66326.firebaseapp.com",
- projectId: "school-website-66326",
- storageBucket: "school-website-66326.firebasestorage.app",
- messagingSenderId: "660829781706",
- appId: "1:660829781706:web:bf447db1d80fc094d9be33"
-};
-
-// **CRUCIAL CHANGE:** Only initialize if Firebase hasn't been initialized yet 
-// (which prevents conflicts when run alongside modular 'auth.js' or on 'announcement.html').
-if (!firebase.apps.length) {
-    // Initialize Firebase (using compat SDKs for this script)
-    firebase.initializeApp(firebaseConfig);
-}
+// Firebase config moved to js/shared/firebase-config.js
 const db = firebase.firestore();
 const announcementsCollection = db.collection('announcements');
 

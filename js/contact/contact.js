@@ -4,7 +4,7 @@
 // ================================================
 
 // This is the URL of your deployed Google Apps Script.
-const scriptURL = 'https://script.google.com/macros/s/AKfycbwVSH-t7831ixuLZN5ekD0ST5EMWrySnc4Rj7pJCfRw8HwZaq0XWGzu4M1EnlHgzC3N/exec'; 
+const scriptURL = 'https://script.google.com/macros/s/AKfycbzBjGPrVxkRj07aAx0nei0SwwpD3-ewd7oakBnl2q6ojoQ12H8bERkqNjBdK49t2tlS/exec'; 
 
 const contactForm = document.querySelector('.contact-form');
 const contactFormContainer = document.querySelector('.contact-form-container');

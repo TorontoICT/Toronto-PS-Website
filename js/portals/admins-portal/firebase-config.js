@@ -1,19 +1,9 @@
 // firebase-config.js
 
-// You must replace this with your actual Firebase project config.
-const firebaseConfig = {
-    apiKey: "AIzaSyAJlr-6eTCCpQtWHyPics3-tbOS_X5xA84",
-    authDomain: "school-website-66326.firebaseapp.com",
-    projectId: "school-website-66326",
-    storageBucket: "school-website-66326.firebasestorage.app",
-    messagingSenderId: "660829781706",
-    appId: "1:660829781706:web:bf447db1d80fc094d9be33"
-};
-
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const auth = firebase.auth(); // make auth available globally
+// Firebase initialization moved to js/shared/firebase-config.js
+// Ensure that `js/shared/firebase-config.js` is included before these portal scripts.
+const db = (window.db) ? window.db : (window.firebase && firebase.firestore ? firebase.firestore() : null);
+const auth = (window.auth) ? window.auth : (window.firebase && firebase.auth ? firebase.auth() : null); // make auth available globally
 
 // =========================================================
 // === GLOBAL STATE VARIABLES (required by other scripts) ===

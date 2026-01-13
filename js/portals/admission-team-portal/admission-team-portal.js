@@ -333,15 +333,7 @@ function viewApplicantDetails(index) {
  */
 async function updateApplicantStatus(row) {
     // **FIX**: Initialize Firestore to perform the duplication check.
-    if (!firebase.apps.length) {
-        // This config should match your other portal files.
-        const firebaseConfig = {
-            apiKey: "AIzaSyAJlr-6eTCCpQtWHkPics3-tbOS_X5xA84",
-            authDomain: "school-website-66326.firebaseapp.com",
-            projectId: "school-website-66326",
-        };
-        firebase.initializeApp(firebaseConfig);
-    }
+    // Firebase config moved to js/shared/firebase-config.js
     const db = firebase.firestore();
 
     const statusSelect = document.getElementById(`new-status-${row}`);

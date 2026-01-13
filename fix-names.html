@@ -15,6 +15,7 @@
     </style>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="js/shared/firebase-config.js"></script>
 </head>
 <body>
 
@@ -30,21 +31,8 @@
     </div>
 
     <script>
-        // 1. Paste your Firebase project configuration here
-        const firebaseConfig = {
-            apiKey: "AIzaSyAJlr-6eTCCpQtWHkPics3-tbOS_X5xA84",
-            authDomain: "school-website-66326.firebaseapp.com",
-            projectId: "school-website-66326",
-            storageBucket: "school-website-66326.appspot.com",
-            messagingSenderId: "660829781706",
-            appId: "1:660829781706:web:bf447db1d80fc094d9be33"
-        };
-
-        // 2. Initialize Firebase
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const db = firebase.firestore();
+        // Firebase initialization moved to `js/shared/firebase-config.js`
+        const db = window.db || (window.firebase && firebase.firestore ? firebase.firestore() : null);
 
         // 3. The script logic
         async function fixSwappedNames() {

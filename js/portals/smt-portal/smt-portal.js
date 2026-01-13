@@ -10,9 +10,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let db;
 
     if (userData) {
-        // Initialize Firebase
+        // Initialize Firebase (use shared config)
         if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
+            if (typeof firebaseConfig !== 'undefined') {
+                firebase.initializeApp(firebaseConfig);
+            } else {
+                console.warn('Firebase not initialized. Ensure js/shared/firebase-config.js is included before portal scripts.');
+            }
         }
         db = firebase.firestore();
 

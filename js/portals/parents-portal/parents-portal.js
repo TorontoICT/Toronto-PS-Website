@@ -2,16 +2,7 @@
 
 import { displayOfficialSchoolCalendar } from './calendar-display.js';
 
-// This should be the same config as in your other portal files
-const firebaseConfig = {
-  apiKey: "AIzaSyAJlr-6eTCCpQtWHkPics3-tbOS_X5xA84",
-  authDomain: "school-website-66326.firebaseapp.com",
-  databaseURL: "https://school-website-66326-default-rtdb.firebaseio.com",
-  projectId: "school-website-66326",
-  storageBucket: "school-website-66326.firebasestorage.app",
-  messagingSenderId: "660829781706",
-  appId: "1:660829781706:web:bf447db1d80fc094d9be33"
-};
+// Firebase config moved to js/shared/firebase-config.js
 
 document.addEventListener('DOMContentLoaded', () => {
     initializeParentPortal();
@@ -28,9 +19,6 @@ function initializeParentPortal() {
         return;
     }
 
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
     const db = firebase.firestore();
 
     // Load dynamic data into the portal
