@@ -7,7 +7,7 @@
 // Import the functions you need from the SDKs you need. **MODIFIED**: Added updatePassword and reauthenticateWithCredential.
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
 // *** MODIFICATION: Import sendPasswordResetEmail ***
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, collection, query, where, limit, getDocs } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
 
@@ -132,6 +132,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const loginPasswordInput = document.getElementById('loginPassword');
   const loginSubmitButton = document.getElementById('loginSubmit');
 
+  const googleLoginBtn = document.getElementById('google-login-btn');
+  const googleRegisterBtn = document.getElementById('google-register-btn');
+
   // Get references for new teacher fields
   const isClassTeacherSelect = document.getElementById('is-class-teacher');
   const classTeacherDetailsContainer = document.getElementById('class-teacher-details-container');
@@ -151,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       // Hide or show the main password section based on the selected role
       if (passwordSection) {
-        passwordSection.style.display = (value === 'learner') ? 'none' : 'block';
+        passwordSection.style.display = (value && value !== 'learner') ? 'block' : 'none';
       }
 
       if (!value) return; // Don't try to show fields if no role is selected
@@ -654,6 +657,160 @@ document.addEventListener('DOMContentLoaded', () => {
       } catch (error) {
         console.error("Registration Error:", error);
         alert(`Registration Error: ${error.message}`);
+      }
+    });
+  }
+
+  // =========================================================
+  // === GOOGLE AUTHENTICATION HANDLERS ===
+  // =========================================================
+
+  const googleProvider = new GoogleAuthProvider();
+
+  // --- Google Login ---
+  if (googleLoginBtn) {
+    googleLoginBtn.addEventListener('click', async () => {
+      const role = loginRoleSelect?.value || '';
+      if (!role) {
+        alert('Please select your role before signing in.');
+        return;
+      }
+
+      try {
+        const result = await signInWithPopup(auth, googleProvider);
+        const user = result.user;
+        
+        // Check if user exists in Firestore
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+          const userData = userDocSnap.data();
+          if (userData.role === role) {
+             // Proceed with login
+             const sessionData = { ...userData, uid: user.uid };
+             sessionStorage.setItem('currentUser', JSON.stringify(sessionData));
+             alert(`Welcome back, ${userData.learnerName || userData.name || userData.preferredName || userData.surname || userData.fullName || 'User'}!`);
+             
+             let portalPath = '';
+             switch(role) {
+               case 'learner': portalPath = "learners-portal.html"; break;
+               case 'parent': portalPath = "parents-portal.html"; break;
+               case 'teacher': portalPath = "teachers-portal.html"; break;
+               case 'admissions-team': portalPath = "admission-team-portal.html"; break;
+               case 'smt': portalPath = "smt-portal.html"; break;
+               case 'admin': portalPath = "admins-portal.html"; break;
+               default: portalPath = "index.html"; break;
+             }
+             window.location.href = portalPath;
+          } else {
+            alert(`The account you signed in with is not registered as a "${role}". Please check your role selection.`);
+            await signOut(auth);
+          }
+        } else {
+          alert("No account found for this Google email. Please register first.");
+          await signOut(auth);
+        }
+      } catch (error) {
+        console.error("Google Login Error:", error);
+        alert(`Google Sign-In failed: ${error.message}`);
+      }
+    });
+  }
+
+  // --- Google Registration ---
+  if (googleRegisterBtn) {
+    googleRegisterBtn.addEventListener('click', async () => {
+      const role = registerRoleSelect?.value;
+      if (!role) {
+        alert('Please select a role first.');
+        return;
+      }
+
+      // Validate role-specific fields (excluding password)
+      const roleForm = document.getElementById(`${role}-fields`);
+      const requiredInputs = roleForm ? roleForm.querySelectorAll('input[required], select[required], textarea[required]') : [];
+      for (let input of requiredInputs) {
+        // Skip password fields for Google Auth
+        if (input.type === 'password') continue;
+        // Skip hidden inputs (like parent admission lookup if not visible/used in logic)
+        if (input.offsetParent === null) continue; 
+
+        if (!input.value.trim()) {
+          alert('Please fill in all required fields for your role before signing up with Google.');
+          input.focus();
+          return;
+        }
+      }
+
+      // Special validation for Learner/Parent (reusing logic from standard registration)
+      if (role === 'learner') {
+         const learnerDetailsContainer = document.getElementById('learner-details-container');
+         if (!learnerDetailsContainer.dataset.learnerData) {
+             alert("Please find and confirm your details using your admission number before registering.");
+             return;
+         }
+      }
+      if (role === 'parent') {
+         const admissionNumber = document.getElementById('parent-admission-number-lookup').value.trim();
+         if (!admissionNumber) {
+             alert('Please use the "Find Learner" button to verify your learner\'s admission number first.');
+             return;
+         }
+      }
+
+      try {
+        const result = await signInWithPopup(auth, googleProvider);
+        const user = result.user;
+        
+        // Collect data from the form
+        const userData = collectUserData(role);
+        
+        // Overwrite/Set critical fields from Google Auth
+        userData.uid = user.uid;
+        userData.email = user.email; // Use Google email
+        userData.authProvider = 'google';
+
+        // Check if user already exists
+        const userDocRef = doc(db, "users", user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        if (userDocSnap.exists()) {
+            alert("An account with this Google email already exists. Please log in instead.");
+            return;
+        }
+
+        // Save to Firestore
+        await setDoc(userDocRef, userData);
+
+        // Handle Parent Linking (Copied from standard registration)
+        if (role === 'parent') {
+            const admissionNumberForUpdate = document.getElementById('parent-admission-number-lookup').value.trim();
+            if (admissionNumberForUpdate) {
+                const learnerQuery = query(collection(db, 'sams_registrations'), where('admissionId', '==', admissionNumberForUpdate), limit(1));
+                const learnerSnapshot = await getDocs(learnerQuery);
+                if (!learnerSnapshot.empty) {
+                    const learnerDocRef = learnerSnapshot.docs[0].ref;
+                    await setDoc(learnerDocRef, { parentUserId: user.uid }, { merge: true });
+                }
+            }
+        }
+
+        // Handle Learner Name Update (Copied from standard registration)
+        if (role === 'learner' && userData.nameWasUpdated) {
+             const learnerQuery = query(collection(db, 'sams_registrations'), where('admissionId', '==', userData.admissionId), limit(1));
+             const learnerSnapshot = await getDocs(learnerQuery);
+             if (!learnerSnapshot.empty) {
+                 const learnerDocRef = learnerSnapshot.docs[0].ref;
+                 await setDoc(learnerDocRef, { learnerName: userData.learnerName, learnerSurname: userData.learnerSurname }, { merge: true });
+             }
+        }
+
+        alert(`Registration successful! Welcome, ${userData.learnerName || userData.name || userData.preferredName || userData.surname || userData.fullName}!`);
+        if (loginLink) loginLink.click();
+
+      } catch (error) {
+        console.error("Google Registration Error:", error);
+        alert(`Registration failed: ${error.message}`);
       }
     });
   }
