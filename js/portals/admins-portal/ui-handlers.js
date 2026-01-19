@@ -1181,16 +1181,27 @@ function populateAttendanceWeekFilter(year, term) {
 
     const { start, end } = termBoundaries[term];
 
-    // Helper to get the month for a given week number in a year
-    const getMonthForWeek = (yr, wk) => {
-        const d = new Date(yr, 0, 1 + (wk - 1) * 7); // Approx date
-        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        return monthNames[d.getMonth()];
+    // Helper to get the Monday of an ISO week
+    const getDateOfISOWeek = (w, y) => {
+        var simple = new Date(y, 0, 1 + (w - 1) * 7);
+        var dow = simple.getDay();
+        var ISOweekStart = simple;
+        if (dow <= 4)
+            ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
+        else
+            ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
+        return ISOweekStart;
     };
 
     for (let week = start; week <= end; week++) {
-        const monthName = getMonthForWeek(year, week);
-        const optionText = `Week ${week} (${monthName})`;
+        const monday = getDateOfISOWeek(week, year);
+        const friday = new Date(monday);
+        friday.setDate(monday.getDate() + 4);
+        
+        const startStr = `${monday.getDate()} ${monday.toLocaleString('default', { month: 'short' })}`;
+        const endStr = `${friday.getDate()} ${friday.toLocaleString('default', { month: 'short' })}`;
+        
+        const optionText = `Week ${week} (${startStr} - ${endStr})`;
         weekFilter.add(new Option(optionText, week));
     }
 }

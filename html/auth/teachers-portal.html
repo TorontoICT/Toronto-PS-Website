@@ -323,21 +323,44 @@
     <!-- Nested Attendance Form -->
     <form id="attendance-form" class="learner-mgmt-view class-teacher-only" style="display: none;">
      <h2>Mark Attendance</h2>
-     <label for="attendance-class-select">Select Class:</label>
-     <select id="attendance-class-select" name="class">
-      <option value="">-- Select a Class to Load Roster --</option>
-     </select>
+     
+     <div class="filters-container" style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; align-items: flex-end;">
+        <div class="form-group" style="flex: 1; min-width: 100px; margin-bottom: 0;">
+            <label for="attendance-year-filter">Year:</label>
+            <select id="attendance-year-filter" style="padding: 8px;"></select>
+        </div>
+        <div class="form-group" style="flex: 1; min-width: 100px; margin-bottom: 0;">
+            <label for="attendance-term-filter">Term:</label>
+            <select id="attendance-term-filter" style="padding: 8px;">
+                <option value="1">Term 1</option>
+                <option value="2">Term 2</option>
+                <option value="3">Term 3</option>
+                <option value="4">Term 4</option>
+            </select>
+        </div>
+        <div class="form-group" style="flex: 2; min-width: 150px; margin-bottom: 0;">
+            <label for="attendance-week-filter">Week:</label>
+            <select id="attendance-week-filter" style="padding: 8px;"></select>
+        </div>
+        <div class="form-group" style="flex: 2; min-width: 150px; margin-bottom: 0;">
+            <label for="attendance-class-select">Class:</label>
+            <select id="attendance-class-select" name="class" style="padding: 8px;">
+             <option value="">-- Select Class --</option>
+            </select>
+        </div>
+     </div>
+
      <p id="attendance-week-display" style="font-weight: 600; margin-top: 15px; text-align: center;"></p>
      <table class="data-table attendance-weekly-table">
       <thead>
        <tr>
         <th>Admission No.</th>
         <th>Learner Name</th>
-        <th>Monday</th>
-        <th>Tuesday</th>
-        <th>Wednesday</th>
-        <th>Thursday</th>
-        <th>Friday</th>
+        <th id="th-mon">Monday</th>
+        <th id="th-tue">Tuesday</th>
+        <th id="th-wed">Wednesday</th>
+        <th id="th-thu">Thursday</th>
+        <th id="th-fri">Friday</th>
        </tr>
       </thead>
       <tbody id="attendance-table-body">

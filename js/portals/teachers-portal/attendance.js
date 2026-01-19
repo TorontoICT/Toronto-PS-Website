@@ -13,6 +13,18 @@ function getWeekNumber(d) {
 }
 
 /**
+ * Helper to get the Monday of an ISO week.
+ */
+function getDateOfISOWeek(w, y) {
+    var simple = new Date(y, 0, 1 + (w - 1) * 7);
+    var dow = simple.getDay();
+    var ISOweekStart = simple;
+    if (dow <= 4) ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
+    else ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
+    return ISOweekStart;
+}
+
+/**
  * Overhauls the attendance register to support a weekly view.
  * @param {firebase.firestore.Firestore} db - The Firestore database instance.
  * @param {object} teacherData - The current teacher's user data, including responsibleClass.
@@ -21,8 +33,11 @@ function setupAttendanceRegister(db, teacherData) {
     const classSelect = document.getElementById('attendance-class-select');
     const tableBody = document.getElementById('attendance-table-body');
     const weekDisplay = document.getElementById('attendance-week-display');
+    const yearFilter = document.getElementById('attendance-year-filter');
+    const termFilter = document.getElementById('attendance-term-filter');
+    const weekFilter = document.getElementById('attendance-week-filter');
 
-    if (!classSelect || !tableBody) return;
+    if (!classSelect || !tableBody || !yearFilter || !termFilter || !weekFilter) return;
 
     classSelect.innerHTML = '<option value="">-- Select a Class to Load Roster --</option>';
 
@@ -37,11 +52,76 @@ function setupAttendanceRegister(db, teacherData) {
         return;
     }
 
-    classSelect.addEventListener('change', async (e) => {
-        const selectedClass = e.target.value;
-        const today = new Date();
-        const year = today.getFullYear();
-        const weekNumber = getWeekNumber(today);
+    // --- Initialize Filters ---
+    const currentYear = new Date().getFullYear();
+    const currentWeek = getWeekNumber(new Date());
+    
+    // Populate Year
+    yearFilter.innerHTML = '';
+    for (let y = currentYear - 1; y <= currentYear + 1; y++) {
+        yearFilter.add(new Option(y, y, y === currentYear, y === currentYear));
+    }
+
+    // Helper to populate weeks based on term
+    const populateWeeks = () => {
+        const term = parseInt(termFilter.value);
+        const year = parseInt(yearFilter.value);
+        const termBoundaries = {
+            1: { start: 1, end: 13 },
+            2: { start: 14, end: 26 },
+            3: { start: 27, end: 39 },
+            4: { start: 40, end: 53 }
+        };
+        const { start, end } = termBoundaries[term];
+        
+        weekFilter.innerHTML = '';
+        let selectedWeek = null;
+
+        for (let w = start; w <= end; w++) {
+            const monday = getDateOfISOWeek(w, year);
+            const friday = new Date(monday);
+            friday.setDate(monday.getDate() + 4);
+            
+            const startStr = `${monday.getDate()} ${monday.toLocaleString('default', { month: 'short' })}`;
+            const endStr = `${friday.getDate()} ${friday.toLocaleString('default', { month: 'short' })}`;
+            
+            const option = new Option(`Week ${w} (${startStr} - ${endStr})`, w);
+            weekFilter.add(option);
+
+            // Default to current week if within range
+            if (year === currentYear && w === currentWeek) selectedWeek = w;
+        }
+        
+        if (selectedWeek) weekFilter.value = selectedWeek;
+    };
+
+    // Initial population
+    // Determine current term based on current week
+    if (currentWeek >= 1 && currentWeek <= 13) termFilter.value = 1;
+    else if (currentWeek >= 14 && currentWeek <= 26) termFilter.value = 2;
+    else if (currentWeek >= 27 && currentWeek <= 39) termFilter.value = 3;
+    else termFilter.value = 4;
+    
+    populateWeeks();
+
+    // --- Load Data Function ---
+    const loadAttendanceData = async () => {
+        const selectedClass = classSelect.value;
+        const year = parseInt(yearFilter.value);
+        const weekNumber = parseInt(weekFilter.value);
+
+        // Update Headers with Dates
+        const mondayDate = getDateOfISOWeek(weekNumber, year);
+        const days = ['mon', 'tue', 'wed', 'thu', 'fri'];
+        const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+        
+        days.forEach((d, index) => {
+            const date = new Date(mondayDate);
+            date.setDate(mondayDate.getDate() + index);
+            const dateStr = `${date.getDate()} ${date.toLocaleString('default', { month: 'short' })}`;
+            const th = document.getElementById(`th-${d}`);
+            if (th) th.textContent = `${dayNames[index]} (${dateStr})`;
+        });
 
         weekDisplay.textContent = `Showing Attendance for: Week ${weekNumber}, ${year}`;
 
@@ -109,7 +189,13 @@ function setupAttendanceRegister(db, teacherData) {
             console.error("Error loading weekly attendance:", error);
             tableBody.innerHTML = `<tr><td colspan="7" class="error-message">Failed to load attendance. Please try again.</td></tr>`;
         }
-    });
+    };
+
+    // Event Listeners
+    classSelect.addEventListener('change', loadAttendanceData);
+    yearFilter.addEventListener('change', () => { populateWeeks(); loadAttendanceData(); });
+    termFilter.addEventListener('change', () => { populateWeeks(); loadAttendanceData(); });
+    weekFilter.addEventListener('change', loadAttendanceData);
 }
 
 /**
@@ -123,6 +209,8 @@ function setupAttendanceFormListener(form, db) {
         const submitButton = form.querySelector('button[type="submit"]');
         const statusMessage = document.getElementById('attendance-submit-status');
         const selectedClass = document.getElementById('attendance-class-select').value;
+        const year = parseInt(document.getElementById('attendance-year-filter').value);
+        const weekNumber = parseInt(document.getElementById('attendance-week-filter').value);
 
         if (!selectedClass) {
             alert("Please select a class before submitting.");
@@ -133,9 +221,6 @@ function setupAttendanceFormListener(form, db) {
         submitButton.innerHTML = '<i class="fas fa-sync fa-spin"></i> Saving...';
 
         const batch = db.batch();
-        const today = new Date();
-        const year = today.getFullYear();
-        const weekNumber = getWeekNumber(today);
         const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
 
         document.querySelectorAll('#attendance-table-body tr').forEach(row => {

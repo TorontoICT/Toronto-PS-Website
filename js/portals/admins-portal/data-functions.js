@@ -655,15 +655,42 @@ async function loadAttendanceRecords(year, term, weekFilter = 'All', classFilter
         4: { start: 40, end: 53 }   // Oct-Dec
     };
 
+    // Helper to get Monday of ISO week
+    const getDateOfISOWeek = (w, y) => {
+        var simple = new Date(y, 0, 1 + (w - 1) * 7);
+        var dow = simple.getDay();
+        var ISOweekStart = simple;
+        if (dow <= 4)
+            ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
+        else
+            ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
+        return ISOweekStart;
+    };
+
     let statusText;
     let queryHeaderText;
+    let dayDateMap = {};
 
     if (weekFilter === 'All') {
         statusText = `Fetching absentee records for ${year}, Term ${term}`;
         queryHeaderText = "Total Days Absent This Term";
     } else {
-        statusText = `Fetching absentee records for ${year}, Week ${weekFilter}`;
+        // Calculate date range for status text
+        const monday = getDateOfISOWeek(parseInt(weekFilter), parseInt(year));
+        const friday = new Date(monday);
+        friday.setDate(monday.getDate() + 4);
+        const dateRange = `${monday.getDate()} ${monday.toLocaleString('default', { month: 'short' })} - ${friday.getDate()} ${friday.toLocaleString('default', { month: 'short' })}`;
+
+        statusText = `Fetching absentee records for ${year}, Week ${weekFilter} (${dateRange})`;
         queryHeaderText = "Absent Days This Week";
+
+        // Pre-calculate dates for days
+        const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+        days.forEach((day, index) => {
+            const d = new Date(monday);
+            d.setDate(monday.getDate() + index);
+            dayDateMap[day] = `${d.getDate()} ${d.toLocaleString('default', { month: 'short' })}`;
+        });
     }
 
     if (classFilter !== 'All') statusText += ` in Class ${classFilter}`;
@@ -703,7 +730,13 @@ async function loadAttendanceRecords(year, term, weekFilter = 'All', classFilter
 
             const absentDays = Object.entries(data.attendance || {})
                 .filter(([, status]) => status === 'absent')
-                .map(([day]) => day.charAt(0).toUpperCase() + day.slice(1));
+                .map(([day]) => {
+                    let dayLabel = day.charAt(0).toUpperCase() + day.slice(1);
+                    if (weekFilter !== 'All' && dayDateMap[day]) {
+                        dayLabel += ` (${dayDateMap[day]})`;
+                    }
+                    return dayLabel;
+                });
 
             if (absentDays.length > 0) {
                 if (absenteeData.has(learnerId)) {
