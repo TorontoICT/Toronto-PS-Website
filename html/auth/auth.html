@@ -12,6 +12,13 @@
     <link rel="stylesheet" href="../../home.css">
     <link rel="stylesheet" href="../../css/auth/auth.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+      (function(){
+         emailjs.init("YOUR_PUBLIC_KEY"); // Replace with your actual Public Key
+      })();
+    </script>
     <script type="module" src="../../js/auth/auth.js" defer></script>
 </head>
 <body>
@@ -289,9 +296,15 @@
     <input type="email" name="email" placeholder="Email Address" id="loginEmail" required>
     <!-- Specific admission number input for learners, hidden by default -->
     <input type="text" name="admission-number" placeholder="Admission Number" id="loginAdmissionNumber" style="display: none;">
+    <div class="forgot-password-link-container" style="display: flex; justify-content: space-between;">
+     <a href="#" id="show-resend-verification" style="font-size: 0.9em;">Resend Verification Email</a>
+    </div><br>
     <div class="password-wrapper">
       <input type="password" name="password" placeholder="Password" id="loginPassword" required>
       <i class="fas fa-eye toggle-password" aria-hidden="true"></i>
+    </div>
+    <div class="forgot-password-link-container" style="display: flex; justify-content: space-between;">
+     <a href="#" id="show-forgot-password">Forgot Password?</a>
     </div>
     <button id="loginSubmit" type="submit" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 transition duration-150 mt-4">Log In</button>
     <div class="mt-4 flex items-center justify-between">
@@ -305,9 +318,7 @@
     <p id="learner-login-note" class="form-note" style="display: none; margin-top: 15px;">
       Learners: Use your Admission Number as the username and your ID Number as the password.
     </p>
-    <div class="forgot-password-link-container">
-     <a href="#" id="show-forgot-password">Forgot Password?</a>
-    </div>
+
    </form>
      </div>
 
@@ -317,6 +328,19 @@
       <form action="#" method="post">
        <input type="email" name="forgot-email" placeholder="Your Email Address" id="forgotEmail" required>
        <button id="forgotSubmit" type="submit" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 transition duration-150 mt-4">Send Reset Link</button>
+      </form>
+     </div>
+
+     <div id="resend-verification-form" class="form" aria-hidden="true" style="display: none;">
+      <h2>Resend Verification</h2>
+      <p class="form-note">Enter your email and password to resend the verification link.</p>
+      <form action="#" method="post">
+       <input type="email" name="resend-email" placeholder="Email Address" id="resendEmail" required>
+       <div class="password-wrapper">
+         <input type="password" name="resend-password" placeholder="Password" id="resendPassword" required>
+         <i class="fas fa-eye toggle-password" aria-hidden="true"></i>
+       </div>
+       <button id="resendSubmit" type="submit" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 transition duration-150 mt-4">Resend Email</button>
       </form>
      </div>
 

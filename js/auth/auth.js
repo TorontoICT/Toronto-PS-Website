@@ -7,7 +7,7 @@
 // Import the functions you need from the SDKs you need. **MODIFIED**: Added updatePassword and reauthenticateWithCredential.
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
 // *** MODIFICATION: Import sendPasswordResetEmail ***
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider, GoogleAuthProvider, signInWithPopup, sendEmailVerification, updateProfile } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, collection, query, where, limit, getDocs } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
 
@@ -34,6 +34,17 @@ function isStrongPassword(password) {
   return regex.test(password);
 }
 
+/**
+ * Sends a post-registration email to the user.
+ * Currently sends the Firebase Verification Email.
+ * @param {object} user - The Firebase User object.
+ * @param {string} role - The user's role.
+ */
+async function sendPostRegistrationEmail(user, role) {
+    if (role === 'learner') return; // Learners use internal IDs/fake emails
+    await sendEmailVerification(user);
+}
+
 // =========================================================
 // === DOM-DEPENDENT LOGIC - initialize on DOMContentLoaded ===
 // =========================================================
@@ -51,6 +62,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const forgotPasswordForm = document.getElementById('forgot-password-form');
   const forgotEmailInput = document.getElementById('forgotEmail');
   const forgotSubmitButton = document.getElementById('forgotSubmit');
+
+  // *** NEW: Get references for Resend Verification form elements ***
+  const resendVerificationLink = document.getElementById('show-resend-verification');
+  const resendVerificationForm = document.getElementById('resend-verification-form');
+  const resendEmailInput = document.getElementById('resendEmail');
+  const resendPasswordInput = document.getElementById('resendPassword');
+  const resendSubmitButton = document.getElementById('resendSubmit');
 
   // *** NEW: Get reference for learner self-registration button ***
   const findMyDetailsBtn = document.getElementById('find-my-details-btn');
@@ -621,6 +639,18 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
+
+        // **NEW**: Update Auth Profile Display Name so it appears in Email Templates (%DISPLAY_NAME%)
+        const displayName = userData.learnerName 
+            ? `${userData.learnerName} ${userData.learnerSurname}`
+            : (userData.preferredName 
+                ? `${userData.preferredName} ${userData.surname}`
+                : `${userData.name || ''} ${userData.surname || ''}`.trim());
+        
+        if (displayName) {
+            await updateProfile(user, { displayName: displayName });
+        }
+
         // Add the new UID to the user data object before saving it
         userData.uid = user.uid; 
         await setDoc(doc(db, "users", user.uid), userData);
@@ -651,7 +681,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        alert(`Registration successful! Welcome, ${userData.learnerName || userData.name || userData.preferredName || userData.surname || userData.admissionNumber || userData.fullName}!`);
+        try {
+            await sendPostRegistrationEmail(user, role);
+            if (role !== 'learner') {
+                alert("Registration successful! Please check your email to verify your account.");
+            } else {
+                alert(`Registration successful! Welcome, ${userData.learnerName || userData.name || userData.preferredName || userData.surname || userData.admissionNumber || userData.fullName}!`);
+            }
+        } catch (emailError) {
+            console.error("Failed to send email:", emailError);
+            alert("Registration successful, but we couldn't send the verification email. Please use 'Resend Verification' on the login page.");
+        }
         // switch to login view if available
         if (loginLink) loginLink.click();
       } catch (error) {
@@ -852,6 +892,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (userDocSnap.exists()) {
           const userData = userDocSnap.data();
           if (userData.role === role) {
+            // Check email verification for non-learners
+            if (role !== 'learner' && !user.emailVerified) {
+                alert("Please verify your email address before logging in.\n\nIf you need a new link, click 'Resend Verification Email' on the login page.");
+                await signOut(auth);
+                return;
+            }
+
             // **NEW**: Check if learner needs to change password
             if (role === 'learner' && userData.mustChangePassword) {
               handleForcePasswordChange(user, userData);
@@ -976,6 +1023,39 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // *** NEW: Resend Verification Handler ***
+  if (resendSubmitButton) {
+    resendSubmitButton.addEventListener('click', async function(event) {
+      event.preventDefault();
+      const email = resendEmailInput?.value || '';
+      const password = resendPasswordInput?.value || '';
+
+      if (!email || !password) {
+        alert('Please enter your email and password.');
+        return;
+      }
+
+      try {
+        // We must sign in to get the user object to send verification
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        if (user.emailVerified) {
+            alert("This email is already verified. You can log in.");
+        } else {
+            await sendEmailVerification(user);
+            alert(`Verification email sent to ${email}. Please check your inbox.`);
+        }
+        
+        await signOut(auth); // Sign out immediately
+        setVisible('login'); // Return to login screen
+      } catch (error) {
+        console.error("Resend Verification Error:", error);
+        alert(`Error: ${error.message}`);
+      }
+    });
+  }
+
   // =========================================================
   // === Inserted form switching & role toggle snippet ===
   // This restores accessible switching and hash-based initial state
@@ -989,11 +1069,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const showLogin = loginLink;
   // *** NEW: Add forgotten password link ***
   const showForgot = forgotPasswordLink; 
+  // *** NEW: Add resend verification form variable ***
+  const resend = resendVerificationForm;
 
 
 function setVisible(formToShow) {
     // Collect all forms to hide
-    const allForms = [register, login, forgot];
+    const allForms = [register, login, forgot, resend];
     const formLinksContainer = formLinks; 
     
     // **FIXED LOGIC START**
@@ -1026,6 +1108,11 @@ function setVisible(formToShow) {
         forgot.style.display = 'block';
         hash = '#forgot-password';
         if (formLinksContainer) formLinksContainer.style.display = 'none';
+    } else if (formToShow === 'resend' && resend) {
+        targetForm = resend;
+        resend.style.display = 'block';
+        hash = '#resend-verification';
+        if (formLinksContainer) formLinksContainer.style.display = 'none';
     }
 
     if (targetForm) {
@@ -1052,6 +1139,8 @@ function setVisible(formToShow) {
       setVisible('register');
     } else if (currentHash === '#forgot-password') {
       setVisible('forgot');
+    } else if (currentHash === '#resend-verification') {
+      setVisible('resend');
     } else {
       // Default to login if hash is empty or anything else
       setVisible('login');
@@ -1077,6 +1166,16 @@ function setVisible(formToShow) {
       // Copy login email if available
       if (loginEmailInput?.value) {
         forgotEmailInput.value = loginEmailInput.value;
+      }
+    });
+  }
+  // *** NEW: Event listener for Resend Verification link ***
+  if (resendVerificationLink) {
+    resendVerificationLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      setVisible('resend');
+      if (loginEmailInput?.value) {
+        resendEmailInput.value = loginEmailInput.value;
       }
     });
   }
@@ -1147,6 +1246,12 @@ onAuthStateChanged(auth, (user) => {
 
         // Initialize settings handlers if the user is logged in
         if (user) {
+            // Check email verification for non-learners on protected pages
+            if (sessionUser.role !== 'learner' && !user.emailVerified) {
+                alert("Please verify your email address to access this portal.");
+                window.location.href = "../../html/auth/auth.html";
+                return;
+            }
             setupSettingsHandlers(user);
         }
     }
