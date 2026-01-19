@@ -368,6 +368,15 @@
         <div id="excel-upload-status" style="margin-top: 15px;"></div>
       </div>
 
+      <!-- **NEW**: Bulk Remove Tool -->
+      <div class="tool-card accent-1" style="margin-top: 20px;">
+          <h3><i class="fas fa-user-minus"></i> Bulk Remove Learners</h3>
+          <p>Select multiple learners to remove them from your class roster at once.</p>
+          <button id="open-bulk-remove-modal-btn" class="cta-button danger">
+              <i class="fas fa-trash-alt"></i> Open Bulk Remove Tool
+          </button>
+      </div>
+
       <hr style="margin: 30px 0;">
 
       <div class="tool-card">
@@ -1089,6 +1098,32 @@
               <button type="submit" class="cta-button primary-green"><i class="fas fa-sms"></i> Send SMS</button>
             </form>
           </div>
+        </div>
+      </div>
+
+      <!-- Bulk Remove Learners Modal -->
+      <div id="bulk-remove-modal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <span class="modal-close-btn" id="close-bulk-remove-modal">&times;</span>
+            <h3>Bulk Remove Learners</h3>
+            <p>Select learners to remove from your class. This will unassign them from <strong><span id="bulk-remove-class-name"></span></strong>.</p>
+            
+            <div class="form-group">
+                <input type="text" id="bulk-remove-search" placeholder="Search learner name..." style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px;">
+            </div>
+
+            <div id="bulk-remove-list-container" class="scroll-container" style="max-height: 300px; overflow-y: auto; border: 1px solid #eee; padding: 10px; text-align: left; margin-bottom: 15px;">
+                <p class="info-message">Loading learners...</p>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <input type="checkbox" id="select-all-bulk-remove"> <label for="select-all-bulk-remove">Select All</label>
+                </div>
+                <button id="execute-bulk-remove-btn" class="cta-button danger" disabled>
+                    <i class="fas fa-trash-alt"></i> Remove Selected (<span id="bulk-remove-count">0</span>)
+                </button>
+            </div>
         </div>
       </div>
  </main>

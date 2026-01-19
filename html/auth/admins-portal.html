@@ -122,6 +122,14 @@
     <div class="portal-content-wrapper">
       <h1 class="portal-title">Admins Portal Dashboard</h1>
 
+      <!-- **NEW**: Shared action bar for buttons visible across multiple sections -->
+      <div id="shared-actions-bar" style="margin-bottom: 20px; display: flex; gap: 10px;">
+          <button id="open-bulk-remove-modal-btn" class="cta-button-small danger" style="display: none;">
+              <i class="fas fa-user-minus"></i> Bulk Remove
+          </button>
+          <!-- Other shared buttons can be added here in the future -->
+      </div>
+
       <section id="profile" class="portal-section active-section">
         <h2>Your Profile</h2>
         <div class="profile-card">
@@ -206,19 +214,27 @@
                 <button id="export-lms-pdf-btn" class="cta-button-small primary-red"><i class="fas fa-file-pdf"></i> Export to PDF</button>
             </div>
 
-            <div class="form-group" style="max-width: 250px; margin-bottom: 20px;">
-                <label for="grade-filter">Filter by Grade:</label>
-                <select id="grade-filter" style="padding: 10px; border: 1px solid #ccc; border-radius: 5px; width: 100%;">
-                    <option value="All">All Grades (R - 7)</option>
-                    <option value="R">Grade R</option>
-                    <option value="1">Grade 1</option> 
-                    <option value="2">Grade 2</option>
-                    <option value="3">Grade 3</option>
-                    <option value="4">Grade 4</option>
-                    <option value="5">Grade 5</option>
-                    <option value="6">Grade 6</option>
-                    <option value="7">Grade 7</option>
-                </select>
+            <div class="filters-wrapper" style="display: flex; gap: 15px; align-items: flex-end; margin-bottom: 20px; flex-wrap: wrap;">
+                <div class="form-group" style="flex: 1; min-width: 200px; margin-bottom: 0;">
+                    <label for="grade-filter">Filter by Grade:</label>
+                    <select id="grade-filter" style="padding: 10px; border: 1px solid #ccc; border-radius: 5px; width: 100%;">
+                        <option value="All">All Grades (R - 7)</option>
+                        <option value="R">Grade R</option>
+                        <option value="1">Grade 1</option> 
+                        <option value="2">Grade 2</option>
+                        <option value="3">Grade 3</option>
+                        <option value="4">Grade 4</option>
+                        <option value="5">Grade 5</option>
+                        <option value="6">Grade 6</option>
+                        <option value="7">Grade 7</option>
+                    </select>
+                </div>
+                <div class="form-group" style="flex: 1; min-width: 200px; margin-bottom: 0;">
+                    <label for="class-filter">Filter by Class:</label>
+                    <select id="class-filter" style="padding: 10px; border: 1px solid #ccc; border-radius: 5px; width: 100%;" disabled>
+                        <option value="All">All Classes</option>
+                    </select>
+                </div>
             </div>
             <table id="active-learners-table">
               <thead>
@@ -233,6 +249,9 @@
               <tbody>
                 </tbody>
             </table>
+            <div style="text-align: center; margin-top: 10px;">
+                <button id="load-more-all-btn" class="cta-button-secondary" style="display: none;">Load More Learners</button>
+            </div>
             <p class="data-status-message" id="active-learners-status">Loading all active learners...</p>
           </div>
         </div>
@@ -754,6 +773,13 @@
             <p>Adjust and configure system settings and user permissions.</p>
             <a href="#" class="cta-button">Go to Settings</a>
           </div>
+          <div class="grid-item tool-card">
+            <h3>Database Organization</h3>
+            <p>Generate the "Class View" collection in Firebase. This organizes learners into documents per class (e.g., "Grade 7C") for easier browsing in the console.</p>
+            <button id="rebuild-class-views-btn" class="cta-button primary-blue">
+                <i class="fas fa-sync"></i> Rebuild Class Views
+            </button>
+          </div>
         </div>
       </section>
     </div>
@@ -761,6 +787,44 @@
     <!-- Modal for Printable Mark Sheet (re-used from teacher portal) -->
     <div id="marksheet-modal" class="modal">
         <div id="marksheet-modal-content" class="modal-content printable-area"></div>
+    </div>
+
+    <!-- Bulk Remove Learners Modal -->
+    <div id="bulk-remove-modal" class="modal">
+      <div class="modal-content" style="max-width: 600px;">
+          <span class="modal-close-btn" id="close-bulk-remove-modal">&times;</span>
+          <h3>Bulk Remove Learners from Class</h3>
+          <p>Select a class, then select learners to unassign them (remove from class roster).</p>
+          
+          <div class="form-group">
+              <label for="bulk-remove-class-select">Select Class:</label>
+              <select id="bulk-remove-class-select" style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                  <option value="">-- Select Class --</option>
+              </select>
+          </div>
+
+          <div class="form-group">
+              <input type="text" id="bulk-remove-search" placeholder="Search learner name..." style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; display:none;">
+          </div>
+
+          <div id="bulk-remove-list-container" class="scroll-container" style="max-height: 300px; overflow-y: auto; border: 1px solid #eee; padding: 10px; text-align: left; margin-bottom: 15px;">
+              <p class="info-message">Please select a class first.</p>
+          </div>
+
+          <div style="margin-bottom: 15px; padding: 10px; background-color: #fee2e2; border-radius: 4px; border: 1px solid #fca5a5;">
+              <input type="checkbox" id="bulk-delete-permanent"> 
+              <label for="bulk-delete-permanent" style="color: #991b1b; font-weight: bold; cursor: pointer;">Permanently delete these learners from the database?</label>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                  <input type="checkbox" id="select-all-bulk-remove" disabled> <label for="select-all-bulk-remove">Select All</label>
+              </div>
+              <button id="execute-bulk-remove-btn" class="cta-button danger" disabled>
+                  <i class="fas fa-trash-alt"></i> Remove Selected (<span id="bulk-remove-count">0</span>)
+              </button>
+          </div>
+      </div>
     </div>
 
     <!-- Image Viewer Modal -->
