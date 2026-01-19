@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function showSection(targetId) {
         // Define parent-child relationships for nested navigation
         const sectionMap = { // **FIX**: Removed 'grades-form' from this map.
-            'attendance-form': 'students',
+            'attendance-view': 'students',
             'class-setup': 'students'
         };
         const parentId = sectionMap[targetId] || targetId;
@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const targetId = this.getAttribute('href').substring(1);
 
       // Define which sections are part of the learner management module
-      const learnerMgmtSections = ['students', 'attendance-form', 'class-setup'];
+      const learnerMgmtSections = ['students', 'attendance-view', 'class-setup'];
 
       // Remove active class from all sidebar links
       sidebarLinks.forEach(l => l.classList.remove('active'));
@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const initialHash = window.location.hash.substring(1) || 'dashboard';
   showSection(initialHash); // This will now handle the new section
   // Activate the correct sidebar link on page load
-  const learnerMgmtSectionsOnLoad = ['students', 'attendance-form', 'class-setup', 'grades-form'];
+  const learnerMgmtSectionsOnLoad = ['students', 'attendance-view', 'class-setup', 'grades-form'];
   let initialSidebarTarget = learnerMgmtSectionsOnLoad.includes(initialHash) ? 'students' : initialHash;
   const initialLink = document.querySelector(`.sidebar a[href="#${initialSidebarTarget}"]`);
   if (initialLink) {

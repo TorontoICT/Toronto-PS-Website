@@ -39,16 +39,17 @@ function setupAttendanceRegister(db, teacherData) {
 
     if (!classSelect || !tableBody || !yearFilter || !termFilter || !weekFilter) return;
 
-    classSelect.innerHTML = '<option value="">-- Select a Class to Load Roster --</option>';
+    classSelect.innerHTML = '<option value="">-- Select Class --</option>';
 
-    if (teacherData.isClassTeacher && teacherData.responsibleClass) {
-        classSelect.add(new Option(`Class: ${teacherData.responsibleClass}`, teacherData.responsibleClass));
-        classSelect.value = teacherData.responsibleClass;
-        classSelect.dispatchEvent(new Event('change'));
+    // **MODIFIED**: Only show the responsible class as requested, and do not auto-select.
+    if (teacherData.responsibleClass) {
+        classSelect.disabled = false;
+        classSelect.add(new Option(`Class ${teacherData.responsibleClass}`, teacherData.responsibleClass));
+        classSelect.value = ""; // Ensure it defaults to the placeholder
     } else {
-        classSelect.innerHTML = '<option value="">Not assigned as a Class Teacher</option>';
+        classSelect.innerHTML = '<option value="">No Responsible Class</option>';
         classSelect.disabled = true;
-        tableBody.innerHTML = `<tr><td colspan="7" class="info-message">You are not assigned as a Class Teacher, or your responsible class is not set.</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="7" class="info-message">You are not assigned as a Class Teacher.</td></tr>`;
         return;
     }
 
