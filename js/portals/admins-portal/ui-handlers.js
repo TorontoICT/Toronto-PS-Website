@@ -270,6 +270,13 @@ function navigateToEditTeacherForm(data) {
  * Handles all internal portal navigation by toggling section visibility and loading data.
  */
 function handleNavigation() {
+    // **FIX**: Close and reset the bulk remove modal during navigation to prevent it from persisting across sections.
+    const bulkRemoveModal = document.getElementById('bulk-remove-modal');
+    if (bulkRemoveModal && bulkRemoveModal.style.display !== 'none') {
+        const closeBtn = document.getElementById('close-bulk-remove-modal');
+        if (closeBtn) closeBtn.click(); // Programmatically click the close button to trigger its reset logic.
+    }
+
     let targetId = window.location.hash.substring(1); 
     
     // Define a default and check for a valid section ID
@@ -360,8 +367,10 @@ function handleNavigation() {
             // Reload list if it was a detail view or if pagination reset
             if (lastVisibleAll === null || listContainer.style.display === 'block') { 
                 const gradeFilter = document.getElementById('grade-filter');
+                const classFilter = document.getElementById('class-filter');
                 const selectedGrade = gradeFilter ? gradeFilter.value : 'All';
-                loadAllActiveLearners(selectedGrade, true); 
+                const selectedClass = classFilter ? classFilter.value : 'All';
+                loadAllActiveLearners(selectedGrade, selectedClass, true); 
             }
         } else {
             listContainer.style.display = 'none';
@@ -458,6 +467,17 @@ function handleNavigation() {
     // School Calendar Management
     if (targetId === 'school-calendar') {
         setupOfficialCalendarManager(db);
+    }
+
+    // **NEW**: Control visibility of the shared "Bulk Remove" button
+    const bulkRemoveBtn = document.getElementById('open-bulk-remove-modal-btn');
+    if (bulkRemoveBtn) {
+        const visibleInSections = ['sams-applications', 'sams-learners', 'grade-assignment'];
+        if (visibleInSections.includes(targetId)) {
+            bulkRemoveBtn.style.display = 'inline-flex'; // Use inline-flex to correctly align icon and text
+        } else {
+            bulkRemoveBtn.style.display = 'none';
+        }
     }
 }
 
@@ -1849,3 +1869,249 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+/**
+ * Sets up the Bulk Remove Tool for admins.
+ */
+function setupAdminBulkRemoveTool() {
+    const openBtn = document.getElementById('open-bulk-remove-modal-btn');
+    const modal = document.getElementById('bulk-remove-modal');
+    const closeBtn = document.getElementById('close-bulk-remove-modal');
+    const listContainer = document.getElementById('bulk-remove-list-container');
+    const executeBtn = document.getElementById('execute-bulk-remove-btn');
+    const selectAllCb = document.getElementById('select-all-bulk-remove');
+    const searchInput = document.getElementById('bulk-remove-search');
+    const countSpan = document.getElementById('bulk-remove-count');
+    const classSelect = document.getElementById('bulk-remove-class-select');
+    const permanentDeleteCb = document.getElementById('bulk-delete-permanent');
+
+    if (!openBtn || !modal) return;
+
+    let currentLearners = [];
+    let selectedIds = new Set();
+
+    // Open Modal
+    openBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        modal.style.display = 'block'; // Ensure block display
+        
+        // Reset UI
+        classSelect.innerHTML = '<option value="">Loading classes...</option>';
+        listContainer.innerHTML = '<p class="info-message">Please select a class first.</p>';
+        searchInput.style.display = 'none';
+        searchInput.value = '';
+        if (selectAllCb) {
+            selectAllCb.checked = false;
+            selectAllCb.disabled = true;
+        }
+        selectedIds.clear();
+        if (permanentDeleteCb) permanentDeleteCb.checked = false; // Reset delete checkbox
+        updateUI();
+
+        // Load Classes
+        try {
+            const classes = await fetchAllUniqueClassSections();
+            classSelect.innerHTML = '<option value="">-- Select Class --</option>';
+            classes.forEach(c => {
+                classSelect.add(new Option(c, c));
+            });
+        } catch (err) {
+            console.error("Error loading classes:", err);
+            classSelect.innerHTML = '<option value="">Error loading classes</option>';
+        }
+    });
+
+    // Close Modal
+    const closeModal = () => {
+        modal.style.display = 'none';
+    };
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+
+    // Class Selection Change
+    classSelect.addEventListener('change', () => {
+        const className = classSelect.value;
+        selectedIds.clear();
+        updateUI();
+        
+        if (className) {
+            loadLearners(className);
+            searchInput.style.display = 'block';
+            if (selectAllCb) selectAllCb.disabled = false;
+        } else {
+            listContainer.innerHTML = '<p class="info-message">Please select a class first.</p>';
+            searchInput.style.display = 'none';
+            if (selectAllCb) selectAllCb.disabled = true;
+        }
+    });
+
+    // Load Learners for selected class
+    async function loadLearners(className) {
+        listContainer.innerHTML = '<p class="info-message">Loading learners...</p>';
+        try {
+            const snapshot = await db.collection('sams_registrations')
+                .where('fullGradeSection', '==', className)
+                .get();
+            
+            currentLearners = [];
+            snapshot.forEach(doc => {
+                currentLearners.push({ id: doc.id, ...doc.data() });
+            });
+
+            renderList();
+        } catch (error) {
+            console.error("Error loading learners:", error);
+            listContainer.innerHTML = '<p class="error-message">Error loading learners.</p>';
+        }
+    }
+
+    // Render Learner List
+    function renderList() {
+        const filter = searchInput.value.toLowerCase();
+        const filtered = currentLearners.filter(l => 
+            (l.learnerName + ' ' + l.learnerSurname).toLowerCase().includes(filter)
+        );
+
+        if (filtered.length === 0) {
+            listContainer.innerHTML = '<p class="info-message">No learners found.</p>';
+            return;
+        }
+
+        listContainer.innerHTML = '';
+        // Sort by surname
+        filtered.sort((a, b) => (a.learnerSurname || '').localeCompare(b.learnerSurname || '')).forEach(l => {
+            const div = document.createElement('div');
+            div.style.padding = '8px';
+            div.style.borderBottom = '1px solid #eee';
+            div.style.display = 'flex';
+            div.style.alignItems = 'center';
+            
+            const isChecked = selectedIds.has(l.id);
+            
+            div.innerHTML = `
+                <label style="display: flex; align-items: center; cursor: pointer; width: 100%;">
+                    <input type="checkbox" class="bulk-remove-cb" value="${l.id}" ${isChecked ? 'checked' : ''} style="margin-right: 10px;">
+                    <span>${l.learnerSurname}, ${l.learnerName} (${l.admissionId})</span>
+                </label>
+            `;
+            listContainer.appendChild(div);
+        });
+
+        // Re-attach listeners to new checkboxes
+        listContainer.querySelectorAll('.bulk-remove-cb').forEach(cb => {
+            cb.addEventListener('change', (e) => {
+                if (e.target.checked) selectedIds.add(e.target.value);
+                else selectedIds.delete(e.target.value);
+                updateUI();
+            });
+        });
+        
+        // Update Select All state based on visible items
+        if (selectAllCb) {
+             const allVisibleChecked = filtered.every(l => selectedIds.has(l.id));
+             selectAllCb.checked = filtered.length > 0 && allVisibleChecked;
+        }
+    }
+
+    // Search Input
+    searchInput.addEventListener('input', renderList);
+
+    // Select All
+    if (selectAllCb) {
+        selectAllCb.addEventListener('change', (e) => {
+            const isChecked = e.target.checked;
+            const filter = searchInput.value.toLowerCase();
+            const filtered = currentLearners.filter(l => 
+                (l.learnerName + ' ' + l.learnerSurname).toLowerCase().includes(filter)
+            );
+            
+            filtered.forEach(l => {
+                if (isChecked) selectedIds.add(l.id);
+                else selectedIds.delete(l.id);
+            });
+            renderList(); // Re-render to update checkboxes
+            updateUI();
+        });
+    }
+
+    // Update UI (Button state)
+    function updateUI() {
+        if (countSpan) countSpan.textContent = selectedIds.size;
+        if (executeBtn) executeBtn.disabled = selectedIds.size === 0;
+    }
+
+    // Execute Removal
+    executeBtn.addEventListener('click', async () => {
+        const isPermanent = permanentDeleteCb ? permanentDeleteCb.checked : false;
+        const actionText = isPermanent ? "PERMANENTLY DELETE" : "remove";
+        const confirmMessage = isPermanent 
+            ? `WARNING: You are about to PERMANENTLY DELETE ${selectedIds.size} learner(s) from the database. This cannot be undone.\n\nAre you sure?`
+            : `Are you sure you want to remove ${selectedIds.size} learners from class ${classSelect.value}?`;
+
+        if (!confirm(confirmMessage)) return;
+
+        executeBtn.disabled = true;
+        executeBtn.innerHTML = '<i class="fas fa-sync fa-spin"></i> Removing...';
+
+        const batch = db.batch();
+        const className = classSelect.value;
+        // Reference to the class view document to keep it in sync
+        const classViewRef = db.collection('sams_class_views').doc(className.replace(/\s+/g, '_'));
+
+        selectedIds.forEach(docId => {
+            const ref = db.collection('sams_registrations').doc(docId);
+            const learner = currentLearners.find(l => l.id === docId);
+
+            if (isPermanent) {
+                // 1. Delete the learner document
+                batch.delete(ref);
+            } else {
+                // 1. Unassign the learner
+                batch.update(ref, {
+                    section: null,
+                    fullGradeSection: null
+                });
+            }
+
+            // 2. Remove from the Class View (sams_class_views)
+            // We do this for both Unassign and Delete to keep the class list accurate
+            if (learner) {
+                const learnerSummary = {
+                    admissionId: learner.admissionId,
+                    name: learner.learnerName,
+                    surname: learner.learnerSurname,
+                    uid: learner.uid || null
+                };
+                batch.update(classViewRef, {
+                    learners: firebase.firestore.FieldValue.arrayRemove(learnerSummary)
+                });
+            }
+        });
+
+        try {
+            await batch.commit();
+            alert(isPermanent ? 'Learners permanently deleted.' : 'Learners removed from class successfully.');
+            closeModal();
+            
+            // Refresh main list if visible
+            const gradeFilter = document.getElementById('grade-filter');
+            if (gradeFilter && typeof loadAllActiveLearners === 'function') {
+                loadAllActiveLearners(gradeFilter.value, true);
+            }
+        } catch (error) {
+            console.error("Error removing learners:", error);
+            alert("Failed to remove learners.");
+        } finally {
+            executeBtn.disabled = false;
+            executeBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Remove Selected';
+        }
+    });
+
+    // --- REBUILD CLASS VIEWS LISTENER ---
+    const rebuildBtn = document.getElementById('rebuild-class-views-btn');
+    if (rebuildBtn) {
+        rebuildBtn.addEventListener('click', rebuildFirebaseClassViews);
+    }
+}

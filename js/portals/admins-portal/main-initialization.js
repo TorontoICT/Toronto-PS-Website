@@ -26,10 +26,49 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Event listener for the main LMS list filter
     const gradeFilter = document.getElementById('grade-filter');
+    const classFilter = document.getElementById('class-filter');
+    const loadMoreAllBtn = document.getElementById('load-more-all-btn'); 
     if (gradeFilter) {
-        gradeFilter.addEventListener('change', (e) => {
+        gradeFilter.addEventListener('change', async (e) => {
+            const selectedGrade = e.target.value;
             selectedLearnerData = null; 
-            loadAllActiveLearners(e.target.value);
+            
+            // Reset and populate class filter
+            if (classFilter) {
+                classFilter.innerHTML = '<option value="All">All Classes</option>';
+                classFilter.value = 'All';
+                
+                if (selectedGrade !== 'All') {
+                    classFilter.disabled = true;
+                    if (typeof getSectionsForGrade === 'function') {
+                        const sections = await getSectionsForGrade(selectedGrade);
+                        sections.forEach(sec => {
+                            classFilter.add(new Option(`Class ${sec}`, sec));
+                        });
+                        classFilter.disabled = false;
+                    }
+                } else {
+                    classFilter.disabled = true;
+                }
+            }
+
+            loadAllActiveLearners(selectedGrade, 'All', true); 
+        });
+    }
+
+    if (loadMoreAllBtn) {
+    loadMoreAllBtn.addEventListener('click', () => {
+        const selectedGrade = gradeFilter ? gradeFilter.value : 'All';
+        const selectedClass = classFilter ? classFilter.value : 'All';
+        loadAllActiveLearners(selectedGrade, selectedClass, false); 
+        });
+    }
+    
+    if (classFilter) {
+        classFilter.addEventListener('change', (e) => {
+            selectedLearnerData = null;
+            const selectedGrade = gradeFilter ? gradeFilter.value : 'All';
+            loadAllActiveLearners(selectedGrade, e.target.value, true);
         });
     }
 
@@ -177,6 +216,9 @@ document.addEventListener('DOMContentLoaded', () => {
             loadAttendanceRecords(e.target.value);
         });
     }
+
+    // --- BULK REMOVE TOOL ---
+    if (typeof setupAdminBulkRemoveTool === 'function') setupAdminBulkRemoveTool();
 });
 
 /**

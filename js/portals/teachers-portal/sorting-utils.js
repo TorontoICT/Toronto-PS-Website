@@ -7,10 +7,10 @@
  */
 function sortLearnersByName(items) {
     items.sort((a, b) => {
-        // Reverted to correct logic after database fix: learnerSurname is the surname.
-        const surnameCompare = (a.learnerSurname || '').localeCompare(b.learnerSurname || '');
-        if (surnameCompare !== 0) return surnameCompare;
-        return (a.learnerName || '').localeCompare(b.learnerName || '');
+        // Reverted to correct logic after database fix: learnerName is the name.
+        const nameCompare = (a.learnerName || '').localeCompare(b.learnerName|| '');
+        if (nameCompare !== 0) return nameCompare;
+        return (a.learnerSurname || '').localeCompare(b.learnerSurname || '');
     });
 }
 
@@ -20,5 +20,5 @@ function sortLearnersByName(items) {
  * @returns {string} The formatted name.
  */
 function formatLearnerName(learner) {
-    return `${learner.learnerSurname || ''} ${learner.learnerName || ''}`.trim();
+    return `${learner.learnerName || ''} ${learner.learnerSurname || ''}`.trim();
 }

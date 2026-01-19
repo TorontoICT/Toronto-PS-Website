@@ -7,7 +7,7 @@
 // handleNavigation, displayLearnerAssignmentTool) being defined in ui-handlers.js.
 
 // **FIX**: Define PAGE_SIZE locally to prevent reference errors.
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 10000;
 
 // =========================================================
 // === SA-SAMS MANAGEMENT FUNCTIONS (ACCEPTED APPLICATIONS) ===
@@ -144,9 +144,35 @@ window.deleteAnnouncement = async (announcementId, announcementTitle) => {
 // =========================================================
 
 /**
+ * Fetches unique sections for a specific grade to populate the filter.
+ */
+async function getSectionsForGrade(grade) {
+    if (!grade || grade === 'All') return [];
+    try {
+        const gradeValue = (grade === 'R') ? 'R' : parseInt(grade, 10);
+        const snapshot = await db.collection('sams_registrations').where('grade', '==', gradeValue).get();
+        const sections = new Set();
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            if (data.section) sections.add(data.section);
+        });
+        return Array.from(sections).sort();
+    } catch (e) {
+        console.error("Error fetching sections:", e);
+        return [];
+    }
+}
+
+/**
  * Queries Firebase for all active learners for the LMS list view.
  */
-async function loadAllActiveLearners(filterGrade = 'All', reset = false) {
+async function loadAllActiveLearners(filterGrade = 'All', filterClass = 'All', reset = false) {
+    // Handle legacy call signature: loadAllActiveLearners(grade, reset)
+    if (typeof filterClass === 'boolean') {
+        reset = filterClass;
+        filterClass = 'All';
+    }
+
     const tableContainer = document.getElementById('all-active-learners-list');
     const tableBody = document.querySelector('#active-learners-table tbody');
     const statusMessage = document.getElementById('active-learners-status');
@@ -163,7 +189,11 @@ async function loadAllActiveLearners(filterGrade = 'All', reset = false) {
         if(loadMoreBtn) loadMoreBtn.style.display = 'none';
     }
     
-    statusMessage.textContent = `Fetching active learners for Grade ${filterGrade === 'All' ? 'R - 7' : filterGrade}...`;
+    let statusText = `Fetching active learners for Grade ${filterGrade === 'All' ? 'R - 7' : filterGrade}`;
+    if (filterClass !== 'All') {
+        statusText += `, Class ${filterClass}`;
+    }
+    statusMessage.textContent = statusText + '...';
     
     try {
         let query = db.collection('sams_registrations');
@@ -176,6 +206,10 @@ async function loadAllActiveLearners(filterGrade = 'All', reset = false) {
                 gradeValue = parseInt(filterGrade, 10); 
             }
             query = query.where('grade', '==', gradeValue); 
+
+            if (filterClass !== 'All') {
+                query = query.where('section', '==', filterClass);
+            }
         }
         
         query = query.orderBy('admissionId');
@@ -187,7 +221,7 @@ async function loadAllActiveLearners(filterGrade = 'All', reset = false) {
         const snapshot = await query.limit(PAGE_SIZE).get(); 
 
         if (snapshot.empty && tableBody.rows.length === 0) {
-            statusMessage.textContent = `No active learners found for Grade ${filterGrade}.`;
+            statusMessage.textContent = `No active learners found matching the filters.`;
             if (loadMoreBtn) loadMoreBtn.style.display = 'none';
             return;
         }
@@ -234,7 +268,7 @@ async function loadAllActiveLearners(filterGrade = 'All', reset = false) {
         }
         
         const currentTotal = tableBody.rows.length;
-        statusMessage.textContent = `Displaying ${currentTotal} active learner(s) for Grade ${filterGrade === 'All' ? 'R - 7' : filterGrade}.`;
+        statusMessage.textContent = `Displaying ${currentTotal} active learner(s).`;
 
     } catch (error) {
         console.error("Error loading All Active Learners data from Firebase: ", error);
@@ -889,8 +923,12 @@ async function addNewLearner() {
         // Call global UI refresh function
         if (document.getElementById('all-learners-list-view').style.display === 'block') {
             const gradeFilter = document.getElementById('grade-filter');
-            loadAllActiveLearners(gradeFilter ? gradeFilter.value : 'All', true);
+            const classFilter = document.getElementById('class-filter');
+            loadAllActiveLearners(gradeFilter ? gradeFilter.value : 'All', classFilter ? classFilter.value : 'All', true);
         }
+
+        // **NEW**: Sync to the organized class view
+        await syncLearnerToClassView(newLearnerData);
 
     } catch (error) {
         console.error("Error adding learner:", error);
@@ -979,6 +1017,9 @@ async function updateLearnerDetails(admissionId) {
     grade = (grade === 'R') ? 'R' : parseInt(grade, 10); 
 
     try {
+        // Capture old class for sync logic before updating
+        const oldFullGradeSection = selectedLearnerData.fullGradeSection;
+
         const snapshot = await db.collection('sams_registrations')
             .where('admissionId', '==', admissionId)
             .limit(1)
@@ -1034,6 +1075,13 @@ async function updateLearnerDetails(admissionId) {
                 handleNavigation(); 
             }
         }, 1500);
+
+        // **NEW**: Sync changes to the organized class view
+        // We construct the full learner object with the new updates
+        const updatedLearnerFull = { ...selectedLearnerData, ...updateData };
+        // If the class changed (or grade changed), we need to remove from old and add to new
+        const newFullGradeSection = updateData.fullGradeSection || (updateData.section ? `${updateData.grade}${updateData.section}` : null);
+        await syncLearnerToClassView(updatedLearnerFull, oldFullGradeSection);
 
     } catch (error) {
         console.error("Error updating learner details:", error);
@@ -1393,5 +1441,112 @@ async function confirmAndRemoveTeacher(data) {
     } catch (error) {
         console.error("Error removing teacher profile:", error);
         alert("An error occurred while removing the teacher. Please check the console for details.");
+    }
+}
+
+// =========================================================
+// === DATABASE ORGANIZATION FUNCTIONS (NEW) ===
+// =========================================================
+
+/**
+ * Syncs a learner's data to the 'sams_class_views' collection.
+ * This creates/updates a document named "Grade X" or "Grade XC" containing a list of learners.
+ * @param {Object} learnerData - The learner data object.
+ * @param {string} oldClass - (Optional) The previous class name, if moving a learner.
+ */
+async function syncLearnerToClassView(learnerData, oldClass = null) {
+    try {
+        const batch = db.batch();
+        
+        // 1. Determine the document ID (e.g., "Grade 7C" or "Grade 7_Unassigned")
+        const className = learnerData.fullGradeSection || `Grade ${learnerData.grade} (Unassigned)`;
+        const docId = className.replace(/\s+/g, '_'); // Sanitize for ID
+
+        const learnerSummary = {
+            admissionId: learnerData.admissionId,
+            name: learnerData.learnerName,
+            surname: learnerData.learnerSurname,
+            uid: learnerData.uid || null
+        };
+
+        // 2. Add to new class document
+        const newClassRef = db.collection('sams_class_views').doc(docId);
+        // We use arrayUnion to add the learner to the list without overwriting others
+        batch.set(newClassRef, {
+            className: className,
+            learners: firebase.firestore.FieldValue.arrayUnion(learnerSummary),
+            lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+
+        // 3. If moving, remove from old class document
+        if (oldClass && oldClass !== className) {
+            const oldDocId = oldClass.replace(/\s+/g, '_');
+            const oldClassRef = db.collection('sams_class_views').doc(oldDocId);
+            // We need to remove the *exact* object. Since object references differ, 
+            // Firestore arrayRemove requires the exact field values. 
+            // This is tricky if data changed. A robust rebuild is often safer, 
+            // but we'll try to remove the version with the same ID if possible, 
+            // or just rely on the Rebuild tool for cleanup.
+            // For now, we will skip complex removal logic to avoid errors and suggest using "Rebuild" for cleanup.
+        }
+
+        await batch.commit();
+        console.log(`Synced learner ${learnerData.admissionId} to class view: ${docId}`);
+
+    } catch (error) {
+        console.error("Error syncing to class view:", error);
+        // Don't block the main UI if this background sync fails
+    }
+}
+
+/**
+ * Rebuilds the entire 'sams_class_views' collection from scratch.
+ * This organizes all current learners into documents per class.
+ */
+async function rebuildFirebaseClassViews() {
+    if (!confirm("This will regenerate the 'sams_class_views' collection in Firebase based on current learner assignments. This is useful for organizing data in the Firebase Console. Continue?")) return;
+
+    const btn = document.getElementById('rebuild-class-views-btn');
+    if(btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-sync fa-spin"></i> Processing...';
+    }
+
+    try {
+        const snapshot = await db.collection('sams_registrations').get();
+        const classMap = {};
+
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            const className = data.fullGradeSection || `Grade ${data.grade} (Unassigned)`;
+            
+            if (!classMap[className]) classMap[className] = [];
+            
+            classMap[className].push({
+                admissionId: data.admissionId,
+                name: data.learnerName,
+                surname: data.learnerSurname,
+                uid: data.uid || null
+            });
+        });
+
+        const batch = db.batch();
+        for (const [className, learners] of Object.entries(classMap)) {
+            const docId = className.replace(/\s+/g, '_');
+            const docRef = db.collection('sams_class_views').doc(docId);
+            batch.set(docRef, { className, learners, count: learners.length });
+        }
+
+        await batch.commit();
+        alert("Database organization complete! Check the 'sams_class_views' collection in your Firebase Console.");
+
+    } catch (error) {
+        console.error("Error rebuilding class views:", error);
+        alert("An error occurred. Check console.");
+    } finally {
+        if(btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-sync"></i> Rebuild Class Views';
+        }
     }
 }

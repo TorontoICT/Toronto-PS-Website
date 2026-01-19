@@ -77,6 +77,8 @@ document.addEventListener('DOMContentLoaded', () => {
         setupAiContentGenerator(db, userData);
         // **NEW**: Initialize the Chat Engine
         setupChatEngine(db, userData);
+        // **NEW**: Initialize Bulk Remove Tool
+        setupBulkRemoveTool(db, userData);
 
         // Make delete function globally accessible for onclick handlers
         window.deleteAiHistoryItem = deleteAiHistoryItem;
@@ -227,3 +229,155 @@ document.addEventListener('DOMContentLoaded', () => {
       setupLearnerProfileSection(db, userData); // Pass userData here as well
   }
 });
+
+/**
+ * Sets up the Bulk Remove Tool for class teachers.
+ */
+function setupBulkRemoveTool(db, userData) {
+    const openBtn = document.getElementById('open-bulk-remove-modal-btn');
+    const modal = document.getElementById('bulk-remove-modal');
+    const closeBtn = document.getElementById('close-bulk-remove-modal');
+    const listContainer = document.getElementById('bulk-remove-list-container');
+    const executeBtn = document.getElementById('execute-bulk-remove-btn');
+    const selectAllCb = document.getElementById('select-all-bulk-remove');
+    const searchInput = document.getElementById('bulk-remove-search');
+    const countSpan = document.getElementById('bulk-remove-count');
+    const classNameSpan = document.getElementById('bulk-remove-class-name');
+
+    if (!openBtn || !modal) return;
+
+    let currentLearners = [];
+    let selectedIds = new Set();
+
+    openBtn.addEventListener('click', async () => {
+        modal.style.display = 'flex';
+        
+        // Fetch latest teacher data to get the current responsible class
+        const userDoc = await db.collection('users').doc(userData.uid).get();
+        const teacher = userDoc.data();
+        const responsibleClass = teacher.responsibleClass;
+
+        if (!responsibleClass) {
+            listContainer.innerHTML = '<p class="error-message">You do not have a responsible class assigned.</p>';
+            return;
+        }
+
+        classNameSpan.textContent = responsibleClass;
+        loadLearners(responsibleClass);
+    });
+
+    closeBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+        selectedIds.clear();
+        if (selectAllCb) selectAllCb.checked = false;
+        updateUI();
+    });
+
+    async function loadLearners(className) {
+        listContainer.innerHTML = '<p class="info-message">Loading learners...</p>';
+        try {
+            const snapshot = await db.collection('sams_registrations')
+                .where('fullGradeSection', '==', className)
+                .get();
+            
+            currentLearners = [];
+            snapshot.forEach(doc => {
+                currentLearners.push({ id: doc.id, ...doc.data() });
+            });
+
+            renderList();
+        } catch (error) {
+            console.error("Error loading learners:", error);
+            listContainer.innerHTML = '<p class="error-message">Error loading learners.</p>';
+        }
+    }
+
+    function renderList() {
+        const filter = searchInput.value.toLowerCase();
+        const filtered = currentLearners.filter(l => 
+            (l.learnerName + ' ' + l.learnerSurname).toLowerCase().includes(filter)
+        );
+
+        if (filtered.length === 0) {
+            listContainer.innerHTML = '<p class="info-message">No learners found.</p>';
+            return;
+        }
+
+        listContainer.innerHTML = '';
+        filtered.sort((a, b) => (a.learnerSurname || '').localeCompare(b.learnerSurname || '')).forEach(l => {
+            const div = document.createElement('div');
+            div.style.padding = '5px 0';
+            div.style.borderBottom = '1px solid #f0f0f0';
+            const isChecked = selectedIds.has(l.id) ? 'checked' : '';
+            div.innerHTML = `
+                <label style="display: flex; align-items: center; cursor: pointer;">
+                    <input type="checkbox" class="bulk-remove-cb" value="${l.id}" ${isChecked} style="margin-right: 10px;">
+                    <span>${l.learnerSurname}, ${l.learnerName} (${l.admissionId})</span>
+                </label>
+            `;
+            listContainer.appendChild(div);
+        });
+
+        listContainer.querySelectorAll('.bulk-remove-cb').forEach(cb => {
+            cb.addEventListener('change', (e) => {
+                if (e.target.checked) selectedIds.add(e.target.value);
+                else selectedIds.delete(e.target.value);
+                updateUI();
+            });
+        });
+        updateUI();
+    }
+
+    searchInput.addEventListener('input', renderList);
+
+    selectAllCb.addEventListener('change', (e) => {
+        const checkboxes = listContainer.querySelectorAll('.bulk-remove-cb');
+        checkboxes.forEach(cb => {
+            cb.checked = e.target.checked;
+            if (e.target.checked) selectedIds.add(cb.value);
+            else selectedIds.delete(cb.value);
+        });
+        updateUI();
+    });
+
+    function updateUI() {
+        countSpan.textContent = selectedIds.size;
+        executeBtn.disabled = selectedIds.size === 0;
+    }
+
+    executeBtn.addEventListener('click', async () => {
+        if (!confirm(`Are you sure you want to remove ${selectedIds.size} learners from your class?`)) return;
+
+        executeBtn.disabled = true;
+        executeBtn.innerHTML = '<i class="fas fa-sync fa-spin"></i> Removing...';
+
+        const batch = db.batch();
+        selectedIds.forEach(docId => {
+            const ref = db.collection('sams_registrations').doc(docId);
+            // Unassign the learner by setting section and fullGradeSection to null
+            batch.update(ref, {
+                section: null,
+                fullGradeSection: null
+            });
+        });
+
+        try {
+            await batch.commit();
+            alert('Learners removed successfully.');
+            modal.style.display = 'none';
+            selectedIds.clear();
+            
+            // Trigger a refresh of the main roster list if the dropdown exists
+            const rosterSelect = document.getElementById('roster-setup-class-select');
+            if (rosterSelect) {
+                rosterSelect.dispatchEvent(new Event('change'));
+            }
+        } catch (error) {
+            console.error("Error removing learners:", error);
+            alert("Failed to remove learners.");
+        } finally {
+            executeBtn.disabled = false;
+            executeBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Remove Selected';
+        }
+    });
+}
