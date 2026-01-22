@@ -11,6 +11,7 @@ async function loadTeacherProfile(userData) {
     const profileEmail = document.querySelector('.profile-email');
     const profileContact = document.querySelector('.profile-contact');
     const profileDepartment = document.querySelector('.profile-department');
+    const profileSpecialId = document.querySelector('.profile-special-id');
     const parentClassFilter = document.getElementById('teacher-parent-class-filter');
     const rosterSetupClassSelect = document.getElementById('roster-setup-class-select');
     const profileClassFilter = document.getElementById('profile-class-filter');
@@ -36,6 +37,7 @@ async function loadTeacherProfile(userData) {
             if (profileSurname) profileSurname.innerHTML = `<strong>Surname:</strong> ${teacherData.surname || 'N/A'}`;
             if (profilePreferredName) profilePreferredName.innerHTML = `<strong>Preferred Name:</strong> ${teacherData.preferredName || 'N/A'}`;
             if (profileEmail) profileEmail.innerHTML = `<strong>Email:</strong> ${teacherData.email || 'N/A'}`;
+            if (profileSpecialId) profileSpecialId.innerHTML = `<strong>Special ID:</strong> ${teacherData.specialId || 'N/A'}`;
             if (profileContact) profileContact.innerHTML = `<strong>Contact:</strong> ${teacherData.contactNumber || 'N/A'}`;
             if (profileDepartment) {
                 const departments = teacherData.departments;
@@ -83,7 +85,8 @@ function setupProfileEditing(db, teacherAuthData) {
 
     if (!editBtn || !cancelBtn || !profileCard || !editFormContainer || !editForm) return;
 
-    editBtn.addEventListener('click', async () => {
+    editBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
         const userDoc = await db.collection('users').doc(teacherAuthData.uid).get();
         if (userDoc.exists) {
             const data = userDoc.data();

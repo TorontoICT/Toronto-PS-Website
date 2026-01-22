@@ -499,6 +499,116 @@ function setupPortalNavigation() {
     }
 }
 
+/**
+ * Loads the admissions team member's profile data.
+ * @param {object} userData - The user data from session storage.
+ */
+function loadAdmissionsProfile(userData) {
+    const profileName = document.querySelector('.profile-name');
+    const profileEmail = document.querySelector('.profile-email');
+    const profileSpecialId = document.querySelector('.profile-special-id');
+    const profileContact = document.querySelector('.profile-contact');
+    const profilePic = document.getElementById('admissions-profile-pic');
+
+    if (profileName) profileName.innerHTML = `<strong>Name:</strong> ${userData.preferredName || ''} ${userData.surname || ''}`;
+    if (profileEmail) profileEmail.innerHTML = `<strong>Email:</strong> ${userData.email || 'N/A'}`;
+    if (profileSpecialId) profileSpecialId.innerHTML = `<strong>Special ID:</strong> ${userData.specialId || 'N/A'}`;
+    if (profileContact) profileContact.innerHTML = `<strong>Contact:</strong> ${userData.contactNumber || 'N/A'}`;
+    if (profilePic && userData.photoUrl) profilePic.src = userData.photoUrl;
+}
+
+/**
+ * Sets up the event listeners and logic for editing the Admissions Team member's profile.
+ * @param {firebase.firestore.Firestore} db - The Firestore database instance.
+ * @param {object} userData - The authenticated user's data.
+ */
+function setupAdmissionsProfileEditing(db, userData) {
+    const editBtn = document.getElementById('edit-profile-btn');
+    const cancelBtn = document.getElementById('cancel-edit-profile-btn');
+    const profileCard = document.querySelector('#profile .profile-card');
+    const editFormContainer = document.getElementById('edit-profile-form-container');
+    const editForm = document.getElementById('edit-profile-form');
+
+    if (!editBtn || !cancelBtn || !profileCard || !editFormContainer || !editForm) return;
+
+    // Show the edit form
+    editBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        
+        try {
+            const userDoc = await db.collection('users').doc(userData.uid).get();
+            if (userDoc.exists) {
+                const data = userDoc.data();
+                document.getElementById('edit-profile-preferred-name').value = data.preferredName || '';
+                document.getElementById('edit-profile-surname').value = data.surname || '';
+                document.getElementById('edit-profile-contact').value = data.contactNumber || '';
+
+                profileCard.style.display = 'none';
+                editFormContainer.style.display = 'block';
+            } else {
+                alert('Could not load your profile data to edit.');
+            }
+        } catch (error) {
+            console.error("Error fetching profile for edit:", error);
+            alert('An error occurred while loading profile data.');
+        }
+    });
+
+    // Hide the edit form
+    cancelBtn.addEventListener('click', () => {
+        profileCard.style.display = 'flex';
+        editFormContainer.style.display = 'none';
+    });
+
+    // Handle form submission
+    editForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const statusMessage = document.getElementById('edit-profile-status');
+        const submitButton = editForm.querySelector('button[type="submit"]');
+
+        const updatedData = {
+            preferredName: document.getElementById('edit-profile-preferred-name').value.trim(),
+            surname: document.getElementById('edit-profile-surname').value.trim(),
+            contactNumber: document.getElementById('edit-profile-contact').value.trim(),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<i class="fas fa-sync fa-spin"></i> Saving...';
+        statusMessage.style.display = 'none';
+
+        try {
+            await db.collection('users').doc(userData.uid).update(updatedData);
+            
+            // Update session storage so the UI reflects changes immediately without re-login
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            const newSessionUser = { ...currentUser, ...updatedData };
+            sessionStorage.setItem('currentUser', JSON.stringify(newSessionUser));
+
+            statusMessage.textContent = 'Profile updated successfully!';
+            statusMessage.className = 'status-message-box success';
+            statusMessage.style.display = 'block';
+
+            loadAdmissionsProfile(newSessionUser); // Refresh the profile display
+
+            setTimeout(() => {
+                profileCard.style.display = 'flex';
+                editFormContainer.style.display = 'none';
+                statusMessage.style.display = 'none';
+            }, 2000);
+
+        } catch (error) {
+            console.error("Error updating profile:", error);
+            statusMessage.textContent = 'Failed to update profile. Please try again.';
+            statusMessage.className = 'status-message-box error';
+            statusMessage.style.display = 'block';
+        } finally {
+            submitButton.disabled = false;
+            submitButton.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+        }
+    });
+}
+
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
     // Expose functions to the global scope for HTML event handlers
@@ -512,6 +622,16 @@ document.addEventListener('DOMContentLoaded', () => {
     setupPortalNavigation();
     // Load all data automatically upon page load
     window.loadAllApplications();
+
+    // Initialize Firestore
+    const db = firebase.firestore();
+
+    // Load User Profile
+    const userData = JSON.parse(sessionStorage.getItem('currentUser'));
+    if (userData) {
+        loadAdmissionsProfile(userData);
+        setupAdmissionsProfileEditing(db, userData);
+    }
 
     // **NEW**: Set up the listener for the manual application form
     setupManualApplicationForm();

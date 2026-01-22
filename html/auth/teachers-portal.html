@@ -110,7 +110,7 @@
 
    <div id="profile" class="portal-section hidden-section">
     <h2>My Profile</h2>
-    <div class="profile-card">
+    <div class="profile-card" style="position: relative;">
       <div class="profile-pic-container">
         <img src="../../images/placeholder-profile.png" alt="Teacher Profile Picture" class="profile-pic" id="teacher-profile-pic">
         <label for="profile-pic-upload" class="profile-pic-upload-label" title="Upload new profile picture">
@@ -123,9 +123,11 @@
       <p class="profile-surname"><strong>Surname:</strong> Loading...</p>
       <p class="profile-preferred-name"><strong>Preferred Name:</strong> Loading...</p>
       <p class="profile-email"><strong>Email:</strong> Loading...</p>
+            <p class="profile-special-id"><strong>Special ID:</strong> Loading...</p>
             <p class="profile-contact"><strong>Contact:</strong> Loading...</p>
             <p class="profile-department"><strong>Department(s):</strong> Loading...</p>
-     </div><button id="edit-profile-btn" class="cta-button-edit">Edit Profile</button>
+     </div>
+     <button type="button" id="edit-profile-btn" class="cta-button-edit" style="position: absolute; top: 20px; right: 20px;">Edit Profile</button>
     </div>
 
     <!-- **NEW**: Edit Profile Form (hidden by default) -->
@@ -146,7 +148,7 @@
                     <input type="tel" id="edit-profile-contact">
                 </div>
                 <div class="form-group" style="grid-column: 1 / -1;">
-                    <label>Department(s) - Select all that apply</label>
+                    <p style="margin-bottom: 8px; font-weight: 600; color: #4b5563;">Department(s) - Select all that apply</p>
                     <div id="edit-profile-departments-group" class="checkbox-group">
                         <label><input type="checkbox" name="edit-department" value="Science & Maths"> Science & Maths</label>
                         <label><input type="checkbox" name="edit-department" value="Languages"> Languages</label>
@@ -813,6 +815,7 @@
                         </select>
                     </div>
                     <div class="form-group">
+                        <label for="chat-parent-search" class="sr-only">Search Parents</label>
                         <input type="text" id="chat-parent-search" placeholder="Search for a parent...">
                     </div>
                 </div>
@@ -827,8 +830,8 @@
                 </div>
                 <div id="chat-window" class="chat-window" style="display: none;"></div>
                 <!-- Modals for Actions will be moved here from the dynamic JS build -->
-                <div id="template-modal" class="modal"><div class="modal-content"><span class="modal-close-btn">&times;</span><h2>Use a Message Template</h2><select id="message-template-select" style="width:100%; margin-top:1rem;"><option value="">-- Select a Template --</option><option value="positive-feedback">Positive Feedback</option><option value="behavior-concern">Behavior Concern</option><option value="homework-reminder">Homework Reminder</option><option value="meeting-request">Request a Meeting</option></select><button id="apply-template-btn" class="cta-button" style="margin-top:1rem;">Apply Template</button></div></div>
-                <div id="schedule-modal" class="modal"><div class="modal-content"><span class="modal-close-btn">&times;</span><h2>Schedule Message</h2><p>Select a time and communication method.</p><input type="datetime-local" id="schedule-send-time" style="width:100%; margin-top:1rem;"><div class="send-button-group" style="margin-top:1rem; justify-content: center;"><button id="send-email-btn" class="cta-button-small" title="Send as Email"><i class="fas fa-envelope"></i> Email</button><button id="send-sms-btn" class="cta-button-small" title="Send as SMS"><i class="fas fa-sms"></i> SMS</button></div></div></div>
+                <div id="template-modal" class="modal"><div class="modal-content"><span class="modal-close-btn">&times;</span><h2>Use a Message Template</h2><label for="message-template-select" class="sr-only">Select Template</label><select id="message-template-select" style="width:100%; margin-top:1rem;"><option value="">-- Select a Template --</option><option value="positive-feedback">Positive Feedback</option><option value="behavior-concern">Behavior Concern</option><option value="homework-reminder">Homework Reminder</option><option value="meeting-request">Request a Meeting</option></select><button id="apply-template-btn" class="cta-button" style="margin-top:1rem;">Apply Template</button></div></div>
+                <div id="schedule-modal" class="modal"><div class="modal-content"><span class="modal-close-btn">&times;</span><h2>Schedule Message</h2><p>Select a time and communication method.</p><label for="schedule-send-time" class="sr-only">Schedule Time</label><input type="datetime-local" id="schedule-send-time" style="width:100%; margin-top:1rem;"><div class="send-button-group" style="margin-top:1rem; justify-content: center;"><button id="send-email-btn" class="cta-button-small" title="Send as Email"><i class="fas fa-envelope"></i> Email</button><button id="send-sms-btn" class="cta-button-small" title="Send as SMS"><i class="fas fa-sms"></i> SMS</button></div></div></div>
             </div>
         </div>
    </div>
@@ -1162,6 +1165,45 @@
     <a href="#"><i class="fa-brands fa-square-youtube"></i></a>
   </footer>
   <script src="../../js/portals/teachers-portal/sorting-utils.js"></script>
+  <script>
+    // Global helper to fix ReferenceError for portfolio navigation
+    window.showPortfolioListView = function() {
+        const listContainer = document.getElementById('portfolio-subject-list-container');
+        const detailView = document.getElementById('portfolio-detail-view');
+        if (listContainer) listContainer.style.display = 'block';
+        if (detailView) detailView.style.display = 'none';
+    };
+  </script>
+    <script>
+    /**
+     * A placeholder navigation function.
+     * Replace with the actual logic to handle
+     * navigation in your teacher's portal.
+     */
+    function handleNavigation() {
+        console.warn(
+            "handleNavigation() is a placeholder. Implement your navigation logic."
+        );
+
+        // Simple demo to make the button do something - REMOVE FOR REAL IMPLEMENTATION
+        const targetId = window.location.hash.substring(1);
+        const sections = document.querySelectorAll('.portal-section');
+
+        sections.forEach(section => {
+            section.classList.remove('active-section');
+            section.classList.add('hidden-section');
+        });
+
+        const targetSection = document.getElementById(targetId);
+        if (targetSection) {
+            targetSection.classList.add('active-section');
+            targetSection.classList.remove('hidden-section');
+        }
+    }
+    ;
+  </script>
+
+
   <!-- Refactored Teacher Portal Scripts -->
  <script src="../../js/portals/teachers-portal/profile.js"></script>
  <script src="../../js/portals/teachers-portal/dashboard.js"></script>

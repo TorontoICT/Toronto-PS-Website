@@ -1061,6 +1061,7 @@ function loadAdminProfile() {
         document.querySelector('#profile .profile-details p:nth-child(1)').innerHTML = `<strong>Name:</strong> ${userData.preferredName || 'Admin'} ${userData.surname || 'User'}`;
         document.querySelector('#profile .profile-details p:nth-child(2)').innerHTML = `<strong>Role:</strong> ${userData.role || 'Admin'}`; 
         document.querySelector('#profile .profile-details p:nth-child(3)').innerHTML = `<strong>Email:</strong> ${userData.email || 'N/A'}`;
+        document.querySelector('#profile .profile-details p:nth-child(4)').innerHTML = `<strong>Special ID:</strong> ${userData.specialId || 'N/A'}`;
 
         // **NEW**: Add edit profile functionality
         const profileSection = document.getElementById('profile');

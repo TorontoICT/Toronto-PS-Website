@@ -7,7 +7,7 @@
 // Import the functions you need from the SDKs you need. **MODIFIED**: Added updatePassword and reauthenticateWithCredential.
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
 // *** MODIFICATION: Import sendPasswordResetEmail ***
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider, GoogleAuthProvider, signInWithPopup, sendEmailVerification, updateProfile } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider, GoogleAuthProvider, signInWithPopup, sendEmailVerification, updateProfile, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, collection, query, where, limit, getDocs } from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
 
 
@@ -45,6 +45,19 @@ async function sendPostRegistrationEmail(user, role) {
     await sendEmailVerification(user);
 }
 
+// *** NEW: Setup Recaptcha for Phone Auth (Invisible) ***
+function setupRecaptcha() {
+    const container = document.getElementById('recaptcha-container');
+    if (container && !window.recaptchaVerifier) {
+        window.recaptchaVerifier = new RecaptchaVerifier(auth, container, {
+            'size': 'invisible',
+            'callback': (response) => {
+                // reCAPTCHA solved, allow signInWithPhoneNumber.
+            }
+        });
+    }
+}
+
 // =========================================================
 // === DOM-DEPENDENT LOGIC - initialize on DOMContentLoaded ===
 // =========================================================
@@ -52,6 +65,10 @@ async function sendPostRegistrationEmail(user, role) {
 document.addEventListener('DOMContentLoaded', () => {
   // Get references to elements for form switching
   const loginLink = document.getElementById('show-login');
+  
+  // Initialize Recaptcha container if present
+  setupRecaptcha();
+
   const registerLink = document.getElementById('show-register');
   // *** NEW: Get references for form links to switch to login/register after reset attempt ***
   const formLinks = document.querySelector('.form-links'); 
@@ -69,6 +86,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const resendEmailInput = document.getElementById('resendEmail');
   const resendPasswordInput = document.getElementById('resendPassword');
   const resendSubmitButton = document.getElementById('resendSubmit');
+
+  // *** NEW: Get references for Forgot Special ID form elements ***
+  const forgotIdLinkContainer = document.getElementById('forgot-id-link-container');
+  const forgotIdLink = document.getElementById('show-forgot-id');
+  const forgotIdForm = document.getElementById('forgot-id-form');
+  const forgotIdEmailInput = document.getElementById('forgotIdEmail');
+  const forgotIdSubmitButton = document.getElementById('forgotIdSubmit');
+
+  // *** NEW: Back buttons for recovery forms ***
+  const backToLoginForgot = document.getElementById('back-to-login-forgot');
+  const backToLoginId = document.getElementById('back-to-login-id');
+  const backToLoginResend = document.getElementById('back-to-login-resend');
 
   // *** NEW: Get reference for learner self-registration button ***
   const findMyDetailsBtn = document.getElementById('find-my-details-btn');
@@ -146,6 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const loginEmailInput = document.getElementById('loginEmail');
   // **NEW**: Get references for learner-specific login fields
   const loginAdmissionNumberInput = document.getElementById('loginAdmissionNumber');
+  const loginSpecialIdInput = document.getElementById('loginSpecialId');
   const learnerLoginNote = document.getElementById('learner-login-note');
   const loginPasswordInput = document.getElementById('loginPassword');
   const loginSubmitButton = document.getElementById('loginSubmit');
@@ -192,16 +222,31 @@ document.addEventListener('DOMContentLoaded', () => {
   if (loginRoleSelect) {
     loginRoleSelect.addEventListener('change', () => {
       const isLearner = loginRoleSelect.value === 'learner';
-      // Toggle visibility of email vs. admission number inputs
-      loginEmailInput.style.display = isLearner ? 'none' : 'block';
+      const isStaff = ['teacher', 'smt', 'admin', 'admissions-team'].includes(loginRoleSelect.value);
+      
+      // Toggle visibility of email vs. admission number vs. special ID inputs
+      // **MODIFIED**: Email is now visible for Staff as well ("include back the email")
+      loginEmailInput.style.display = (!isLearner) ? 'block' : 'none'; 
       loginAdmissionNumberInput.style.display = isLearner ? 'block' : 'none';
+      loginSpecialIdInput.style.display = isStaff ? 'block' : 'none';
+
+      // **NEW**: Toggle visibility of the Forgot Special ID link
+      if (forgotIdLinkContainer) {
+          forgotIdLinkContainer.style.display = isStaff ? 'block' : 'none';
+      }
+      
       learnerLoginNote.style.display = isLearner ? 'block' : 'none';
 
       // Clear the non-visible input to avoid confusion
       if (isLearner) {
         loginEmailInput.value = '';
+        loginSpecialIdInput.value = '';
+      } else if (isStaff) {
+        // Staff uses both Email and Special ID now, so we don't clear the email
+        loginAdmissionNumberInput.value = '';
       } else {
         loginAdmissionNumberInput.value = '';
+        loginSpecialIdInput.value = '';
       }
     });
   }
@@ -285,17 +330,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     row.innerHTML = `
       <div class="form-group">
-        <select class="assignment-grade" name="assignment-grade">
+        <select class="assignment-grade" name="assignment-grade" aria-label="Grade">
           <option value="">Grade</option>
           <option value="R">R</option><option value="1">1</option><option value="2">2</option><option value="3">3</option>
           <option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option>
         </select>
       </div>
       <div class="form-group">
-        <input type="text" class="assignment-section" name="assignment-section" placeholder="Section (e.g., A)" maxlength="10" style="text-transform: uppercase;">
+        <input type="text" class="assignment-section" name="assignment-section" placeholder="Section (e.g., A)" maxlength="10" style="text-transform: uppercase;" aria-label="Section">
       </div>
       <div class="form-group">
-        <select class="assignment-subject" name="assignment-subject">
+        <select class="assignment-subject" name="assignment-subject" aria-label="Subject">
           <option value="">Subject</option>
           <option value="Sepedi HL">Sepedi HL</option>
           <option value="Englis FAL">Englis FAL</option>
@@ -310,7 +355,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <option value="All Subjects (Foundation)">All Subjects (Foundation)</option>
         </select>
       </div>
-      <button type="button" class="remove-assignment-btn"><i class="fas fa-times"></i></button>
+      <button type="button" class="remove-assignment-btn" aria-label="Remove Assignment"><i class="fas fa-times"></i></button>
     `;
 
     list.appendChild(row);
@@ -358,6 +403,9 @@ document.addEventListener('DOMContentLoaded', () => {
         userData.email = document.querySelector('input[name="teacher-email"]')?.value || '';
         userData.surname = document.querySelector('input[name="teacher-surname"]')?.value || '';
         userData.preferredName = document.querySelector('input[name="teacher-preferred-name"]')?.value || '';
+        // **NEW**: Collect Post Number and generate Special ID
+        userData.postNumber = document.getElementById('teacher-post-number')?.value || '';
+        userData.specialId = `Teacher${userData.postNumber}`;
         // **NEW**: Collect selected departments for the teacher
         userData.departments = getCheckedValues('teacher-department');
 
@@ -396,12 +444,17 @@ document.addEventListener('DOMContentLoaded', () => {
         userData.email = document.querySelector('input[name="admissions-email"]')?.value || '';
         userData.surname = document.querySelector('input[name="admissions-surname"]')?.value || '';
         userData.preferredName = document.querySelector('input[name="admissions-preferred-name"]')?.value || '';
-        userData.specialId = document.querySelector('input[name="admissions-special-id"]')?.value || '';
+        // **NEW**: Collect Post Number and generate Special ID
+        userData.postNumber = document.getElementById('admissions-post-number')?.value || '';
+        userData.specialId = `Admissions${userData.postNumber}`;
       } else if (role === 'smt') {
         userData.email = document.querySelector('input[name="smt-email"]')?.value || '';
         userData.surname = document.querySelector('input[name="smt-surname"]')?.value || '';
         userData.preferredName = document.querySelector('input[name="smt-preferred-name"]')?.value || '';
         userData.smtRole = document.querySelector('select[name="smt-specific-role"]')?.value || '';
+        // **NEW**: Collect Post Number and generate Special ID
+        userData.postNumber = document.getElementById('smt-post-number')?.value || '';
+        userData.specialId = `SMT${userData.postNumber}`;
         // **NEW**: Collect DH-specific data if the role is 'dh'
         if (userData.smtRole === 'dh') {
             userData.dhDepartments = getCheckedValues('dh-department');
@@ -411,7 +464,9 @@ document.addEventListener('DOMContentLoaded', () => {
         userData.email = document.querySelector('input[name="admin-email"]')?.value || '';
         userData.surname = document.querySelector('input[name="admin-surname"]')?.value || '';
         userData.preferredName = document.querySelector('input[name="admin-preferred-name"]')?.value || '';
-        userData.specialId = document.querySelector('input[name="admin-special-id"]')?.value || '';
+        // **NEW**: Collect Post Number and generate Special ID
+        userData.postNumber = document.getElementById('admin-post-number')?.value || '';
+        userData.specialId = `Admin${userData.postNumber}`;
       }
     } catch (err) {
       console.warn('collectUserData: missing field', err);
@@ -637,6 +692,15 @@ document.addEventListener('DOMContentLoaded', () => {
       const admissionNumberForUpdate = (role === 'parent') ? document.getElementById('parent-admission-number-lookup').value.trim() : null;
 
       try {
+        // **NEW**: Check if Special ID already exists for staff roles
+        if (userData.specialId) {
+            const idQuery = query(collection(db, 'users'), where('specialId', '==', userData.specialId), limit(1));
+            const idSnapshot = await getDocs(idQuery);
+            if (!idSnapshot.empty) {
+                throw new Error(`The Special ID "${userData.specialId}" is already in use. Please check your Post Number.`);
+            }
+        }
+
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
@@ -684,7 +748,11 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             await sendPostRegistrationEmail(user, role);
             if (role !== 'learner') {
-                alert("Registration successful! Please check your email to verify your account.");
+                let msg = "Registration successful! Please check your email to verify your account.";
+                if (userData.specialId) {
+                    msg += `\n\nIMPORTANT: Your login ID is: ${userData.specialId}`;
+                }
+                alert(msg);
             } else {
                 alert(`Registration successful! Welcome, ${userData.learnerName || userData.name || userData.preferredName || userData.surname || userData.admissionNumber || userData.fullName}!`);
             }
@@ -874,6 +942,21 @@ document.addEventListener('DOMContentLoaded', () => {
               alert('Please enter your Admission Number.');
               return;
           }
+      } else if (['teacher', 'smt', 'admin', 'admissions-team'].includes(role)) {
+          // **MODIFIED**: Staff now requires both Email and Special ID
+          email = loginEmailInput?.value.trim() || '';
+          const specialId = loginSpecialIdInput.value.trim();
+          
+          if (!email) {
+              alert('Please enter your Email Address.');
+              return;
+          }
+          if (!specialId) {
+              alert('Please enter your Special ID (e.g., Teacher123).');
+              return;
+          }
+          // Email is set, we proceed to signInWithEmailAndPassword. 
+          // Special ID verification happens after successful auth.
       } else {
           email = loginEmailInput?.value.trim() || '';
       }
@@ -892,6 +975,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (userDocSnap.exists()) {
           const userData = userDocSnap.data();
           if (userData.role === role) {
+            // **NEW**: Verify Special ID for staff roles
+            if (['teacher', 'smt', 'admin', 'admissions-team'].includes(role)) {
+                const inputSpecialId = loginSpecialIdInput.value.trim();
+                if (userData.specialId !== inputSpecialId) {
+                    alert("The Special ID provided does not match the account associated with this email.");
+                    await signOut(auth);
+                    return;
+                }
+            }
+
             // Check email verification for non-learners
             if (role !== 'learner' && !user.emailVerified) {
                 alert("Please verify your email address before logging in.\n\nIf you need a new link, click 'Resend Verification Email' on the login page.");
@@ -1004,21 +1097,53 @@ document.addEventListener('DOMContentLoaded', () => {
   if (forgotSubmitButton) {
     forgotSubmitButton.addEventListener('click', async function(event) {
       event.preventDefault();
-      const email = forgotEmailInput?.value || '';
+      const email = forgotEmailInput?.value.trim() || '';
 
       if (!email) {
         alert('Please enter your email address.');
         return;
       }
 
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        alert('Please enter a valid email address format.');
+        return;
+      }
+
       try {
+        // Check if the email exists in the 'users' collection first to provide specific feedback
+        const usersRef = collection(db, 'users');
+        const q = query(usersRef, where('email', '==', email), limit(1));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+            alert("Error: This email address is not registered for a portal.");
+            return;
+        }
+
+        // Check if account is suspended or disabled
+        const userData = querySnapshot.docs[0].data();
+        if (userData.isSuspended || userData.isDisabled || userData.status === 'suspended') {
+            alert("Error: This account is suspended or disabled. Please contact the school administration.");
+            return;
+        }
+
         await sendPasswordResetEmail(auth, email);
         alert(`Password reset link sent to ${email}. Please check your inbox.`);
         // Switch back to login form after successful send
         setVisible('login');
       } catch (error) {
         console.error("Password Reset Error:", error);
-        alert(`Password Reset Error: ${error.message}`);
+        if (error.code === 'auth/user-not-found') {
+            alert("Error: This email address is not found in our records.");
+        } else if (error.code === 'auth/invalid-email') {
+            alert("Error: The email address is invalid.");
+        } else if (error.code === 'auth/user-disabled') {
+            alert("Error: This account has been disabled. Please contact the school administration.");
+        } else {
+            alert(`Password Reset Error: ${error.message}`);
+        }
       }
     });
   }
@@ -1056,6 +1181,72 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // *** NEW: Forgot Special ID Handler ***
+  if (forgotIdSubmitButton) {
+    forgotIdSubmitButton.addEventListener('click', async function(event) {
+      event.preventDefault();
+      const email = forgotIdEmailInput?.value.trim() || '';
+
+      if (!email) {
+        alert('Please enter your email address.');
+        return;
+      }
+
+      try {
+        const usersRef = collection(db, 'users');
+        const q = query(usersRef, where('email', '==', email), limit(1));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+            alert("Error: This email address is not found in our records.");
+            return;
+        }
+
+        const userData = querySnapshot.docs[0].data();
+        if (!userData.specialId) {
+            alert("Error: This account does not have a Special ID associated with it.");
+            return;
+        }
+
+        // Send email via EmailJS
+        const templateParams = {
+            to_name: userData.preferredName || userData.name || 'Staff Member',
+            to_email: email,
+            special_id: userData.specialId
+        };
+        
+        // NOTE: Ensure you have a template in EmailJS that uses {{special_id}}
+        await emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams);
+        
+        alert(`Your Special ID has been sent to ${email}. Please check your inbox.`);
+        setVisible('login');
+      } catch (error) {
+        console.error("Forgot ID Error:", error);
+        alert(`Error: Failed to send recovery email. ${error.text || error.message}`);
+      }
+    });
+  }
+
+  // *** NEW: Back Button Handlers ***
+  if (backToLoginForgot) {
+    backToLoginForgot.addEventListener('click', (e) => {
+      e.preventDefault();
+      setVisible('login');
+    });
+  }
+  if (backToLoginId) {
+    backToLoginId.addEventListener('click', (e) => {
+      e.preventDefault();
+      setVisible('login');
+    });
+  }
+  if (backToLoginResend) {
+    backToLoginResend.addEventListener('click', (e) => {
+      e.preventDefault();
+      setVisible('login');
+    });
+  }
+
   // =========================================================
   // === Inserted form switching & role toggle snippet ===
   // This restores accessible switching and hash-based initial state
@@ -1071,11 +1262,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const showForgot = forgotPasswordLink; 
   // *** NEW: Add resend verification form variable ***
   const resend = resendVerificationForm;
+  // *** NEW: Add forgot ID form variable ***
+  const forgotId = forgotIdForm;
 
 
 function setVisible(formToShow) {
     // Collect all forms to hide
-    const allForms = [register, login, forgot, resend];
+    const allForms = [register, login, forgot, resend, forgotId];
     const formLinksContainer = formLinks; 
     
     // **FIXED LOGIC START**
@@ -1113,6 +1306,11 @@ function setVisible(formToShow) {
         resend.style.display = 'block';
         hash = '#resend-verification';
         if (formLinksContainer) formLinksContainer.style.display = 'none';
+    } else if (formToShow === 'forgot-id' && forgotId) {
+        targetForm = forgotId;
+        forgotId.style.display = 'block';
+        hash = '#forgot-id';
+        if (formLinksContainer) formLinksContainer.style.display = 'none';
     }
 
     if (targetForm) {
@@ -1141,6 +1339,8 @@ function setVisible(formToShow) {
       setVisible('forgot');
     } else if (currentHash === '#resend-verification') {
       setVisible('resend');
+    } else if (currentHash === '#forgot-id') {
+      setVisible('forgot-id');
     } else {
       // Default to login if hash is empty or anything else
       setVisible('login');
@@ -1176,6 +1376,16 @@ function setVisible(formToShow) {
       setVisible('resend');
       if (loginEmailInput?.value) {
         resendEmailInput.value = loginEmailInput.value;
+      }
+    });
+  }
+  // *** NEW: Event listener for Forgot ID link ***
+  if (forgotIdLink) {
+    forgotIdLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      setVisible('forgot-id');
+      if (loginEmailInput?.value) {
+        forgotIdEmailInput.value = loginEmailInput.value;
       }
     });
   }

@@ -58,6 +58,7 @@ async function loadSmtProfile(db, userData) {
     const profilePreferredName = document.querySelector('.profile-preferred-name');
     const profileEmail = document.querySelector('.profile-email');
     const profileContact = document.querySelector('.profile-contact');
+    const profileSpecialId = document.querySelector('.profile-special-id');
     const profileSmtRole = document.querySelector('.profile-smt-role');
     const dhProfileDetails = document.getElementById('dh-profile-details');
 
@@ -73,6 +74,7 @@ async function loadSmtProfile(db, userData) {
             if (profileSurname) profileSurname.innerHTML = `<strong>Surname:</strong> ${smtData.surname || 'N/A'}`;
             if (profilePreferredName) profilePreferredName.innerHTML = `<strong>Preferred Name:</strong> ${smtData.preferredName || 'N/A'}`;
             if (profileEmail) profileEmail.innerHTML = `<strong>Email:</strong> ${smtData.email || 'N/A'}`;
+            if (profileSpecialId) profileSpecialId.innerHTML = `<strong>Special ID:</strong> ${smtData.specialId || 'N/A'}`;
             if (profileContact) profileContact.innerHTML = `<strong>Contact:</strong> ${smtData.contactNumber || 'N/A'}`;
             if (profileSmtRole) profileSmtRole.innerHTML = `<strong>Role:</strong> ${smtData.smtRole || 'N/A'}`;
 

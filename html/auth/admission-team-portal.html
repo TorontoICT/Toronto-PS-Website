@@ -84,6 +84,7 @@
         <aside class="sidebar">
             <h3 class="sidebar-title">Admissions Menu</h3>
             <ul>
+                <li><a href="#profile"><i class="fas fa-user-circle"></i> My Profile</a></li>
                 <li><a href="#dashboard"><i class="fas fa-chart-line"></i> Overview</a></li>
                 <li><a href="#manual-application"><i class="fas fa-edit"></i> Manual Application</a></li>
                 <li><a href="#new-applicants"><i class="fas fa-file-invoice"></i> New Submissions</a></li>
@@ -119,6 +120,46 @@
                         <p class="metric-number" id="metric-offers-count">0</p>
                         <a href="#offers-extended" class="cta-button-small">View Offers</a>
                     </div>
+                </div>
+            </div>
+
+            <div id="profile" class="portal-section hidden-section">
+                <h2>My Profile</h2>
+                <div class="profile-card">
+                  <div class="profile-pic-container">
+                    <img src="../../images/placeholder-profile.png" alt="Admissions Team Profile Picture" class="profile-pic" id="admissions-profile-pic">
+                  </div>
+                 <div class="profile-details">
+                  <p class="profile-name"><strong>Name:</strong> Loading...</p>
+                  <p class="profile-email"><strong>Email:</strong> Loading...</p>
+                  <p class="profile-special-id"><strong>Special ID:</strong> Loading...</p>
+                  <p class="profile-contact"><strong>Contact:</strong> Loading...</p>
+                 </div>
+                 <button id="edit-profile-btn" class="cta-button-edit">Edit Profile</button>
+                </div>
+
+                <!-- Edit Profile Form -->
+                <div id="edit-profile-form-container" class="tool-card" style="display: none; margin-top: 20px;">
+                    <h3>Edit My Profile</h3>
+                    <form id="edit-profile-form">
+                        <div class="grid-container" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+                            <div class="form-group">
+                                <label for="edit-profile-preferred-name">Preferred Name</label>
+                                <input type="text" id="edit-profile-preferred-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-profile-surname">Surname</label>
+                                <input type="text" id="edit-profile-surname" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-profile-contact">Contact Number</label>
+                                <input type="tel" id="edit-profile-contact">
+                            </div>
+                        </div>
+                        <p id="edit-profile-status" class="status-message-box" style="display: none;"></p>
+                        <button type="submit" class="cta-button"><i class="fas fa-save"></i> Save Changes</button>
+                        <button type="button" id="cancel-edit-profile-btn" class="cta-button-secondary" style="margin-left: 10px;">Cancel</button>
+                    </form>
                 </div>
             </div>
 
@@ -258,7 +299,23 @@
             </div>
             <div id="settings" class="portal-section hidden-section">
                 <h2>Settings</h2>
-                <p>Manage admission criteria, form fields, and user roles.</p>
+                <div class="grid-container dashboard-cards">
+                    <div class="tool-card accent-3">
+                        <h3><i class="fas fa-lock"></i> Change Password</h3>
+                        <p>Update your password to ensure your account security.</p>
+                        <form id="settings-change-password-form">
+                            <div class="form-group">
+                                <label for="current-password">Current Password:</label>
+                                <input type="password" id="current-password" name="current-password" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="new-password">New Password:</label>
+                                <input type="password" id="new-password" name="new-password" required>
+                            </div>
+                            <button type="submit" class="cta-button primary-blue">Update Password</button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </section>
     <!-- Image Viewer Modal -->

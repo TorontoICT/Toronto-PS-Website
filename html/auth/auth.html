@@ -80,7 +80,8 @@
        <h2 id="auth-heading">Create an account</h2>
        <p class="form-note">Choose a role, complete the fields shown and register. Use an institutional email where available.</p>
        <form action="#" method="post">
-    <select id="role-select" required>
+    <label for="role-select" class="sr-only">Select Role</label>
+    <select id="role-select" required autocomplete="off">
      <option value="">-- Select Role --</option>
      <option value="learner">Learner</option>
      <option value="parent">Parent</option>
@@ -93,7 +94,8 @@
     <div id="parent-fields" class="role-fields">
       <p class="form-note" style="margin-bottom: 15px; text-align: left;">To begin, please enter your learner's unique admission number.</p>
       <div class="form-group" style="display: flex; gap: 10px; align-items: center;">
-        <input type="text" id="parent-admission-number-lookup" placeholder="Learner's Admission Number" required>
+        <label for="parent-admission-number-lookup" class="sr-only">Learner's Admission Number</label>
+        <input type="text" id="parent-admission-number-lookup" placeholder="Learner's Admission Number" required autocomplete="off">
         <button type="button" id="find-learner-btn" class="bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded hover:bg-gray-300 transition duration-150 whitespace-nowrap h-fit m-0">Find Learner</button>
       </div>
 
@@ -104,23 +106,24 @@
         </p>
         <fieldset>
           <legend>Your Details (from school records)</legend>
-          <div class="form-group"><input type="text" id="parent-name-display" placeholder="Parent Name" readonly></div>
-          <div class="form-group"><input type="text" id="parent-surname-display" placeholder="Parent Surname" readonly></div>
-          <div class="form-group"><input type="text" id="parent-contact-display" placeholder="Parent Contact" readonly></div>
+          <div class="form-group"><label for="parent-name-display" class="sr-only">Parent Name</label><input type="text" id="parent-name-display" placeholder="Parent Name" readonly></div>
+          <div class="form-group"><label for="parent-surname-display" class="sr-only">Parent Surname</label><input type="text" id="parent-surname-display" placeholder="Parent Surname" readonly></div>
+          <div class="form-group"><label for="parent-contact-display" class="sr-only">Parent Contact</label><input type="text" id="parent-contact-display" placeholder="Parent Contact" readonly></div>
         </fieldset>
         <fieldset>
           <legend>Learner Details</legend>
-          <div class="form-group"><input type="text" id="learner-name-display" placeholder="Learner Name" readonly></div>
+          <div class="form-group"><label for="learner-name-display" class="sr-only">Learner Name</label><input type="text" id="learner-name-display" placeholder="Learner Name" readonly></div>
         </fieldset>
         <p class="form-note" style="margin-top: 15px; text-align: left;">Enter the email address you provided to the school to create your login.</p>
-        <div class="form-group"><input type="email" name="parent-email" placeholder="Your Email Address" required></div>
+        <div class="form-group"><label for="parent-email" class="sr-only">Your Email Address</label><input type="email" id="parent-email" name="parent-email" placeholder="Your Email Address" required autocomplete="email"></div>
       </div>
     </div>
     
     <div id="learner-fields" class="role-fields">
       <p class="form-note" style="margin-bottom: 15px; text-align: left;">To create your portal account, please enter your unique school admission number.</p>
       <div class="form-group" style="display: flex; gap: 10px; align-items: center;">
-        <input type="text" id="learner-admission-number-lookup" placeholder="Your Admission Number" required>
+        <label for="learner-admission-number-lookup" class="sr-only">Your Admission Number</label>
+        <input type="text" id="learner-admission-number-lookup" placeholder="Your Admission Number" required autocomplete="username">
         <button type="button" id="find-my-details-btn" class="bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded hover:bg-gray-300 transition duration-150 whitespace-nowrap h-fit m-0">Find Me</button>
       </div>
 
@@ -131,8 +134,8 @@
         </p>
         <fieldset>
           <legend>Your Details</legend>
-          <div class="form-group"><label for="learner-reg-name">First Name</label><input type="text" id="learner-reg-name" required></div>
-          <div class="form-group"><label for="learner-reg-surname">Surname</label><input type="text" id="learner-reg-surname" required></div>
+          <div class="form-group"><label for="learner-reg-name">First Name</label><input type="text" id="learner-reg-name" required autocomplete="given-name"></div>
+          <div class="form-group"><label for="learner-reg-surname">Surname</label><input type="text" id="learner-reg-surname" required autocomplete="family-name"></div>
           <div class="form-group"><label for="learner-reg-grade">Grade</label><input type="text" id="learner-reg-grade" readonly></div>
           <div class="form-group"><label for="learner-reg-id-number">ID Number (Your Temporary Password)</label><input type="text" id="learner-reg-id-number" readonly></div>
         </fieldset>
@@ -143,12 +146,13 @@
     </div>
 
     <div id="teacher-fields" class="role-fields">
-     <div class="form-group"><input type="text" name="teacher-surname" placeholder="Surname" required></div>
-     <div class="form-group"><input type="text" name="teacher-preferred-name" placeholder="Preferred Name" required></div>
-     <div class="form-group"><input type="email" name="teacher-email" placeholder="Email" required></div>
+     <div class="form-group"><label for="teacher-surname" class="sr-only">Surname</label><input type="text" id="teacher-surname" name="teacher-surname" placeholder="Surname" required autocomplete="family-name"></div>
+     <div class="form-group"><label for="teacher-preferred-name" class="sr-only">Preferred Name</label><input type="text" id="teacher-preferred-name" name="teacher-preferred-name" placeholder="Preferred Name" required autocomplete="given-name"></div>
+     <div class="form-group"><label for="teacher-email" class="sr-only">Email</label><input type="email" id="teacher-email" name="teacher-email" placeholder="Email" required autocomplete="email"></div>
+     <div class="form-group"><label for="teacher-post-number" class="sr-only">Post Number</label><input type="text" id="teacher-post-number" name="teacher-post-number" placeholder="Post Number" required autocomplete="off"></div>
      <!-- **NEW**: Department Selection Checkboxes -->
      <div class="form-group" style="grid-column: 1 / -1;">
-        <label style="text-align: left; color: #6b7280;">Department(s) - Select all that apply</label>
+        <p style="text-align: left; color: #6b7280; margin-bottom: 8px;">Department(s) - Select all that apply</p>
         <div class="checkbox-group">
             <label><input type="checkbox" name="teacher-department" value="Science & Maths"> Science & Maths</label>
             <label><input type="checkbox" name="teacher-department" value="Languages"> Languages</label>
@@ -205,11 +209,13 @@
     </div>
 
     <div id="smt-fields" class="role-fields">
-      <div class="form-group"><input type="text" name="smt-surname" placeholder="Surname" required></div>
-      <div class="form-group"><input type="text" name="smt-preferred-name" placeholder="Preferred Name" required></div>
-      <div class="form-group"><input type="email" name="smt-email" placeholder="Email" required></div>
+      <div class="form-group"><label for="smt-surname" class="sr-only">Surname</label><input type="text" id="smt-surname" name="smt-surname" placeholder="Surname" required autocomplete="family-name"></div>
+      <div class="form-group"><label for="smt-preferred-name" class="sr-only">Preferred Name</label><input type="text" id="smt-preferred-name" name="smt-preferred-name" placeholder="Preferred Name" required autocomplete="given-name"></div>
+      <div class="form-group"><label for="smt-email" class="sr-only">Email</label><input type="email" id="smt-email" name="smt-email" placeholder="Email" required autocomplete="email"></div>
+      <div class="form-group"><label for="smt-post-number" class="sr-only">Post Number</label><input type="text" id="smt-post-number" name="smt-post-number" placeholder="Post Number" required autocomplete="off"></div>
       <div class="form-group">
-        <select name="smt-specific-role" required>
+        <label for="smt-specific-role" class="sr-only">Select SMT Role</label>
+        <select id="smt-specific-role" name="smt-specific-role" required autocomplete="off">
           <option value="">-- Select SMT Role --</option>
           <option value="principal">Principal</option>
           <option value="deputy-principal-1">1st Deputy Principal</option>
@@ -222,7 +228,7 @@
         <fieldset class="role-specific-fieldset">
             <legend>Departmental Head Details</legend>
             <div class="form-group">
-                <label>Department(s) - Select all that apply</label>
+                <p style="margin-bottom: 8px; color: #6b7280;">Department(s) - Select all that apply</p>
                 <div class="checkbox-group">
                     <label><input type="checkbox" name="dh-department" value="Science & Maths"> Science & Maths</label>
                     <label><input type="checkbox" name="dh-department" value="Languages"> Languages</label>
@@ -231,7 +237,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <label>Responsible for which Grade(s) - Select all that apply</label>
+                <p style="margin-bottom: 8px; color: #6b7280;">Responsible for which Grade(s) - Select all that apply</p>
                 <div class="checkbox-group">
                     <label><input type="checkbox" name="dh-grade" value="R-3"> Foundation (R-3)</label>
                     <label><input type="checkbox" name="dh-grade" value="4-7"> Intersen (4-7)</label>
@@ -242,26 +248,28 @@
     </div>
         
             <div id="admissions-team-fields" class="role-fields">
-     <div class="form-group"><input type="text" name="admissions-surname" placeholder="Surname" required></div>
-     <div class="form-group"><input type="text" name="admissions-preferred-name" placeholder="Preferred Name" required></div>
-     <div class="form-group"><input type="email" name="admissions-email" placeholder="Email" required></div>
-     <div class="form-group"><input type="text" name="admissions-special-id" placeholder="Staff ID" required></div>
+     <div class="form-group"><label for="admissions-surname" class="sr-only">Surname</label><input type="text" id="admissions-surname" name="admissions-surname" placeholder="Surname" required autocomplete="family-name"></div>
+     <div class="form-group"><label for="admissions-preferred-name" class="sr-only">Preferred Name</label><input type="text" id="admissions-preferred-name" name="admissions-preferred-name" placeholder="Preferred Name" required autocomplete="given-name"></div>
+     <div class="form-group"><label for="admissions-email" class="sr-only">Email</label><input type="email" id="admissions-email" name="admissions-email" placeholder="Email" required autocomplete="email"></div>
+     <div class="form-group"><label for="admissions-post-number" class="sr-only">Post Number</label><input type="text" id="admissions-post-number" name="admissions-post-number" placeholder="Post Number" required autocomplete="off"></div>
     </div>
 
     <div id="admin-fields" class="role-fields">
-     <div class="form-group"><input type="text" name="admin-surname" placeholder="Surname" required></div>
-     <div class="form-group"><input type="text" name="admin-preferred-name" placeholder="Preferred Name" required></div>
-     <div class="form-group"><input type="email" name="admin-email" placeholder="Email" required></div>
-     <div class="form-group"><input type="text" name="admin-special-id" placeholder="Special ID" required></div>
+     <div class="form-group"><label for="admin-surname" class="sr-only">Surname</label><input type="text" id="admin-surname" name="admin-surname" placeholder="Surname" required autocomplete="family-name"></div>
+     <div class="form-group"><label for="admin-preferred-name" class="sr-only">Preferred Name</label><input type="text" id="admin-preferred-name" name="admin-preferred-name" placeholder="Preferred Name" required autocomplete="given-name"></div>
+     <div class="form-group"><label for="admin-email" class="sr-only">Email</label><input type="email" id="admin-email" name="admin-email" placeholder="Email" required autocomplete="email"></div>
+     <div class="form-group"><label for="admin-post-number" class="sr-only">Post Number</label><input type="text" id="admin-post-number" name="admin-post-number" placeholder="Post Number" required autocomplete="off"></div>
     </div>
 
     <div id="password-section">
       <div class="password-wrapper">
-        <input type="password" name="password" placeholder="Password" id="registerPassword" required>
+        <label for="registerPassword" class="sr-only">Password</label>
+        <input type="password" name="password" placeholder="Password" id="registerPassword" required autocomplete="new-password">
         <i class="fas fa-eye toggle-password" aria-hidden="true"></i>
       </div>
       <div class="password-wrapper">
-        <input type="password" name="confirm-password" placeholder="Confirm Password" id="confirmPassword" required>
+        <label for="confirmPassword" class="sr-only">Confirm Password</label>
+        <input type="password" name="confirm-password" placeholder="Confirm Password" id="confirmPassword" required autocomplete="new-password">
         <i class="fas fa-eye toggle-password" aria-hidden="true"></i>
       </div>
     </div>
@@ -283,7 +291,8 @@
        <h2>Sign in</h2>
        <p class="form-note">Select your role and enter your credentials.</p>
        <form action="#" method="post">
-    <select id="login-role-select" required>
+    <label for="login-role-select" class="sr-only">Select Role</label>
+    <select id="login-role-select" required autocomplete="off">
      <option value="">-- Select Role --</option>
      <option value="learner">Learner</option>
      <option value="parent">Parent</option>
@@ -293,14 +302,23 @@
      <option value="admin">Admin (System)</option>
     </select>
     <!-- Generic email input for most roles -->
-    <input type="email" name="email" placeholder="Email Address" id="loginEmail" required>
+    <label for="loginEmail" class="sr-only">Email Address</label>
+    <input type="email" name="email" placeholder="Email Address" id="loginEmail" required autocomplete="username">
     <!-- Specific admission number input for learners, hidden by default -->
-    <input type="text" name="admission-number" placeholder="Admission Number" id="loginAdmissionNumber" style="display: none;">
+    <label for="loginAdmissionNumber" class="sr-only">Admission Number</label>
+    <input type="text" name="admission-number" placeholder="Admission Number" id="loginAdmissionNumber" style="display: none;" autocomplete="username">
+    <!-- Special ID input for staff, hidden by default -->
+    <label for="loginSpecialId" class="sr-only">Special ID</label>
+    <input type="text" name="special-id" placeholder="Special ID (e.g. Teacher123)" id="loginSpecialId" style="display: none;" autocomplete="username">
+    <div id="forgot-id-link-container" style="display: none; text-align: right; margin-top: 4px; margin-bottom: 10px;">
+        <a href="#" id="show-forgot-id" style="font-size: 0.85em; color: #6b7280; text-decoration: none;">Forgot Special ID?</a>
+    </div>
     <div class="forgot-password-link-container" style="display: flex; justify-content: space-between;">
      <a href="#" id="show-resend-verification" style="font-size: 0.9em;">Resend Verification Email</a>
     </div><br>
     <div class="password-wrapper">
-      <input type="password" name="password" placeholder="Password" id="loginPassword" required>
+      <label for="loginPassword" class="sr-only">Password</label>
+      <input type="password" name="password" placeholder="Password" id="loginPassword" required autocomplete="current-password">
       <i class="fas fa-eye toggle-password" aria-hidden="true"></i>
     </div>
     <div class="forgot-password-link-container" style="display: flex; justify-content: space-between;">
@@ -326,8 +344,21 @@
       <h2>Reset Password</h2>
       <p class="form-note">Enter your email address and we'll send you a link to reset your password.</p>
       <form action="#" method="post">
-       <input type="email" name="forgot-email" placeholder="Your Email Address" id="forgotEmail" required>
+       <label for="forgotEmail" class="sr-only">Your Email Address</label>
+       <input type="email" name="forgot-email" placeholder="Your Email Address" id="forgotEmail" required autocomplete="email">
        <button id="forgotSubmit" type="submit" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 transition duration-150 mt-4">Send Reset Link</button>
+       <button type="button" id="back-to-login-forgot" class="w-full bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded hover:bg-gray-300 transition duration-150 mt-2">Back to Login</button>
+      </form>
+     </div>
+
+     <div id="forgot-id-form" class="form" aria-hidden="true" style="display: none;">
+      <h2>Recover Special ID</h2>
+      <p class="form-note">Enter your email address and we'll send your Special ID to you.</p>
+      <form action="#" method="post">
+       <label for="forgotIdEmail" class="sr-only">Your Email Address</label>
+       <input type="email" name="forgot-id-email" placeholder="Your Email Address" id="forgotIdEmail" required autocomplete="email">
+       <button id="forgotIdSubmit" type="submit" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 transition duration-150 mt-4">Send Special ID</button>
+       <button type="button" id="back-to-login-id" class="w-full bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded hover:bg-gray-300 transition duration-150 mt-2">Back to Login</button>
       </form>
      </div>
 
@@ -335,14 +366,20 @@
       <h2>Resend Verification</h2>
       <p class="form-note">Enter your email and password to resend the verification link.</p>
       <form action="#" method="post">
-       <input type="email" name="resend-email" placeholder="Email Address" id="resendEmail" required>
+       <label for="resendEmail" class="sr-only">Email Address</label>
+       <input type="email" name="resend-email" placeholder="Email Address" id="resendEmail" required autocomplete="email">
        <div class="password-wrapper">
-         <input type="password" name="resend-password" placeholder="Password" id="resendPassword" required>
+         <label for="resendPassword" class="sr-only">Password</label>
+         <input type="password" name="resend-password" placeholder="Password" id="resendPassword" required autocomplete="current-password">
          <i class="fas fa-eye toggle-password" aria-hidden="true"></i>
        </div>
        <button id="resendSubmit" type="submit" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 transition duration-150 mt-4">Resend Email</button>
+       <button type="button" id="back-to-login-resend" class="w-full bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded hover:bg-gray-300 transition duration-150 mt-2">Back to Login</button>
       </form>
      </div>
+
+     <!-- Required for Firebase Phone Auth -->
+     <div id="recaptcha-container"></div>
 
      <div class="form-links">
        <a id="show-register">Register</a>
@@ -362,17 +399,17 @@
     <form id="force-password-change-form">
       <div class="password-wrapper">
         <label for="current-password-modal">Current Password (Your ID Number)</label>
-        <input type="password" id="current-password-modal" required>
+        <input type="password" id="current-password-modal" required autocomplete="current-password">
         <i class="fas fa-eye toggle-password" aria-hidden="true"></i>
       </div>
       <div class="password-wrapper">
         <label for="new-password-modal">New Password</label>
-        <input type="password" id="new-password-modal" required>
+        <input type="password" id="new-password-modal" required autocomplete="new-password">
         <i class="fas fa-eye toggle-password" aria-hidden="true"></i>
       </div>
       <div class="password-wrapper">
         <label for="confirm-new-password-modal">Confirm New Password</label>
-        <input type="password" id="confirm-new-password-modal" required>
+        <input type="password" id="confirm-new-password-modal" required autocomplete="new-password">
         <i class="fas fa-eye toggle-password" aria-hidden="true"></i>
       </div>
       <button type="submit" id="update-password-submit-btn" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 transition duration-150 mt-4">Update Password & Continue</button>
@@ -417,7 +454,7 @@
         <p class="muted">Subscribe for news, events and term dates.</p>
         <form class="newsletter-form" action="#" method="post" aria-label="Subscribe to newsletter">
           <label for="newsletter-email" class="sr-only">Email address</label>
-          <input id="newsletter-email" type="email" name="email" placeholder="Your email" required>
+          <input id="newsletter-email" type="email" name="email" placeholder="Your email" required autocomplete="email">
           <button type="submit" class="btn-subscribe">Subscribe</button>
         </form>
 
