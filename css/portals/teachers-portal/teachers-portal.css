@@ -390,6 +390,7 @@ label {
 
 input[type="text"],
 input[type="password"],
+input[type="number"],
 input[type="file"],
 select {
     width: 100%;
@@ -608,6 +609,92 @@ input[type="radio"] {
     border-color: var(--primary-indigo);
     box-shadow: 0 0 0 1px var(--primary-indigo);
     outline: none;
+}
+
+/* ==========================================================================
+   Auto-Plan Modal Styles
+   ========================================================================== */
+
+/* Ensure the modal content fits within the viewport and handles scrolling internally */
+#auto-plan-modal .modal-content {
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh; /* Maximum height relative to viewport */
+    width: 95%;
+    max-width: 850px; /* Wider max-width for better grid layout */
+    padding: 25px;
+    overflow: hidden; /* Prevent outer scrollbar */
+}
+
+#auto-plan-form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden; /* Contain children */
+    gap: 15px;
+    margin-top: 15px;
+}
+
+#auto-plan-terms-container {
+    flex: 1; /* Take up remaining vertical space */
+    overflow-y: auto; /* Scroll internally */
+    padding-right: 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background-color: #f9fafb;
+    padding: 15px;
+}
+
+.term-config {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.term-config:last-child {
+    margin-bottom: 0;
+}
+
+.term-config h4 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    color: var(--primary-indigo);
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-bottom: 1px solid #f3f4f6;
+    padding-bottom: 8px;
+}
+
+.term-grid {
+    display: grid;
+    grid-template-columns: 80px 1fr 80px 2fr; /* Count | Type | Marks | Topics */
+    gap: 15px;
+    align-items: end; /* Align inputs to bottom so labels line up */
+}
+
+.term-grid label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6b7280;
+    margin-bottom: 4px;
+    display: block;
+    white-space: nowrap;
+}
+
+/* Footer area for the button */
+.auto-plan-footer {
+    padding-top: 15px;
+    border-top: 1px solid #e5e7eb;
+    margin-top: auto;
+}
+
+.auto-plan-footer button {
+    width: 100%;
+    justify-content: center;
 }
 
 /* ==========================================================================
@@ -940,4 +1027,16 @@ footer a:hover {
     margin-top: 40px;
     padding-top: 20px;
     border-top: 1px solid #ccc;
+}
+
+/* Responsive adjustments for Auto-Plan Grid */
+@media (max-width: 768px) {
+    .term-grid {
+        grid-template-columns: 1fr 1fr; /* 2 columns layout for mobile */
+        gap: 12px;
+    }
+    
+    .term-grid .form-group:nth-child(4) { /* Topics input spans full width */
+        grid-column: 1 / -1;
+    }
 }
