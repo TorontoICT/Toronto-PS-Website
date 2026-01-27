@@ -1135,6 +1135,7 @@ async function updateAdminProfile(adminUid) {
     const updatedData = {
         preferredName: document.getElementById('admin-edit-preferred-name').value.trim(),
         surname: document.getElementById('admin-edit-surname').value.trim(),
+        contactNumber: document.getElementById('admin-edit-contact').value.trim(),
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
 

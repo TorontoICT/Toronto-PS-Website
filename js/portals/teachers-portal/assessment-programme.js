@@ -259,9 +259,26 @@ export function setupAssessmentProgramme(db, userData) {
             const teacherDoc = await db.collection('users').doc(teacherUid).get();
             if (teacherDoc.exists) {
                 const teacherData = teacherDoc.data();
-                if (teacherData.subjects && teacherData.subjects.length > 0) {
+                
+                // Handle both legacy 'subjects' and new 'teachingAssignments'
+                let subjectsList = [];
+                if (teacherData.teachingAssignments && teacherData.teachingAssignments.length > 0) {
+                    // Extract unique Grade-Subject combinations
+                    const uniqueSet = new Set();
+                    teacherData.teachingAssignments.forEach(assign => {
+                        const key = `${assign.grade}-${assign.subject}`;
+                        if (!uniqueSet.has(key)) {
+                            uniqueSet.add(key);
+                            subjectsList.push({ grade: assign.grade, subject: assign.subject });
+                        }
+                    });
+                } else if (teacherData.subjects && teacherData.subjects.length > 0) {
+                    subjectsList = teacherData.subjects;
+                }
+
+                if (subjectsList.length > 0) {
                     classSubjectSelect.innerHTML = '<option value="">-- Select a Subject/Class --</option>';
-                    teacherData.subjects.forEach(sub => {
+                    subjectsList.forEach(sub => {
                         const value = `${sub.grade}-${sub.subject}`;
                         const text = `${sub.grade} - ${sub.subject}`;
                         classSubjectSelect.innerHTML += `<option value="${value}">${text}</option>`;
@@ -276,10 +293,12 @@ export function setupAssessmentProgramme(db, userData) {
         }
 
         // form.reset() clears the select options, so we reset the number inputs manually.
-        document.getElementById('auto-plan-term-1').value = 4;
-        document.getElementById('auto-plan-term-2').value = 4;
-        document.getElementById('auto-plan-term-3').value = 4;
-        document.getElementById('auto-plan-term-4').value = 4;
+        [1, 2, 3, 4].forEach(term => {
+            document.getElementById(`auto-plan-term-${term}-count`).value = 4;
+            document.getElementById(`auto-plan-term-${term}-type`).value = 'Assessment';
+            document.getElementById(`auto-plan-term-${term}-marks`).value = 50;
+            document.getElementById(`auto-plan-term-${term}-topics`).value = 'To be decided';
+        });
         document.getElementById('auto-plan-status').style.display = 'none';
         autoPlanModal.style.display = 'flex';
     });
@@ -501,19 +520,47 @@ export function setupAssessmentProgramme(db, userData) {
             return;
         }
 
-        const [grade, subject] = classSubject.split('-');
-        const termCounts = [
-            { termId: 1, count: parseInt(document.getElementById('auto-plan-term-1').value) || 0 },
-            { termId: 2, count: parseInt(document.getElementById('auto-plan-term-2').value) || 0 },
-            { termId: 3, count: parseInt(document.getElementById('auto-plan-term-3').value) || 0 },
-            { termId: 4, count: parseInt(document.getElementById('auto-plan-term-4').value) || 0 }
-        ];
+        // Check if terms are loaded
+        if (!state.terms || state.terms.length === 0) {
+            statusEl.className = 'status-message-box error';
+            statusEl.textContent = 'School terms are not configured. Please contact the administrator.';
+            statusEl.style.display = 'block';
+            return;
+        }
+
+        // Correctly split grade and subject even if subject contains hyphens
+        const separatorIndex = classSubject.indexOf('-');
+        if (separatorIndex === -1) {
+             statusEl.className = 'status-message-box error';
+             statusEl.textContent = 'Invalid Subject/Class format.';
+             statusEl.style.display = 'block';
+             return;
+        }
+        const grade = classSubject.substring(0, separatorIndex);
+        const subject = classSubject.substring(separatorIndex + 1);
+
+        const termConfigs = [1, 2, 3, 4].map(termId => ({
+            termId,
+            count: parseInt(document.getElementById(`auto-plan-term-${termId}-count`).value) || 0,
+            type: document.getElementById(`auto-plan-term-${termId}-type`).value || 'Assessment',
+            marks: parseInt(document.getElementById(`auto-plan-term-${termId}-marks`).value) || 50,
+            topics: document.getElementById(`auto-plan-term-${termId}-topics`).value || 'To be decided'
+        }));
 
         // Clear existing assessments for this subject/grade combination
         state.assessments = state.assessments.filter(a => a.subject !== subject || a.grade !== grade);
         let totalScheduled = 0;
 
-        for (const { termId, count } of termCounts) {
+        // Helper to format date as YYYY-MM-DD using local time to avoid UTC shifts
+        const toDateString = (date) => {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+
+        for (const config of termConfigs) {
+            const { termId, count, type, marks, topics } = config;
             if (count === 0) continue;
 
             const term = state.terms.find(t => t.id === termId);
@@ -529,49 +576,67 @@ export function setupAssessmentProgramme(db, userData) {
 
             while (currentDate <= endDate) {
                 const day = currentDate.getDay();
-                if (day > 0 && day < 6) availableDates.push(new Date(currentDate));
+                // 0 = Sunday, 6 = Saturday. We want 1-5 (Mon-Fri).
+                if (day > 0 && day < 6) {
+                    availableDates.push(new Date(currentDate));
+                }
                 currentDate.setDate(currentDate.getDate() + 1);
             }
 
             // 2. Remove holidays and already scheduled dates (from other subjects)
-            const holidays = term.holidays.flatMap(h => {
+            const holidays = (term.holidays || []).flatMap(h => {
                 let dates = [];
                 if (!h.start || !h.end) return [];
                 let d = new Date(h.start + 'T00:00:00');
                 const end = new Date(h.end + 'T00:00:00');
                 while (d <= end) {
-                    dates.push(d.toISOString().split('T')[0]);
+                    dates.push(toDateString(d));
                     d.setDate(d.getDate() + 1);
                 }
                 return dates;
             });
-            const existingAssessmentDates = state.assessments.map(a => a.date);
+            const existingAssessmentDates = state.assessments.map(a => a.assessmentDate);
             const reservedDates = new Set([...holidays, ...existingAssessmentDates]);
-            availableDates = availableDates.filter(d => !reservedDates.has(d.toISOString().split('T')[0]));
+            
+            // Filter available dates using the safe string conversion
+            availableDates = availableDates.filter(d => !reservedDates.has(toDateString(d)));
 
             if (availableDates.length < count) {
                 console.warn(`Not enough available days in Term ${termId} to schedule ${count} assessments.`);
-                continue;
             }
 
             // 3. Distribute the new assessments evenly
-            const step = Math.floor(availableDates.length / count);
+            const step = availableDates.length > 0 ? availableDates.length / count : 0;
+            
             for (let i = 0; i < count; i++) {
-                const dateIndex = i * step;
-                const scheduledDate = availableDates[dateIndex];
+                if (availableDates.length === 0) break;
+                
+                const dateIndex = Math.floor(i * step);
+                const safeIndex = Math.min(dateIndex, availableDates.length - 1);
+                const scheduledDate = availableDates[safeIndex];
+                const assessmentDateStr = toDateString(scheduledDate);
+
+                // Calculate Moderation Date (3 days before, ensuring weekday)
+                let modDate = new Date(scheduledDate);
+                modDate.setDate(modDate.getDate() - 3);
+                // Adjust for weekends
+                const modDay = modDate.getDay();
+                if (modDay === 0) modDate.setDate(modDate.getDate() - 2); // Sunday -> Friday
+                if (modDay === 6) modDate.setDate(modDate.getDate() - 1); // Saturday -> Friday
+                const moderationDateStr = toDateString(modDate);
 
                 state.assessments.push({
                     id: Date.now() + totalScheduled + i,
                     term: termId,
                     subject: subject,
                     grade: grade,
-                    type: null, // Default to null for auto-planned
-                    moderationDate: null, // Default to null for auto-planned
-                    assessmentDate: scheduledDate.toISOString().split('T')[0], // Use assessmentDate
-                    totalMarks: null, // Default to null for auto-planned
-                    targetPercentage: null, // Default to null for auto-planned
-                    duration: null, // Default to null for auto-planned
-                    topics: null // Default to null for auto-planned
+                    type: type, 
+                    moderationDate: moderationDateStr, 
+                    assessmentDate: assessmentDateStr, 
+                    totalMarks: marks,
+                    targetPercentage: 60, // Default placeholder
+                    duration: 60, // Default placeholder
+                    topics: topics
                 });
             }
             totalScheduled += count;

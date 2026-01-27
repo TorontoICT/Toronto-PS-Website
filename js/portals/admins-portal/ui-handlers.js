@@ -1062,6 +1062,7 @@ function loadAdminProfile() {
         document.querySelector('#profile .profile-details p:nth-child(2)').innerHTML = `<strong>Role:</strong> ${userData.role || 'Admin'}`; 
         document.querySelector('#profile .profile-details p:nth-child(3)').innerHTML = `<strong>Email:</strong> ${userData.email || 'N/A'}`;
         document.querySelector('#profile .profile-details p:nth-child(4)').innerHTML = `<strong>Special ID:</strong> ${userData.specialId || 'N/A'}`;
+        document.querySelector('#profile .profile-details p:nth-child(5)').innerHTML = `<strong>Contact:</strong> ${userData.contactNumber || 'N/A'}`;
 
         // **NEW**: Add edit profile functionality
         const profileSection = document.getElementById('profile');
@@ -1091,6 +1092,10 @@ function loadAdminProfile() {
                             <div class="form-group">
                                 <label for="admin-edit-surname">Surname</label>
                                 <input type="text" id="admin-edit-surname" value="${userData.surname || ''}" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="admin-edit-contact">Contact Number</label>
+                                <input type="tel" id="admin-edit-contact" value="${userData.contactNumber || ''}">
                             </div>
                         </div>
                         <p id="admin-edit-profile-status" class="status-message-box" style="display: none;"></p>

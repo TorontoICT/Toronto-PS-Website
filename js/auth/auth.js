@@ -403,6 +403,7 @@ document.addEventListener('DOMContentLoaded', () => {
         userData.email = document.querySelector('input[name="teacher-email"]')?.value || '';
         userData.surname = document.querySelector('input[name="teacher-surname"]')?.value || '';
         userData.preferredName = document.querySelector('input[name="teacher-preferred-name"]')?.value || '';
+        userData.contactNumber = document.getElementById('teacher-contact-number')?.value || '';
         // **NEW**: Collect Post Number and generate Special ID
         userData.postNumber = document.getElementById('teacher-post-number')?.value || '';
         userData.specialId = `Teacher${userData.postNumber}`;
@@ -444,6 +445,7 @@ document.addEventListener('DOMContentLoaded', () => {
         userData.email = document.querySelector('input[name="admissions-email"]')?.value || '';
         userData.surname = document.querySelector('input[name="admissions-surname"]')?.value || '';
         userData.preferredName = document.querySelector('input[name="admissions-preferred-name"]')?.value || '';
+        userData.contactNumber = document.getElementById('admissions-contact-number')?.value || '';
         // **NEW**: Collect Post Number and generate Special ID
         userData.postNumber = document.getElementById('admissions-post-number')?.value || '';
         userData.specialId = `Admissions${userData.postNumber}`;
@@ -451,6 +453,7 @@ document.addEventListener('DOMContentLoaded', () => {
         userData.email = document.querySelector('input[name="smt-email"]')?.value || '';
         userData.surname = document.querySelector('input[name="smt-surname"]')?.value || '';
         userData.preferredName = document.querySelector('input[name="smt-preferred-name"]')?.value || '';
+        userData.contactNumber = document.getElementById('smt-contact-number')?.value || '';
         userData.smtRole = document.querySelector('select[name="smt-specific-role"]')?.value || '';
         // **NEW**: Collect Post Number and generate Special ID
         userData.postNumber = document.getElementById('smt-post-number')?.value || '';
@@ -464,6 +467,7 @@ document.addEventListener('DOMContentLoaded', () => {
         userData.email = document.querySelector('input[name="admin-email"]')?.value || '';
         userData.surname = document.querySelector('input[name="admin-surname"]')?.value || '';
         userData.preferredName = document.querySelector('input[name="admin-preferred-name"]')?.value || '';
+        userData.contactNumber = document.getElementById('admin-contact-number')?.value || '';
         // **NEW**: Collect Post Number and generate Special ID
         userData.postNumber = document.getElementById('admin-post-number')?.value || '';
         userData.specialId = `Admin${userData.postNumber}`;

@@ -749,35 +749,61 @@
         <div class="modal-content">
             <span id="auto-plan-modal-close" class="modal-close-btn">&times;</span>
             <h3><i class="fas fa-magic"></i> Auto-Plan Assessments</h3>
-            <p>This tool will evenly distribute a set number of assessments across each term, avoiding weekends and holidays.</p>
-            <form id="auto-plan-form" style="margin-top: 1rem;">
+            <p style="color: #6b7280;">This tool will evenly distribute a set number of assessments across each term, avoiding weekends and holidays.</p>
+            <form id="auto-plan-form">
                 <div class="form-group">
                     <label for="auto-plan-class-subject">Select Subject/Class to Plan For:</label>
                     <select id="auto-plan-class-subject" required>
                         <option value="">-- Loading your classes... --</option>
                     </select>
                 </div>
-                <p style="margin-top: 1rem; font-weight: 600;">Number of assessments per term:</p>
-                <div class="grid-container" style="grid-template-columns: 1fr 1fr; gap: 1rem;">
-                    <div class="form-group">
-                        <label for="auto-plan-term-1">Term 1</label>
-                        <input type="number" id="auto-plan-term-1" value="4" min="0">
+                
+                <div id="auto-plan-terms-container">
+                    <!-- Term 1 -->
+                    <div class="term-config">
+                        <h4>Term 1 Configuration</h4>
+                        <div class="term-grid">
+                            <div class="form-group" style="margin-bottom:0;"><label for="auto-plan-term-1-count">Count</label><input type="number" id="auto-plan-term-1-count" value="4" min="0"></div>
+                            <div class="form-group" style="margin-bottom:0;"><label for="auto-plan-term-1-type">Type</label><input type="text" id="auto-plan-term-1-type" value="Assessment"></div>
+                            <div class="form-group" style="margin-bottom:0;"><label for="auto-plan-term-1-marks">Marks</label><input type="number" id="auto-plan-term-1-marks" value="50"></div>
+                            <div class="form-group" style="margin-bottom:0;"><label for="auto-plan-term-1-topics">Topics</label><input type="text" id="auto-plan-term-1-topics" value="To be decided"></div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="auto-plan-term-2">Term 2</label>
-                        <input type="number" id="auto-plan-term-2" value="4" min="0">
+                    <!-- Term 2 -->
+                    <div class="term-config">
+                        <h4>Term 2 Configuration</h4>
+                        <div class="term-grid">
+                            <div class="form-group" style="margin-bottom:0;"><label for="auto-plan-term-2-count">Count</label><input type="number" id="auto-plan-term-2-count" value="4" min="0"></div>
+                            <div class="form-group" style="margin-bottom:0;"><label for="auto-plan-term-2-type">Type</label><input type="text" id="auto-plan-term-2-type" value="Assessment"></div>
+                            <div class="form-group" style="margin-bottom:0;"><label for="auto-plan-term-2-marks">Marks</label><input type="number" id="auto-plan-term-2-marks" value="50"></div>
+                            <div class="form-group" style="margin-bottom:0;"><label for="auto-plan-term-2-topics">Topics</label><input type="text" id="auto-plan-term-2-topics" value="To be decided"></div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="auto-plan-term-3">Term 3</label>
-                        <input type="number" id="auto-plan-term-3" value="4" min="0">
+                    <!-- Term 3 -->
+                    <div class="term-config">
+                        <h4>Term 3 Configuration</h4>
+                        <div class="term-grid">
+                            <div class="form-group" style="margin-bottom:0;"><label for="auto-plan-term-3-count">Count</label><input type="number" id="auto-plan-term-3-count" value="4" min="0"></div>
+                            <div class="form-group" style="margin-bottom:0;"><label for="auto-plan-term-3-type">Type</label><input type="text" id="auto-plan-term-3-type" value="Assessment"></div>
+                            <div class="form-group" style="margin-bottom:0;"><label for="auto-plan-term-3-marks">Marks</label><input type="number" id="auto-plan-term-3-marks" value="50"></div>
+                            <div class="form-group" style="margin-bottom:0;"><label for="auto-plan-term-3-topics">Topics</label><input type="text" id="auto-plan-term-3-topics" value="To be decided"></div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="auto-plan-term-4">Term 4</label>
-                        <input type="number" id="auto-plan-term-4" value="4" min="0">
+                    <!-- Term 4 -->
+                    <div class="term-config">
+                        <h4>Term 4 Configuration</h4>
+                        <div class="term-grid">
+                            <div class="form-group" style="margin-bottom:0;"><label for="auto-plan-term-4-count">Count</label><input type="number" id="auto-plan-term-4-count" value="4" min="0"></div>
+                            <div class="form-group" style="margin-bottom:0;"><label for="auto-plan-term-4-type">Type</label><input type="text" id="auto-plan-term-4-type" value="Assessment"></div>
+                            <div class="form-group" style="margin-bottom:0;"><label for="auto-plan-term-4-marks">Marks</label><input type="number" id="auto-plan-term-4-marks" value="50"></div>
+                            <div class="form-group" style="margin-bottom:0;"><label for="auto-plan-term-4-topics">Topics</label><input type="text" id="auto-plan-term-4-topics" value="To be decided"></div>
+                        </div>
                     </div>
                 </div>
                 <p id="auto-plan-status" class="status-message-box" style="display: none;"></p>
-                <button type="submit" class="cta-button primary-blue" style="margin-top: 1rem;"><i class="fas fa-cogs"></i> Generate Plan</button>
+                <div class="auto-plan-footer">
+                    <button type="submit" class="cta-button primary-blue"><i class="fas fa-cogs"></i> Generate Plan</button>
+                </div>
             </form>
         </div>
     </div>
