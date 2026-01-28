@@ -2077,6 +2077,15 @@ function setupAdminBulkRemoveTool() {
         // Reference to the class view document to keep it in sync
         const classViewRef = db.collection('sams_class_views').doc(className.replace(/\s+/g, '_'));
 
+        // Check if the class view document exists to avoid "No document to update" error
+        let classViewExists = false;
+        try {
+            const docSnap = await classViewRef.get();
+            classViewExists = docSnap.exists;
+        } catch (e) {
+            console.warn("Skipping class view sync due to read error:", e);
+        }
+
         selectedIds.forEach(docId => {
             const ref = db.collection('sams_registrations').doc(docId);
             const learner = currentLearners.find(l => l.id === docId);
@@ -2094,7 +2103,7 @@ function setupAdminBulkRemoveTool() {
 
             // 2. Remove from the Class View (sams_class_views)
             // We do this for both Unassign and Delete to keep the class list accurate
-            if (learner) {
+            if (learner && classViewExists) {
                 const learnerSummary = {
                     admissionId: learner.admissionId,
                     name: learner.learnerName,

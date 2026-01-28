@@ -26,6 +26,9 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
   <!-- **NEW**: Add SheetJS library for reading/writing Excel files -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <!-- **NEW**: Add Cropper.js for image cropping -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <script src="../../js/shared/firebase-config.js"></script>
 </head>
 
@@ -127,7 +130,7 @@
             <p class="profile-contact"><strong>Contact:</strong> Loading...</p>
             <p class="profile-department"><strong>Department(s):</strong> Loading...</p>
      </div>
-     <button type="button" id="edit-profile-btn" class="cta-button-edit" style="position: absolute; top: 20px; right: 20px;">Edit Profile</button>
+     <a href="#" id="edit-profile-btn" class="cta-button-edit" style="position: absolute; top: 20px; right: 20px;">Edit Profile</a>
     </div>
 
     <!-- **NEW**: Edit Profile Form (hidden by default) -->
@@ -204,60 +207,151 @@
         <div id="edit-learner-info-form-container" class="tool-card" style="display: none; margin-top: 20px;">
             <h3><i class="fas fa-user-edit"></i> Edit Learner Information</h3>
             <form id="edit-learner-info-form">
-                <div class="grid-container" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
-                    <div class="form-group">
-                        <label for="edit-learner-info-name">First Name</label>
-                        <input type="text" id="edit-learner-info-name">
+                <fieldset style="margin-bottom: 20px;">
+                    <legend>Personal Information</legend>
+                    <div class="grid-container" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                        <div class="form-group" style="grid-column: 1 / -1;">
+                            <p style="font-weight: 600; margin-bottom: 5px; color: var(--color-text);">Upload Photos per Phase</p>
+                            <div class="grid-container" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
+                                <div>
+                                    <label for="edit-learner-photo-foundation" style="font-size: 0.8em;">Foundation Phase</label>
+                                    <input type="file" id="edit-learner-photo-foundation" accept="image/jpeg, image/png">
+                                    <div id="status-photo-foundation"></div>
+                                </div>
+                                <div>
+                                    <label for="edit-learner-photo-intermediate" style="font-size: 0.8em;">Intermediate Phase</label>
+                                    <input type="file" id="edit-learner-photo-intermediate" accept="image/jpeg, image/png">
+                                    <div id="status-photo-intermediate"></div>
+                                </div>
+                                <div>
+                                    <label for="edit-learner-photo-senior" style="font-size: 0.8em;">Senior Phase</label>
+                                    <input type="file" id="edit-learner-photo-senior" accept="image/jpeg, image/png">
+                                    <div id="status-photo-senior"></div>
+                                </div>
+                                <div>
+                                    <label for="edit-learner-photo-fet" style="font-size: 0.8em;">FET Phase</label>
+                                    <input type="file" id="edit-learner-photo-fet" accept="image/jpeg, image/png">
+                                    <div id="status-photo-fet"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group"><label for="edit-learner-info-surname">Surname</label><input type="text" id="edit-learner-info-surname"></div>
+                        <div class="form-group"><label for="edit-learner-info-name">First Names</label><input type="text" id="edit-learner-info-name"></div>
+                        <div class="form-group"><label for="edit-learner-info-othername">Name by which called</label><input type="text" id="edit-learner-info-othername"></div>
+                        <div class="form-group"><label for="edit-learner-info-id">ID Number</label><input type="text" id="edit-learner-info-id"></div>
+                        <div class="form-group"><label for="edit-learner-info-dob">Date of Birth</label><input type="date" id="edit-learner-info-dob"></div>
+                        <div class="form-group"><label for="edit-learner-info-gender">Sex (M/F)</label><select id="edit-learner-info-gender"><option value="male">Male</option><option value="female">Female</option></select></div>
+                        <div class="form-group"><label for="edit-learner-info-language">Home Language</label><input type="text" id="edit-learner-info-language"></div>
+                        <div class="form-group"><label for="edit-learner-info-race">Race</label><select id="edit-learner-info-race"><option value="african">African</option><option value="english">English</option><option value="indian">Indian</option><option value="coloured">Coloured</option><option value="other">Other</option></select></div>
+                        <div class="form-group"><label for="edit-learner-info-nationality">Nationality</label><input type="text" id="edit-learner-info-nationality"></div>
+                        <div class="form-group"><label for="edit-learner-children">No. of Children in Household</label><input type="number" id="edit-learner-children"></div>
+                        <div class="form-group"><label for="edit-learner-position">Position in Family</label><select id="edit-learner-position"><option value="">-- Select --</option><option value="Only child">Only child</option><option value="First child">First child</option><option value="Second child">Second child</option><option value="Third child">Third child</option><option value="Fourth child">Fourth child</option><option value="Fifth / more">Fifth / more</option></select></div>
+                        <div class="form-group"><label for="edit-learner-religion">Religion</label><input type="text" id="edit-learner-religion"></div>
+                        <div class="form-group"><label for="edit-learner-disability">Disability (if any)</label><input type="text" id="edit-learner-disability"></div>
+                        <div class="form-group"><label for="edit-learner-social-grant">Social Grant Type</label><input type="text" id="edit-learner-social-grant"></div>
                     </div>
-                    <div class="form-group">
-                        <label for="edit-learner-info-othername">Other Name(s)</label>
-                        <input type="text" id="edit-learner-info-othername">
+                </fieldset>
+
+                <fieldset style="margin-bottom: 20px;">
+                    <legend>Medical Information</legend>
+                    <div class="grid-container" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                        <div class="form-group"><label for="edit-doctor-contact">Family Doctor/Clinic</label><input type="text" id="edit-doctor-contact"></div>
+                        <div class="form-group"><label for="edit-doctor-number">Doctor Contact No</label><input type="text" id="edit-doctor-number"></div>
+                        <div class="form-group"><label for="edit-medical-aid">Medical Aid Name</label><input type="text" id="edit-medical-aid"></div>
+                        <div class="form-group"><label for="edit-medical-aid-no">Medical Aid No.</label><input type="text" id="edit-medical-aid-no"></div>
+                        <div class="form-group"><label for="edit-medical-aid-principal">Principal Member</label><input type="text" id="edit-medical-aid-principal"></div>
+                        <div class="form-group"><label for="edit-emergency-name">Emergency Contact Name</label><input type="text" id="edit-emergency-name"></div>
+                        <div class="form-group"><label for="edit-emergency-number">Emergency Contact No</label><input type="text" id="edit-emergency-number"></div>
+                        <div class="form-group" style="grid-column: 1 / -1;"><label for="edit-allergies" style="color:red;">Allergies (Indicate in RED)</label><textarea id="edit-allergies" rows="2"></textarea></div>
+                        <div class="form-group" style="grid-column: 1 / -1;"><label for="edit-medical-conditions">Chronic Illness</label><textarea id="edit-medical-conditions" rows="2"></textarea></div>
                     </div>
-                    <div class="form-group">
-                        <label for="edit-learner-info-surname">Surname</label>
-                        <input type="text" id="edit-learner-info-surname">
+                </fieldset>
+
+                <fieldset style="margin-top: 20px;">
+                    <legend>Information Regarding Parent(s) or Guardians</legend>
+                    
+                    <h4 style="margin-top:10px; border-bottom:1px solid #eee;">Parent 1 (Father/Guardian)</h4>
+                    <div class="grid-container" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+                        <div class="form-group"><label for="edit-parent1-name">Surname & Initials</label><input type="text" id="edit-parent1-name"></div>
+                        <div class="form-group"><label for="edit-parent1-occupation">Occupation</label><input type="text" id="edit-parent1-occupation"></div>
+                        <div class="form-group"><label for="edit-parent1-contact">Cell Phone</label><input type="text" id="edit-parent1-contact"></div>
+                        <div class="form-group"><label for="edit-parent1-email">Email Address</label><input type="email" id="edit-parent1-email"></div>
+                        <div class="form-group"><label for="edit-parent1-home-tel">Telephone (Home)</label><input type="text" id="edit-parent1-home-tel"></div>
+                        <div class="form-group"><label for="edit-parent1-work-tel">Telephone (Work)</label><input type="text" id="edit-parent1-work-tel"></div>
+                        <div class="form-group"><label for="edit-parent1-city">City/Town</label><input type="text" id="edit-parent1-city"></div>
+                        <div class="form-group" style="grid-column: 1 / -1;"><label for="edit-parent1-address">Physical Address</label><textarea id="edit-parent1-address" rows="2"></textarea></div>
+                        <div class="form-group" style="grid-column: 1 / -1;"><label for="edit-parent1-postal">Postal Address</label><textarea id="edit-parent1-postal" rows="2"></textarea></div>
                     </div>
-                    <div class="form-group">
-                        <label for="edit-learner-info-id">Learner ID</label>
-                        <input type="text" id="edit-learner-info-id">
+
+                    <h4 style="margin-top:20px; border-bottom:1px solid #eee;">Parent 2 (Mother/Guardian)</h4>
+                    <div class="grid-container" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+                        <div class="form-group"><label for="edit-parent2-name">Surname & Initials</label><input type="text" id="edit-parent2-name"></div>
+                        <div class="form-group"><label for="edit-parent2-occupation">Occupation</label><input type="text" id="edit-parent2-occupation"></div>
+                        <div class="form-group"><label for="edit-parent2-contact">Cell Phone</label><input type="text" id="edit-parent2-contact"></div>
+                        <div class="form-group"><label for="edit-parent2-email">Email Address</label><input type="email" id="edit-parent2-email"></div>
+                        <div class="form-group"><label for="edit-parent2-home-tel">Telephone (Home)</label><input type="text" id="edit-parent2-home-tel"></div>
+                        <div class="form-group"><label for="edit-parent2-work-tel">Telephone (Work)</label><input type="text" id="edit-parent2-work-tel"></div>
+                        <div class="form-group"><label for="edit-parent2-city">City/Town</label><input type="text" id="edit-parent2-city"></div>
+                        <div class="form-group" style="grid-column: 1 / -1;"><label for="edit-parent2-address">Physical Address</label><textarea id="edit-parent2-address" rows="2"></textarea></div>
+                        <div class="form-group" style="grid-column: 1 / -1;"><label for="edit-parent2-postal">Postal Address</label><textarea id="edit-parent2-postal" rows="2"></textarea></div>
                     </div>
-                    <div class="form-group">
-                        <label for="edit-learner-info-dob">Date of Birth</label>
-                        <input type="date" id="edit-learner-info-dob">
+                </fieldset>
+
+                <fieldset style="margin-top: 20px;">
+                    <legend>Other Information</legend>
+                    
+                    <h4 style="margin-top:10px;">Person(s) with whom the learner lives</h4>
+                    <div class="grid-container" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+                        <div class="form-group"><label for="edit-living-name">Surname & Initials</label><input type="text" id="edit-living-name"></div>
+                        <div class="form-group"><label for="edit-living-id">ID Number</label><input type="text" id="edit-living-id"></div>
+                        <div class="form-group"><label for="edit-living-contact">Contact Details</label><input type="text" id="edit-living-contact"></div>
+                        <div class="form-group"><label for="edit-living-relationship">Relationship</label><input type="text" id="edit-living-relationship"></div>
                     </div>
-                    <div class="form-group">
-                        <label for="edit-learner-info-gender">Gender</label>
-                        <select id="edit-learner-info-gender"><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option></select>
+
+                    <h4 style="margin-top:10px;">Persons Authorised to Collect</h4>
+                    <div class="grid-container" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+                        <div class="form-group"><label for="edit-collection-name">Surname & Initials</label><input type="text" id="edit-collection-name"></div>
+                        <div class="form-group"><label for="edit-collection-id">ID Number</label><input type="text" id="edit-collection-id"></div>
+                        <div class="form-group"><label for="edit-collection-contact">Contact Details</label><input type="text" id="edit-collection-contact"></div>
+                        <div class="form-group"><label for="edit-collection-relationship">Relationship</label><input type="text" id="edit-collection-relationship"></div>
                     </div>
-                    <div class="form-group">
-                        <label for="edit-learner-info-nationality">Nationality</label>
-                        <input type="text" id="edit-learner-info-nationality">
+
+                    <h4 style="margin-top:10px;">Early Intervention Services (0-5 years)</h4>
+                    <div class="grid-container" style="grid-template-columns: 1fr 1fr;">
+                        <div class="form-group"><label for="edit-intervention-need">Area of Need</label><input type="text" id="edit-intervention-need"></div>
+                        <div class="form-group"><label for="edit-intervention-services">Services Received</label><input type="text" id="edit-intervention-services"></div>
                     </div>
+
+                    <h4 style="margin-top:10px;">School Attended</h4>
                     <div class="form-group">
-                        <label for="edit-learner-info-race">Race</label>
-                        <select id="edit-learner-info-race"><option value="african">African</option><option value="english">English</option><option value="indian">Indian</option><option value="coloured">Coloured</option><option value="other">Other</option></select>
-                    </div>
-                    <div class="form-group">
-                        <label for="edit-learner-info-language">Home Language</label>
-                        <input type="text" id="edit-learner-info-language">
-                    </div>
-                    <div class="form-group">
-                        <label for="edit-learner-info-prev-school">Previous School</label>
+                        <label for="edit-learner-info-prev-school">Previous School Name</label>
                         <input type="text" id="edit-learner-info-prev-school">
                     </div>
-                </div>
-                <fieldset style="margin-top: 20px;">
-                    <legend>Parent/Guardian Details</legend>
-                    <div class="grid-container" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
-                        <div class="form-group"><label for="edit-parent1-name">Parent 1: Full Name</label><input type="text" id="edit-parent1-name"></div>
-                        <div class="form-group"><label for="edit-parent1-contact">Parent 1: Contact</label><input type="text" id="edit-parent1-contact"></div>
-                        <div class="form-group"><label for="edit-parent1-email">Parent 1: Email</label><input type="email" id="edit-parent1-email"></div>
-                        <div class="form-group" style="grid-column: 1 / -1;"><label for="edit-parent1-address">Parent 1: Address</label><textarea id="edit-parent1-address" rows="2"></textarea></div>
+
+                    <h4 style="margin-top:10px;">Areas Needing Ongoing Support</h4>
+                    <div class="form-group">
+                        <textarea id="edit-support-needs" rows="2" placeholder="e.g. Academic, Emotional, etc."></textarea>
+                    </div>
+
+                    <h4 style="margin-top:10px;">Extra-Curricular Activities</h4>
+                    <div class="form-group">
+                        <textarea id="edit-activities" rows="2"></textarea>
+                    </div>
+
+                    <h4 style="margin-top:10px;">Achievements</h4>
+                    <div class="form-group">
+                        <textarea id="edit-achievements" rows="2"></textarea>
                     </div>
                 </fieldset>
                 <p id="edit-learner-info-status" class="status-message-box" style="display: none;"></p>
-                <button type="submit" class="cta-button"><i class="fas fa-save"></i> Save Changes</button>
-                <button type="button" id="cancel-edit-learner-info-btn" class="cta-button-secondary" style="margin-left: 10px;">Cancel</button>
+                
+                <div class="form-navigation" style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; gap: 10px;">
+                    <button type="button" id="btn-prev-step" class="cta-button-secondary" style="display: none;">Previous</button>
+                    <span id="step-indicator" style="color: #666; font-weight: 600;">Step 1 of 4</span>
+                    <button type="button" id="btn-next-step" class="cta-button">Next</button>
+                    <button type="submit" id="btn-save-changes" class="cta-button" style="display: none;"><i class="fas fa-save"></i> Save Changes</button>
+                </div>
+                <button type="button" id="cancel-edit-learner-info-btn" class="cta-button-secondary" style="margin-top: 15px; width: 100%;">Cancel Editing</button>
             </form>
         </div>
 
@@ -1179,6 +1273,21 @@
                 </button>
             </div>
         </div>
+      </div>
+
+      <!-- **NEW**: Crop Image Modal -->
+      <div id="crop-modal" class="modal">
+          <div class="modal-content" style="max-width: 600px;">
+              <span class="modal-close-btn" id="crop-modal-close">&times;</span>
+              <h3>Crop Image</h3>
+              <div class="img-container" style="max-height: 400px; overflow: hidden; background-color: #f0f0f0;">
+                  <img id="image-to-crop" src="" style="max-width: 100%; display: block;">
+              </div>
+              <div style="margin-top: 1rem; text-align: right; display: flex; justify-content: flex-end; gap: 10px;">
+                  <button type="button" id="btn-crop-cancel" class="cta-button-secondary">Cancel</button>
+                  <button type="button" id="btn-crop-save" class="cta-button primary-blue"><i class="fas fa-crop-alt"></i> Crop & Save</button>
+              </div>
+          </div>
       </div>
  </main>
  
