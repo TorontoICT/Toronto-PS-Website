@@ -329,6 +329,7 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease-in-out;
+    text-decoration: none;
 }
 
 .cta-button-edit:hover {
@@ -1039,4 +1040,148 @@ footer a:hover {
     .term-grid .form-group:nth-child(4) { /* Topics input spans full width */
         grid-column: 1 / -1;
     }
+}
+
+/* ==========================================================================
+   Learner Profile Document Styles
+   ========================================================================== */
+
+.learner-profile-document {
+    background-color: #fff;
+    padding: 20px;
+    border: 1px solid #ccc;
+    margin-top: 20px;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 12pt;
+    color: #000;
+}
+
+.learner-profile-document .document-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.learner-profile-document .document-header h2 {
+    font-weight: bold;
+    font-size: 14pt;
+    margin: 0;
+    color: #000;
+}
+
+.learner-profile-document .confidential-notice {
+    font-size: 9pt;
+    font-style: italic;
+    text-align: justify;
+    margin-top: 10px;
+    border: 1px solid #000;
+    padding: 10px;
+}
+
+.learner-profile-document .photo-section {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.learner-profile-document .photo-box {
+    width: 150px;
+    height: 180px;
+    border: 1px solid #000;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    padding-bottom: 5px;
+}
+
+.learner-profile-document .photo-box img {
+    max-width: 100%;
+    max-height: 150px;
+    object-fit: cover;
+    margin-bottom: auto;
+}
+
+.learner-profile-document .photo-box label {
+    font-weight: bold;
+    font-size: 10pt;
+    color: #000;
+}
+
+.learner-profile-document .section-title {
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 13pt;
+    text-align: center;
+    background-color: #e0e0e0;
+    padding: 5px;
+    margin: 20px 0 10px 0;
+    border: 1px solid #000;
+    color: #000;
+}
+
+.learner-profile-document .profile-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11pt;
+    margin-bottom: 20px;
+}
+
+.learner-profile-document .profile-table th,
+.learner-profile-document .profile-table td {
+    border: 1px solid #000;
+    padding: 5px;
+    vertical-align: top;
+}
+
+.learner-profile-document .profile-table th {
+    font-weight: bold;
+    background-color: #f2f2f2;
+    text-align: left;
+}
+
+.learner-profile-document .checkbox-item {
+    margin-right: 15px;
+}
+
+.learner-profile-document .allergy-info {
+    color: red;
+    font-weight: bold;
+}
+
+.learner-profile-document .cumulative-record-card h4 {
+    font-weight: bold;
+    font-size: 12pt;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    color: #000;
+}
+
+.learner-profile-document .page-break {
+    page-break-before: always;
+}
+
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    .learner-profile-document, .learner-profile-document * {
+        visibility: visible;
+    }
+    .learner-profile-document {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        border: none;
+    }
+}
+
+/* Cropper JS Custom Overrides */
+.cropper-view-box,
+.cropper-face {
+    border-radius: 0; /* Optional: Make it round if you want circular profile pics, but square is standard for storage */
 }
