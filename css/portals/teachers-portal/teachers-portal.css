@@ -467,6 +467,11 @@ input[type="radio"] {
     background-color: var(--primary-red);
 }
 
+.status-late {
+    background-color: #f59e0b; /* amber-500 */
+    color: white;
+}
+
 /* Weekly Attendance Table Specific Styles */
 .attendance-weekly-table th, .attendance-weekly-table td {
     text-align: center;
@@ -486,7 +491,8 @@ input[type="radio"] {
 }
 
 .attendance-weekly-table .status-present, 
-.attendance-weekly-table .status-absent {
+.attendance-weekly-table .status-absent,
+.attendance-weekly-table .status-late {
     padding: 2px 8px;
     border-radius: 10px;
     font-size: 0.8em;
@@ -1162,26 +1168,97 @@ footer a:hover {
     page-break-before: always;
 }
 
+/* Cropper JS Custom Overrides */
+.cropper-view-box,
+.cropper-face {
+    border-radius: 0; /* Optional: Make it round if you want circular profile pics, but square is standard for storage */
+}
+
+.print-only {
+    display: none;
+}
+
+/* ==========================================================================
+   Print Specific Styles
+   ========================================================================== */
+
 @media print {
-    body * {
-        visibility: hidden;
+    /* Hide all non-essential elements */
+    body > header,
+    .sidebar,
+    .portal-title,
+    .no-print {
+        display: none !important;
     }
-    .learner-profile-document, .learner-profile-document * {
-        visibility: visible;
+
+    .print-only {
+        display: block;
     }
-    .learner-profile-document {
+
+    /* Ensure only the active section is considered for printing */
+    .portal-section:not(.active-section) {
+        display: none !important;
+    }
+
+    /* Reset layout for the printable area */
+    .portal-main-content,
+    .portal-content-wrapper,
+    .portal-section.active-section {
+        display: block !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        width: 100%;
+    }
+
+    /* Attendance Table Specific Print Styles */
+    .attendance-print-header {
+        text-align: center;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+    }
+    .attendance-print-header .school-logo {
+        max-height: 70px;
+        margin: 0 auto 10px;
+        display: block;
+    }
+    .attendance-print-header h1 {
+        margin: 0;
+        font-size: 1.6em;
+        font-weight: 700;
+        color: #000;
+    }
+    .attendance-print-header h2,
+    .attendance-print-header p {
+        margin: 5px 0 0 0;
+        font-size: 1.2em;
+        font-weight: 600;
+        color: #333;
+    }
+    .attendance-weekly-table { font-size: 10pt; width: 100%; }
+    .attendance-weekly-table th, .attendance-weekly-table td { border: 1px solid #999; }
+    .attendance-status-container input { display: none; }
+    .attendance-status-container label { display: none; }
+
+    .attendance-status-container input:checked + label {
+        display: inline-block;
+        background-color: transparent !important;
+        color: #000 !important;
+        font-weight: bold;
+        padding: 0;
+        border-radius: 0;
+        font-size: 1em;
+    }
+
+    /* Learner Profile Specific Print Styles */
+    .portal-section#learner-profiles.active-section .learner-profile-document {
         position: absolute;
         left: 0;
         top: 0;
         width: 100%;
         margin: 0;
-        padding: 0;
+        padding: 1rem; /* Add some padding for margins */
         border: none;
     }
-}
-
-/* Cropper JS Custom Overrides */
-.cropper-view-box,
-.cropper-face {
-    border-radius: 0; /* Optional: Make it round if you want circular profile pics, but square is standard for storage */
 }
