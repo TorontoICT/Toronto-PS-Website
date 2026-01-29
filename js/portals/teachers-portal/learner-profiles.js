@@ -1,5 +1,8 @@
 // js/portals/teachers-portal/learner-profiles.js
 
+// **NEW**: Add a variable to store the full list of learners for the current class
+let currentClassLearners = [];
+
 /**
  * Sets up the initial state and event listeners for the Learner Profiles section.
  * @param {firebase.firestore.Firestore} db - The Firestore database instance.
@@ -8,16 +11,21 @@
 export function setupLearnerProfileSection(db, teacherData) {
     const classFilter = document.getElementById('profile-class-filter');
     const backButton = document.getElementById('back-to-learner-profile-list');
+    const searchInput = document.getElementById('learner-profile-search');
+    const clearSearchBtn = document.getElementById('clear-learner-search-btn');
 
     document.getElementById('learner-profile-list-view').style.display = 'block';
     document.getElementById('learner-profile-detail-view').style.display = 'none';
 
     classFilter.addEventListener('change', (e) => {
         const selectedClass = e.target.value;
+        searchInput.value = ''; // Reset search on class change
+        if (clearSearchBtn) clearSearchBtn.style.display = 'none'; // Hide clear button
         if (selectedClass) {
             loadLearnersForProfileList(db, selectedClass, teacherData);
         } else {
-            document.getElementById('learner-profile-list-container').innerHTML = '';
+            currentClassLearners = [];
+            renderLearnerProfileList([], teacherData.uid);
             document.getElementById('learner-profile-list-status').textContent = 'Please select a class to load learners.';
         }
     });
@@ -26,6 +34,32 @@ export function setupLearnerProfileSection(db, teacherData) {
         document.getElementById('learner-profile-list-view').style.display = 'block';
         document.getElementById('learner-profile-detail-view').style.display = 'none';
     });
+
+    // Add event listener for the search input
+    searchInput.addEventListener('input', () => {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+
+        // Show or hide the clear button based on input
+        if (clearSearchBtn) {
+            clearSearchBtn.style.display = searchTerm ? 'block' : 'none';
+        }
+
+        const filteredLearners = currentClassLearners.filter(learner => {
+            const fullName = `${learner.learnerName || ''} ${learner.learnerSurname || ''}`.toLowerCase();
+            const admissionId = String(learner.admissionId || '').toLowerCase();
+            return fullName.includes(searchTerm) || admissionId.includes(searchTerm);
+        });
+        renderLearnerProfileList(filteredLearners, teacherData.uid);
+    });
+
+    // Add event listener for the clear search button
+    if (clearSearchBtn) {
+        clearSearchBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            searchInput.dispatchEvent(new Event('input', { bubbles: true })); // Trigger filter
+            searchInput.focus();
+        });
+    }
 }
 
 /**
@@ -35,39 +69,68 @@ export function setupLearnerProfileSection(db, teacherData) {
  * @param {object} teacherData - The authenticated teacher's data.
  */
 async function loadLearnersForProfileList(db, className, teacherData) {
-    const container = document.getElementById('learner-profile-list-container');
     const status = document.getElementById('learner-profile-list-status');
     status.textContent = `Loading learners for class ${className}...`;
-    container.innerHTML = '';
+    renderLearnerProfileList([], teacherData.uid); // Clear previous results
 
     try {
         const snapshot = await db.collection('sams_registrations').where('fullGradeSection', '==', className).get();
         if (snapshot.empty) {
             status.textContent = `No learners found in class ${className}.`;
+            currentClassLearners = []; // Clear stored learners
             return;
         }
 
-        const learners = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        sortLearnersByName(learners);
+        currentClassLearners = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        sortLearnersByName(currentClassLearners);
 
-        let listHTML = '<ul class="resource-list">';
-        learners.forEach(learner => {
-            listHTML += `
-                <li>
-                    <i class="fas fa-user-graduate"></i>
-                    <div>
-                        <h3>${formatLearnerName(learner)}</h3>
-                        <p>Admission No: ${learner.admissionId}</p>
-                    </div>
-                    <button class="cta-button-small" onclick="showLearnerProfileDetail('${learner.id}', '${teacherData.uid}')">View Profile</button>
-                </li>`;
-        });
-        listHTML += '</ul>';
-        container.innerHTML = listHTML;
-        status.textContent = `Displaying ${learners.length} learner(s) for class ${className}.`;
+        renderLearnerProfileList(currentClassLearners, teacherData.uid);
     } catch (error) {
         console.error("Error loading learners for profile list:", error);
         status.textContent = 'An error occurred while loading learners.';
+        currentClassLearners = []; // Clear on error
+    }
+}
+
+/**
+ * Renders the learner list into the DOM based on an array of learner objects.
+ * @param {Array} learners - An array of learner objects to display.
+ * @param {string} teacherUid - The UID of the teacher to pass to the onclick handler.
+ */
+function renderLearnerProfileList(learners, teacherUid) {
+    const container = document.getElementById('learner-profile-list-container');
+    const status = document.getElementById('learner-profile-list-status');
+    container.innerHTML = '';
+
+    if (learners.length === 0) {
+        const searchInput = document.getElementById('learner-profile-search');
+        if (searchInput && searchInput.value) {
+            status.textContent = 'No learners match your search criteria.';
+        }
+        // If search is empty, the message from loadLearnersForProfileList will be shown.
+        return;
+    }
+
+    let listHTML = '<ul class="resource-list">';
+    learners.forEach(learner => {
+        listHTML += `
+            <li>
+                <i class="fas fa-user-graduate"></i>
+                <div>
+                    <h3>${formatLearnerName(learner)}</h3>
+                    <p>Admission No: ${learner.admissionId}</p>
+                </div>
+                <button class="cta-button-small" onclick="showLearnerProfileDetail('${learner.id}', '${teacherUid}')">View Profile</button>
+            </li>`;
+    });
+    listHTML += '</ul>';
+    container.innerHTML = listHTML;
+
+    const totalLearners = currentClassLearners.length;
+    if (learners.length === totalLearners) {
+        status.textContent = `Displaying ${totalLearners} learner(s).`;
+    } else {
+        status.textContent = `Displaying ${learners.length} of ${totalLearners} matching learner(s).`;
     }
 }
 
@@ -320,18 +383,18 @@ async function showLearnerProfileDetail(learnerDocId, teacherUid) {
         `;
 
         contentContainer.innerHTML = `
-            <div class="profile-header" style="position: relative;">
+            <div class="profile-header no-print" style="position: relative;">
                 <img src="${learnerData.photoUrl || '../../images/placeholder-profile.png'}" alt="Learner Photo" class="profile-pic-large">
                 <div class="profile-header-info">
                     <a href="#" id="edit-learner-btn" class="cta-button-edit" style="position: absolute; top: 15px; right: 15px;"><i class="fas fa-user-edit"></i> Edit Info</a>
-                    <button id="print-learner-profile-btn" class="cta-button-edit" style="position: absolute; top: 15px; right: 130px;"><i class="fas fa-print"></i> Print Profile</button>
+                    <button id="print-learner-profile-btn" class="cta-button-edit" style="position: absolute; top: 15px; right: 130px;"><i class="fas fa-print"></i> Print</button>
                     <h2>${formatLearnerName(learnerData)}</h2>
                     <p><strong>Admission No:</strong> ${learnerData.admissionId}</p>
                     <p><strong>Class:</strong> ${learnerData.fullGradeSection}</p>
                 </div>
             </div>
             ${profileHTML}
-            <div style="margin-top: 30px;">
+            <div class="no-print" style="margin-top: 30px;">
                  <h3><i class="fas fa-comments"></i> Behavioral Comments & Observations</h3>
                  <div id="learner-comments-history" class="comments-container scroll-container" style="max-height: 200px; overflow-y: auto; border: 1px solid #eee; padding: 10px; margin-bottom: 10px;">
                     <p class="data-status-message">Loading comments...</p>
@@ -345,7 +408,7 @@ async function showLearnerProfileDetail(learnerDocId, teacherUid) {
                     <p id="comment-status-message" class="status-message-box" style="display: none;"></p>
                 </form>
             </div>
-            <div class="tool-card" style="margin-top: 20px;">
+            <div class="tool-card no-print" style="margin-top: 20px;">
                 <h3><i class="fas fa-folder-open"></i> Learner Documents</h3>
                 <ul id="learner-document-links" class="resource-list"></ul>
             </div>`;

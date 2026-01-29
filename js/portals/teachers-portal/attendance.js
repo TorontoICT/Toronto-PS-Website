@@ -24,6 +24,10 @@ function getDateOfISOWeek(w, y) {
     return ISOweekStart;
 }
 
+// **NEW**: Add variables to store the full list of learners and their attendance data for the current class
+let currentAttendanceLearners = [];
+let currentAttendanceMap = new Map();
+
 /**
  * Overhauls the attendance register to support a weekly view.
  * @param {firebase.firestore.Firestore} db - The Firestore database instance.
@@ -36,8 +40,12 @@ function setupAttendanceRegister(db, teacherData) {
     const yearFilter = document.getElementById('attendance-year-filter');
     const termFilter = document.getElementById('attendance-term-filter');
     const weekFilter = document.getElementById('attendance-week-filter');
+    const searchInput = document.getElementById('attendance-search');
+    const clearSearchBtn = document.getElementById('clear-attendance-search-btn');
+    const printBtn = document.getElementById('print-attendance-btn');
+    const exportExcelBtn = document.getElementById('export-attendance-excel-btn');
 
-    if (!classSelect || !tableBody || !yearFilter || !termFilter || !weekFilter) return;
+    if (!classSelect || !tableBody || !yearFilter || !termFilter || !weekFilter || !searchInput || !clearSearchBtn || !printBtn || !exportExcelBtn) return;
 
     classSelect.innerHTML = '<option value="">-- Select Class --</option>';
 
@@ -111,6 +119,10 @@ function setupAttendanceRegister(db, teacherData) {
         const year = parseInt(yearFilter.value);
         const weekNumber = parseInt(weekFilter.value);
 
+        // Reset search when loading new data
+        searchInput.value = '';
+        clearSearchBtn.style.display = 'none';
+
         // Update Headers with Dates
         const mondayDate = getDateOfISOWeek(weekNumber, year);
         const days = ['mon', 'tue', 'wed', 'thu', 'fri'];
@@ -126,6 +138,12 @@ function setupAttendanceRegister(db, teacherData) {
 
         weekDisplay.textContent = `Showing Attendance for: Week ${weekNumber}, ${year}`;
 
+        // **NEW**: Update the print-only header with current info
+        const printInfo = document.getElementById('attendance-print-info');
+        if (printInfo) {
+            printInfo.textContent = `Class: ${selectedClass} | Week: ${weekNumber}, ${year}`;
+        }
+
         if (!selectedClass) {
             tableBody.innerHTML = `<tr><td colspan="7" class="info-message">Please select a class to view the attendance register.</td></tr>`;
             return;
@@ -136,14 +154,16 @@ function setupAttendanceRegister(db, teacherData) {
         try {
             const learnersSnapshot = await db.collection('sams_registrations').where('fullGradeSection', '==', selectedClass).get();
             if (learnersSnapshot.empty) {
-                tableBody.innerHTML = `<tr><td colspan="7" class="info-message">No learners found for this class.</td></tr>`;
+                currentAttendanceLearners = [];
+                renderAttendanceTable([], new Map());
                 return;
             }
             const learners = learnersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             sortLearnersByName(learners);
+            currentAttendanceLearners = learners; // Store the full list
 
             const learnerIds = learners.map(l => l.id);
-            const attendanceMap = new Map();
+            currentAttendanceMap.clear(); // Use the module-scoped map
 
             if (learnerIds.length > 0) {
                 const promises = [];
@@ -160,32 +180,12 @@ function setupAttendanceRegister(db, teacherData) {
                 const snapshots = await Promise.all(promises);
                 snapshots.forEach(snapshot => {
                     snapshot.forEach(doc => {
-                        attendanceMap.set(doc.data().learnerId, doc.data().attendance);
+                        currentAttendanceMap.set(doc.data().learnerId, doc.data().attendance);
                     });
                 });
             }
 
-            let tableRowsHTML = '';
-            const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
-            learners.forEach(learner => {
-                const learnerAttendance = attendanceMap.get(learner.id) || {};
-                tableRowsHTML += `<tr data-learner-id="${learner.id}" data-admission-id="${learner.admissionId}" data-learner-name="${formatLearnerName(learner)}">`;
-                tableRowsHTML += `<td>${learner.admissionId || 'N/A'}</td><td>${formatLearnerName(learner)}</td>`;
-                days.forEach(day => {
-                    const status = learnerAttendance[day] || 'present';
-                    tableRowsHTML += `
-                        <td>
-                            <div class="attendance-status-container">
-                                <input type="radio" id="${learner.id}-${day}-present" name="${learner.id}-${day}" value="present" ${status === 'present' ? 'checked' : ''}>
-                                <label for="${learner.id}-${day}-present" class="status-present">P</label>
-                                <input type="radio" id="${learner.id}-${day}-absent" name="${learner.id}-${day}" value="absent" ${status === 'absent' ? 'checked' : ''}>
-                                <label for="${learner.id}-${day}-absent" class="status-absent">A</label>
-                            </div>
-                        </td>`;
-                });
-                tableRowsHTML += `</tr>`;
-            });
-            tableBody.innerHTML = tableRowsHTML;
+            renderAttendanceTable(currentAttendanceLearners, currentAttendanceMap);
         } catch (error) {
             console.error("Error loading weekly attendance:", error);
             tableBody.innerHTML = `<tr><td colspan="7" class="error-message">Failed to load attendance. Please try again.</td></tr>`;
@@ -197,6 +197,263 @@ function setupAttendanceRegister(db, teacherData) {
     yearFilter.addEventListener('change', () => { populateWeeks(); loadAttendanceData(); });
     termFilter.addEventListener('change', () => { populateWeeks(); loadAttendanceData(); });
     weekFilter.addEventListener('change', loadAttendanceData);
+
+    // **NEW**: Search event listeners
+    searchInput.addEventListener('input', () => {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        clearSearchBtn.style.display = searchTerm ? 'block' : 'none';
+
+        const filteredLearners = currentAttendanceLearners.filter(learner => {
+            const fullName = formatLearnerName(learner).toLowerCase();
+            const admissionId = String(learner.admissionId || '').toLowerCase();
+            return fullName.includes(searchTerm) || admissionId.includes(searchTerm);
+        });
+
+        renderAttendanceTable(filteredLearners, currentAttendanceMap);
+    });
+
+    clearSearchBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+        searchInput.focus();
+    });
+
+    // **NEW**: Print button event listener
+    printBtn.addEventListener('click', () => {
+        const tableBody = document.getElementById('attendance-table-body');
+        const rowsToHide = [];
+
+        // Temporarily hide rows for learners who were present all week
+        tableBody.querySelectorAll('tr').forEach(row => {
+            if (!row.dataset.learnerId) return;
+            const isAbsentOrLate = row.querySelector('input[value="absent"]:checked, input[value="late"]:checked');
+            if (!isAbsentOrLate) {
+                row.classList.add('no-print');
+                rowsToHide.push(row);
+            }
+        });
+
+        // Define a cleanup function to run after printing
+        const cleanup = () => {
+            rowsToHide.forEach(row => row.classList.remove('no-print'));
+            window.removeEventListener('afterprint', cleanup);
+        };
+
+        window.addEventListener('afterprint', cleanup);
+        window.print();
+    });
+
+    // **NEW**: Excel export button event listener
+    exportExcelBtn.addEventListener('click', () => {
+        exportAttendanceToExcel();
+    });
+}
+
+/**
+ * **NEW**: Calculates and updates the summary row counts based on the current state of the radio buttons in the table.
+ */
+function updateAttendanceSummary() {
+    const tableBody = document.getElementById('attendance-table-body');
+    if (!tableBody) return;
+
+    const absenteeCounts = { monday: 0, tuesday: 0, wednesday: 0, thursday: 0, friday: 0 };
+    const lateCounts = { monday: 0, tuesday: 0, wednesday: 0, thursday: 0, friday: 0 };
+
+    // Find all checked 'absent' radios in one go
+    const absentRadios = tableBody.querySelectorAll('input[value="absent"]:checked');
+    const lateRadios = tableBody.querySelectorAll('input[value="late"]:checked');
+
+    absentRadios.forEach(radio => {
+        // The name is like "learnerId-day"
+        const nameParts = radio.name.split('-');
+        const day = nameParts[nameParts.length - 1]; // last part is the day ('monday', 'tuesday', etc.)
+        if (absenteeCounts.hasOwnProperty(day)) {
+            absenteeCounts[day]++;
+        }
+    });
+
+    lateRadios.forEach(radio => {
+        const nameParts = radio.name.split('-');
+        const day = nameParts[nameParts.length - 1];
+        if (lateCounts.hasOwnProperty(day)) {
+            lateCounts[day]++;
+        }
+    });
+
+    document.getElementById('summary-mon').textContent = absenteeCounts.monday;
+    document.getElementById('summary-tue').textContent = absenteeCounts.tuesday;
+    document.getElementById('summary-wed').textContent = absenteeCounts.wednesday;
+    document.getElementById('summary-thu').textContent = absenteeCounts.thursday;
+    document.getElementById('summary-fri').textContent = absenteeCounts.friday;
+
+    document.getElementById('summary-late-mon').textContent = lateCounts.monday;
+    document.getElementById('summary-late-tue').textContent = lateCounts.tuesday;
+    document.getElementById('summary-late-wed').textContent = lateCounts.wednesday;
+    document.getElementById('summary-late-thu').textContent = lateCounts.thursday;
+    document.getElementById('summary-late-fri').textContent = lateCounts.friday;
+}
+
+/**
+ * **NEW**: Renders the attendance table rows based on a list of learners and their attendance data.
+ * @param {Array} learners - The array of learner objects to render.
+ * @param {Map} attendanceMap - The map of attendance data.
+ */
+function renderAttendanceTable(learners, attendanceMap) {
+    const tableBody = document.getElementById('attendance-table-body');
+    const searchInput = document.getElementById('attendance-search');
+    const footer = document.getElementById('attendance-summary-footer');
+
+    if (learners.length === 0) {
+        if (footer) footer.style.display = 'none';
+        tableBody.innerHTML = (searchInput && searchInput.value)
+            ? `<tr><td colspan="7" class="info-message">No learners match your search.</td></tr>`
+            : `<tr><td colspan="7" class="info-message">No learners found for this class.</td></tr>`;
+        return;
+    }
+
+    if (footer) footer.style.display = 'table-footer-group';
+
+    const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+    const tableRowsHTML = learners.map(learner => {
+        const learnerAttendance = attendanceMap.get(learner.id) || {};
+        
+        // Calculate initial absence count for highlighting
+        let absenceCount = 0;
+        days.forEach(day => {
+            if (learnerAttendance[day] === 'absent') absenceCount++;
+        });
+        const rowStyle = absenceCount >= 3 ? 'style="background-color: #fee2e2;"' : '';
+
+        const dayCells = days.map(day => {
+            const status = learnerAttendance[day] || 'present';
+            return `<td><div class="attendance-status-container">
+                        <input type="radio" id="${learner.id}-${day}-present" name="${learner.id}-${day}" value="present" ${status === 'present' ? 'checked' : ''}>
+                        <label for="${learner.id}-${day}-present" class="status-present">P</label>
+                        <input type="radio" id="${learner.id}-${day}-absent" name="${learner.id}-${day}" value="absent" ${status === 'absent' ? 'checked' : ''}>
+                        <label for="${learner.id}-${day}-absent" class="status-absent">A</label>
+                        <input type="radio" id="${learner.id}-${day}-late" name="${learner.id}-${day}" value="late" ${status === 'late' ? 'checked' : ''}>
+                        <label for="${learner.id}-${day}-late" class="status-late">L</label>
+                    </div></td>`;
+        }).join('');
+
+        return `<tr data-learner-id="${learner.id}" data-admission-id="${learner.admissionId}" data-learner-name="${formatLearnerName(learner)}" ${rowStyle}><td>${learner.admissionId || 'N/A'}</td><td>${formatLearnerName(learner)}</td>${dayCells}</tr>`;
+    }).join('');
+
+    tableBody.innerHTML = tableRowsHTML;
+
+    // NEW: Update summary and add listeners for real-time updates
+    updateAttendanceSummary();
+    tableBody.querySelectorAll('input[type="radio"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            updateAttendanceSummary();
+            updateLearnerRiskStatus(e.target.closest('tr'));
+        });
+    });
+}
+
+/**
+ * Updates the visual highlight of a row based on absence count (3 or more).
+ * @param {HTMLTableRowElement} row - The table row to check.
+ */
+function updateLearnerRiskStatus(row) {
+    if (!row) return;
+    const absentCount = row.querySelectorAll('input[value="absent"]:checked').length;
+    if (absentCount >= 3) {
+        row.style.backgroundColor = '#fee2e2'; // Light red highlight
+    } else {
+        row.style.backgroundColor = ''; // Reset
+    }
+}
+
+/**
+ * **NEW**: Exports the current attendance view to an Excel file using SheetJS,
+ * filtering for only absent and late learners.
+ */
+function exportAttendanceToExcel() {
+    const classSelect = document.getElementById('attendance-class-select');
+    const weekFilter = document.getElementById('attendance-week-filter');
+    const yearFilter = document.getElementById('attendance-year-filter');
+    const tableBody = document.getElementById('attendance-table-body');
+ 
+    const className = classSelect.value;
+    const week = weekFilter.value;
+    const year = yearFilter.value;
+ 
+    if (!className || tableBody.rows.length === 0 || (tableBody.rows.length === 1 && tableBody.rows[0].cells.length === 1)) {
+        alert("No attendance data to export. Please load a class register first.");
+        return;
+    }
+ 
+    const dataForExport = [];
+ 
+    // 1. Headers
+    const headers = [
+        'Admission No.', 'Learner Name',
+        document.getElementById('th-mon').textContent,
+        document.getElementById('th-tue').textContent,
+        document.getElementById('th-wed').textContent,
+        document.getElementById('th-thu').textContent,
+        document.getElementById('th-fri').textContent
+    ];
+    dataForExport.push(headers);
+ 
+    // 2. Learner Rows - Filtered for Absentees and Lates
+    const learnerRows = tableBody.querySelectorAll('tr');
+    let absenteeCount = 0;
+    learnerRows.forEach(row => {
+        const learnerId = row.dataset.learnerId;
+        if (!learnerId) return;
+ 
+        const statuses = [];
+        let isAbsentOrLate = false;
+        const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
+        days.forEach(day => {
+            const statusInput = row.querySelector(`input[name="${learnerId}-${day}"]:checked`);
+            const statusValue = statusInput ? statusInput.value : 'present';
+            if (statusValue === 'absent' || statusValue === 'late') {
+                isAbsentOrLate = true;
+            }
+            statuses.push(statusValue.charAt(0).toUpperCase());
+        });
+ 
+        if (isAbsentOrLate) {
+            absenteeCount++;
+            const admissionId = row.cells[0].textContent;
+            const learnerName = row.cells[1].textContent;
+            dataForExport.push([admissionId, learnerName, ...statuses]);
+        }
+    });
+ 
+    if (absenteeCount === 0) {
+        alert("No learners were absent or late in this period. Nothing to export.");
+        return;
+    }
+ 
+    // 3. Add summary rows to the export
+    dataForExport.push([]); // Add a blank row for spacing
+    const summaryAbsentees = ['Total Absentees', ''];
+    const summaryLates = ['Total Lates', ''];
+    const summaryDays = ['mon', 'tue', 'wed', 'thu', 'fri'];
+    summaryDays.forEach(day => {
+        summaryAbsentees.push(document.getElementById(`summary-${day}`).textContent);
+        summaryLates.push(document.getElementById(`summary-late-${day}`).textContent);
+    });
+    dataForExport.push(summaryAbsentees);
+    dataForExport.push(summaryLates);
+ 
+    // 4. Generate Excel file
+    const worksheet = XLSX.utils.aoa_to_sheet(dataForExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Attendance');
+ 
+    // Auto-fit columns for better readability
+    const colWidths = headers.map((_, i) => ({
+        wch: Math.max(...dataForExport.map(row => row[i] ? row[i].toString().length : 0)) + 2
+    }));
+    worksheet['!cols'] = colWidths;
+ 
+    const fileName = `Absentee_Report_${className}_${year}_W${week}.xlsx`;
+    XLSX.writeFile(workbook, fileName);
 }
 
 /**
