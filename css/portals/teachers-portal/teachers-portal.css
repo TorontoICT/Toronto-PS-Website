@@ -1182,6 +1182,11 @@ footer a:hover {
    Print Specific Styles
    ========================================================================== */
 
+@page {
+    size: auto;
+    margin: 0mm;
+}
+
 @media print {
     /* Hide all non-essential elements */
     body > header,
@@ -1210,6 +1215,7 @@ footer a:hover {
         box-shadow: none !important;
         border: none !important;
         width: 100%;
+        padding: 20px !important;
     }
 
     /* Attendance Table Specific Print Styles */
