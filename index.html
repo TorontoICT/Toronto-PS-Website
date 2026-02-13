@@ -111,11 +111,12 @@
       <div class="footer-newsletter">
         <h4>Stay informed</h4>
         <p class="muted">Subscribe for news, events and term dates.</p>
-        <form class="newsletter-form" action="#" method="post" aria-label="Subscribe to newsletter">
+        <form id="newsletter-form" class="newsletter-form" aria-label="Subscribe to newsletter">
           <label for="newsletter-email" class="sr-only">Email address</label>
           <input id="newsletter-email" type="email" name="email" placeholder="Your email" required>
           <button type="submit" class="btn-subscribe">Subscribe</button>
         </form>
+        <p id="newsletter-status" style="display: none; font-size: 0.9em; margin-top: 10px;"></p>
 
         <div class="footer-social" aria-hidden="false">
           <a href="#" aria-label="Twitter" class="social-icon"><i class="fa-brands fa-x-twitter"></i></a>
@@ -127,7 +128,7 @@
     </div>
 
     <div class="footer-bottom">
-      <small>&copy; 2025 Toronto Primary School. All rights reserved. School Emis No: 923241498</small>
+      <small>&copy; <span id="copyright-year">2025</span> Toronto Primary School. All rights reserved. School Emis No: 923241498</small>
     </div>
   </footer>
 
@@ -143,14 +144,27 @@
       ];
       let currentIndex = 0;
 
+      // Preload images to prevent flash on first cycle
+      backgroundImages.forEach(src => {
+        const img = new Image();
+        img.src = src;
+      });
+
       function changeBackground() {
         currentIndex = (currentIndex + 1) % backgroundImages.length;
         heroSection.style.backgroundImage = `url('${backgroundImages[currentIndex]}')`;
       }
 
+      // Set initial background
+      heroSection.style.backgroundImage = `url('${backgroundImages[0]}')`;
+
       // Change image every 10 seconds (10000 milliseconds)
       setInterval(changeBackground, 10000);
+
+      // Dynamically update the copyright year
+      document.getElementById('copyright-year').textContent = new Date().getFullYear();
     });
   </script>
+  <script src="js/newsletter.js"></script>
 </body>
 </html>
