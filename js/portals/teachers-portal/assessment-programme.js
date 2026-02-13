@@ -948,7 +948,8 @@ export function setupAssessmentProgramme(db, userData) {
             <html><head>
                 <title>Print Assessment Programme</title>
                 <style>
-                    body { font-family: sans-serif; }
+                    @page { size: auto; margin: 0mm; }
+                    body { font-family: sans-serif; padding: 40px; }
                     #ap-print-header {
                         text-align: center;
                         border-bottom: 1px solid #ccc;

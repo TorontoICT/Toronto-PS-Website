@@ -16,7 +16,8 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script type="text/javascript">
       (function(){
-         emailjs.init("YOUR_PUBLIC_KEY"); // Replace with your actual Public Key
+         // IMPORTANT: Replace with your actual EmailJS Public Key from your EmailJS account settings.
+         emailjs.init("YOUR_EMAILJS_PUBLIC_KEY");
       })();
     </script>
     <script type="module" src="../../js/auth/auth.js" defer></script>
@@ -153,12 +154,10 @@
      <div class="form-group"><label for="teacher-post-number" class="sr-only">Post Number</label><input type="text" id="teacher-post-number" name="teacher-post-number" placeholder="Post Number" required autocomplete="off"></div>
      <!-- **NEW**: Department Selection Checkboxes -->
      <div class="form-group" style="grid-column: 1 / -1;">
-        <p style="text-align: left; color: #6b7280; margin-bottom: 8px;">Department(s) - Select all that apply</p>
-        <div class="checkbox-group">
-            <label><input type="checkbox" name="teacher-department" value="Science & Maths"> Science & Maths</label>
-            <label><input type="checkbox" name="teacher-department" value="Languages"> Languages</label>
-            <label><input type="checkbox" name="teacher-department" value="Humanities (SS, LO)"> Humanities (SS, LO)</label>
-            <label><input type="checkbox" name="teacher-department" value="Foundation Phase (All)"> Foundation Phase (All)</label>
+        <p style="text-align: left; color: #6b7280; margin-bottom: 8px;">Department(s) - Select all that apply</p>        
+        <div id="teacher-departments-container" class="checkbox-group">
+            <!-- Checkboxes will be dynamically loaded here -->
+            <p class="loading-text" style="font-size: 0.9em; color: #6b7280;">Loading departments...</p>
         </div>
      </div>
 
@@ -230,12 +229,10 @@
         <fieldset class="role-specific-fieldset">
             <legend>Departmental Head Details</legend>
             <div class="form-group">
-                <p style="margin-bottom: 8px; color: #6b7280;">Department(s) - Select all that apply</p>
-                <div class="checkbox-group">
-                    <label><input type="checkbox" name="dh-department" value="Science & Maths"> Science & Maths</label>
-                    <label><input type="checkbox" name="dh-department" value="Languages"> Languages</label>
-                    <label><input type="checkbox" name="dh-department" value="Humanities"> Humanities (SS, LO)</label>
-                    <label><input type="checkbox" name="dh-department" value="Foundation Phase"> Foundation Phase (All)</label>
+                <p style="margin-bottom: 8px; color: #6b7280;">Department(s) - Select all that apply</p>                
+                <div id="dh-departments-container" class="checkbox-group">
+                    <!-- Checkboxes will be dynamically loaded here -->
+                    <p class="loading-text" style="font-size: 0.9em; color: #6b7280;">Loading departments...</p>
                 </div>
             </div>
             <div class="form-group">

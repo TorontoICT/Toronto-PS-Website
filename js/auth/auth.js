@@ -379,6 +379,60 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   if (teachingAssignmentsContainer) observer.observe(teachingAssignmentsContainer, { attributes: true });
 
+  /**
+   * Fetches department data from Firestore and populates checkbox containers.
+   */
+  async function loadDepartmentCheckboxes() {
+      const teacherContainer = document.getElementById('teacher-departments-container');
+      const dhContainer = document.getElementById('dh-departments-container');
+
+      if (!teacherContainer || !dhContainer) return;
+
+      // Default departments fallback
+      const defaultDepartments = [
+          "Science & Maths",
+          "Languages",
+          "Humanities (SS, LO)",
+          "Foundation Phase (All)"
+      ];
+
+      const renderDepartments = (departments) => {
+          teacherContainer.innerHTML = ''; // Clear loading text
+          dhContainer.innerHTML = ''; // Clear loading text
+
+          departments.forEach(dept => {
+              // For teacher form
+              const teacherLabel = document.createElement('label');
+              teacherLabel.innerHTML = `<input type="checkbox" name="teacher-department" value="${dept}"> ${dept}`;
+              teacherContainer.appendChild(teacherLabel);
+
+              // For DH form
+              const dhLabel = document.createElement('label');
+              dhLabel.innerHTML = `<input type="checkbox" name="dh-department" value="${dept}"> ${dept}`;
+              dhContainer.appendChild(dhLabel);
+          });
+      };
+
+      try {
+          // Assumes departments are stored in a document named 'departments' within a 'school_config' collection.
+          // The document should have a field 'list' which is an array of department names.
+          const docRef = doc(db, 'school_config', 'departments');
+          const docSnap = await getDoc(docRef);
+
+          if (docSnap.exists() && Array.isArray(docSnap.data().list)) {
+              renderDepartments(docSnap.data().list);
+          } else {
+              console.warn("Departments config not found in Firestore (school_config/departments). Using defaults.");
+              renderDepartments(defaultDepartments);
+          }
+      } catch (error) {
+          console.error("Error loading departments from Firestore:", error);
+          console.warn("Falling back to default departments.");
+          renderDepartments(defaultDepartments);
+      }
+  }
+
+
   // Helper to get values from a group of checkboxes
   function getCheckedValues(name) {
     const checked = Array.from(document.querySelectorAll(`input[name="${name}"]:checked`));
@@ -1219,7 +1273,8 @@ document.addEventListener('DOMContentLoaded', () => {
             special_id: userData.specialId
         };
         
-        // NOTE: Ensure you have a template in EmailJS that uses {{special_id}}
+        // IMPORTANT: Replace with your actual Service ID and Template ID from your EmailJS account.
+        // NOTE: Ensure your EmailJS template has a variable like {{special_id}} to display the ID.
         await emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams);
         
         alert(`Your Special ID has been sent to ${email}. Please check your inbox.`);
@@ -1349,6 +1404,9 @@ function setVisible(formToShow) {
       // Default to login if hash is empty or anything else
       setVisible('login');
     }
+
+  // Load dynamic data like departments from Firestore
+  loadDepartmentCheckboxes();
 
   if (showRegister) {
     showRegister.addEventListener('click', (e) => {
