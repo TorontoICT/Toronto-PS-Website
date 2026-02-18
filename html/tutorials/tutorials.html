@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tutorials & Guides - Toronto Primary School</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <link rel="stylesheet" href="../../global.css">
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+  <script src="../../js/shared/firebase-config.js"></script>
+  <style>
+    .tutorials-header {
+        background: linear-gradient(rgba(32, 88, 218, 0.9), rgba(32, 88, 218, 0.9)), url('../../images/4.jpg');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        padding: 80px 20px;
+        text-align: center;
+        margin-top: var(--header-height);
+    }
+    .tutorials-header h1 { font-size: 2.5rem; margin-bottom: 10px; }
+    .tutorials-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        max-width: 1200px;
+        margin: 50px auto;
+        padding: 0 20px;
+    }
+    .tutorial-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        overflow: hidden;
+        transition: transform 0.3s ease;
+        text-decoration: none;
+        color: inherit;
+        display: flex;
+        flex-direction: column;
+    }
+    .tutorial-card:hover { transform: translateY(-5px); }
+    .card-icon {
+        background: #f3f4f6;
+        height: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+        color: var(--primary);
+    }
+    .card-content { padding: 25px; }
+    .card-content h3 { margin-bottom: 10px; color: var(--primary); }
+    .card-content p { color: #666; font-size: 0.95rem; line-height: 1.5; }
+    .btn-launch {
+        margin-top: auto;
+        display: inline-block;
+        padding: 10px 20px;
+        background: var(--accent);
+        color: white;
+        border-radius: 6px;
+        font-weight: bold;
+        text-align: center;
+        margin: 0 25px 25px 25px;
+    }
+    /* Modal Styles */
+    .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(3px); }
+    .modal-content { background-color: #fefefe; margin: 15% auto; padding: 30px; border: 1px solid #888; width: 90%; max-width: 400px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); text-align: center; position: relative; }
+    .close-modal { color: #aaa; float: right; font-size: 28px; font-weight: bold; position: absolute; top: 10px; right: 15px; cursor: pointer; }
+    .close-modal:hover, .close-modal:focus { color: black; text-decoration: none; cursor: pointer; }
+    .modal-content h3 { color: var(--primary); margin-bottom: 15px; }
+    .modal-content input { width: 100%; padding: 12px; margin: 10px 0; display: inline-block; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+    .modal-content button { background-color: var(--primary); color: white; padding: 12px 20px; margin: 8px 0; border: none; cursor: pointer; width: 100%; border-radius: 6px; font-size: 16px; font-weight: bold; transition: background 0.3s; }
+    .modal-content button:hover { background-color: #1a45a0; }
+    .locked-badge {
+        position: absolute; top: 15px; right: 15px; background: #d9534f; color: white; 
+        padding: 5px 10px; border-radius: 20px; font-size: 0.8em; font-weight: bold; 
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="../../index.html" class="brand"><img src="../../images/Logo.png" alt="Toronto Primary School Logo"></a>
+  <input type="checkbox" id="menu-bar">
+  <label for="menu-bar"><i class="fas fa-bars"></i></label>
+  <nav>
+      <ul>
+          <li><a href="../../index.html">Home</a></li>
+          <li><a href="../about/about.html">About</a></li>
+          <li><a href="../academics/academics.html">Academics</a></li>
+          <li><a href="../admission/admission.html">Admission</a></li>
+          <li><a href="../announcements/announcement.html">Announcements</a></li>
+          <li><a href="tutorials.html" class="active">Tutorials</a></li>
+          <li><a href="../contact/contact.html">Contact</a></li>
+      </ul>
+  </nav>
+  <div class="auth-buttons">
+      <a href="../auth/auth.html" class="btn-login">Register / Login</a>
+  </div>
+</header>
+
+<section class="tutorials-header">
+    <h1>Platform Tutorials & Guides</h1>
+    <p>Learn how to navigate and utilize the Toronto Primary School Digital Ecosystem.</p>
+</section>
+
+<div class="tutorials-grid">
+    <!-- Website Navigation Guide -->
+    <a href="../../html/presentations/website_navigation.html" target="_blank" class="tutorial-card">
+        <div class="card-icon"><i class="fas fa-map-signs"></i></div>
+        <div class="card-content">
+            <h3>Website Navigation</h3>
+            <p>A simple guide on how to browse the public website, find information, and access the login portals.</p>
+        </div>
+        <span class="btn-launch">Launch Presentation</span>
+    </a>
+
+    <!-- General Overview -->
+    <a href="../../html/presentations/presentation.html" target="_blank" class="tutorial-card">
+        <div class="card-icon"><i class="fas fa-laptop-code"></i></div>
+        <div class="card-content">
+            <h3>Platform Overview</h3>
+            <p>A comprehensive introduction to the digital platform, covering the vision, ecosystem, and key features for all users.</p>
+        </div>
+        <span class="btn-launch">Launch Presentation</span>
+    </a>
+
+    <!-- Teacher Guide -->
+    <a href="#" class="tutorial-card restricted-link" data-url="../../html/presentations/teacher_presentation.html" data-role="teacher">
+        <div class="locked-badge"><i class="fas fa-lock"></i> Staff Only</div>
+        <div class="card-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+        <div class="card-content">
+            <h3>Teacher's Guide</h3>
+            <p>In-depth training on using the Teacher Portal: Attendance, Grading, AI Lesson Planning, and Parent Communication.</p>
+        </div>
+        <span class="btn-launch"><i class="fas fa-lock"></i> Verify ID to Launch</span>
+    </a>
+
+    <!-- Admin Guide -->
+    <a href="#" class="tutorial-card restricted-link" data-url="../../html/presentations/admin_presentation.html" data-role="admin">
+        <div class="locked-badge"><i class="fas fa-lock"></i> Admin Only</div>
+        <div class="card-icon"><i class="fas fa-user-shield"></i></div>
+        <div class="card-content">
+            <h3>Admin & SMT Portal</h3>
+            <p>A guide for Administrators and Management on system configuration, SA-SAMS integration, and reporting tools.</p>
+        </div>
+        <span class="btn-launch"><i class="fas fa-lock"></i> Verify ID to Launch</span>
+    </a>
+</div>
+
+<footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <a href="../../index.html" class="brand"><img src="../../images/Logo.png" alt="Logo"></a>
+        <p class="footer-tagline">Delivering quality primary education.</p>
+      </div>
+      <div class="footer-contact">
+        <h4>Contact</h4>
+        <p><a href="mailto:torontoprimaryschool24@gmail.com">torontoprimaryschool24@gmail.com</a></p>
+      </div>
+    </div>
+    <div class="footer-bottom"><small>&copy; 2025 Toronto Primary School.</small></div>
+</footer>
+
+<!-- ID Verification Modal -->
+<div id="id-verification-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h3><i class="fas fa-lock"></i> Restricted Access</h3>
+        <p id="modal-instruction">Please enter your <strong>Special ID</strong> to access this tutorial.</p>
+        <input type="text" id="verify-special-id" placeholder="Enter Special ID" autocomplete="off">
+        <p id="verify-error" style="color: #d9534f; display: none; margin-top: 10px; font-size: 0.9em;"></p>
+        <button id="verify-btn">Verify & Open</button>
+        <div style="margin-top: 15px; font-size: 0.9em;">
+            <a href="../auth/auth.html#forgot-id" style="color: var(--primary); text-decoration: none;">Forgot Special ID?</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const modal = document.getElementById('id-verification-modal');
+        const closeBtn = document.querySelector('.close-modal');
+        const verifyBtn = document.getElementById('verify-btn');
+        const idInput = document.getElementById('verify-special-id');
+        const errorMsg = document.getElementById('verify-error');
+        
+        let currentTargetUrl = '';
+        let currentRequiredRole = '';
+
+        // Rate Limiting Constants
+        const MAX_ATTEMPTS = 5;
+        const LOCKOUT_DURATION = 5 * 60 * 1000; // 5 minutes
+
+        function checkRateLimit() {
+            const lockoutTime = localStorage.getItem('verify_lockout_until');
+            if (lockoutTime) {
+                const now = Date.now();
+                if (now < parseInt(lockoutTime)) {
+                    const remainingSeconds = Math.ceil((parseInt(lockoutTime) - now) / 1000);
+                    const minutes = Math.floor(remainingSeconds / 60);
+                    const seconds = remainingSeconds % 60;
+                    return `Too many failed attempts. Please try again in ${minutes}m ${seconds}s.`;
+                } else {
+                    localStorage.removeItem('verify_lockout_until');
+                    localStorage.removeItem('verify_attempts');
+                }
+            }
+            return null;
+        }
+
+        function recordFailedAttempt() {
+            let attempts = parseInt(localStorage.getItem('verify_attempts') || '0');
+            attempts++;
+            localStorage.setItem('verify_attempts', attempts);
+            
+            if (attempts >= MAX_ATTEMPTS) {
+                const lockoutUntil = Date.now() + LOCKOUT_DURATION;
+                localStorage.setItem('verify_lockout_until', lockoutUntil);
+                return true;
+            }
+            return false;
+        }
+
+        function clearRateLimit() {
+            localStorage.removeItem('verify_attempts');
+            localStorage.removeItem('verify_lockout_until');
+        }
+
+        // Close modal logic
+        const closeModal = () => {
+            modal.style.display = 'none';
+            idInput.value = '';
+            errorMsg.style.display = 'none';
+        };
+        closeBtn.onclick = closeModal;
+        window.onclick = (e) => { if (e.target == modal) closeModal(); };
+
+        // Handle restricted link clicks
+        document.querySelectorAll('.restricted-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                const rateLimitMsg = checkRateLimit();
+                if (rateLimitMsg) {
+                    alert(rateLimitMsg);
+                    return;
+                }
+
+                currentTargetUrl = link.dataset.url;
+                currentRequiredRole = link.dataset.role;
+                
+                // Check if already logged in via session
+                const sessionUser = JSON.parse(sessionStorage.getItem('currentUser'));
+                if (sessionUser && sessionUser.specialId) {
+                    // Simple role check based on session
+                    if (isAuthorized(sessionUser.role, currentRequiredRole)) {
+                        window.open(currentTargetUrl, '_blank');
+                        return;
+                    }
+                }
+
+                // If not logged in or role mismatch (though Special ID check usually implies staff), show modal
+                modal.style.display = 'block';
+                idInput.focus();
+            });
+        });
+
+        // Verify Button Logic
+        verifyBtn.addEventListener('click', async () => {
+            const rateLimitMsg = checkRateLimit();
+            if (rateLimitMsg) {
+                errorMsg.textContent = rateLimitMsg;
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            const specialId = idInput.value.trim();
+            if (!specialId) {
+                errorMsg.textContent = "Please enter a Special ID.";
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            verifyBtn.disabled = true;
+            verifyBtn.textContent = "Verifying...";
+            errorMsg.style.display = 'none';
+
+            try {
+                const db = firebase.firestore();
+                const snapshot = await db.collection('users').where('specialId', '==', specialId).limit(1).get();
+
+                if (snapshot.empty) {
+                    const isLocked = recordFailedAttempt();
+                    if (isLocked) {
+                        throw new Error(`Invalid Special ID. Too many attempts. You are locked out for 5 minutes.`);
+                    } else {
+                        const attempts = parseInt(localStorage.getItem('verify_attempts') || '0');
+                        throw new Error(`Invalid Special ID. (${MAX_ATTEMPTS - attempts} attempts remaining)`);
+                    }
+                }
+
+                const userData = snapshot.docs[0].data();
+                
+                if (isAuthorized(userData.role, currentRequiredRole)) {
+                    clearRateLimit();
+                    window.open(currentTargetUrl, '_blank');
+                    closeModal();
+                } else {
+                    throw new Error("Access Denied: Your role does not have permission to view this content.");
+                }
+            } catch (error) {
+                errorMsg.textContent = error.message;
+                errorMsg.style.display = 'block';
+                
+                if (checkRateLimit()) {
+                     errorMsg.textContent = checkRateLimit();
+                }
+            } finally {
+                verifyBtn.disabled = false;
+                verifyBtn.textContent = "Verify & Open";
+            }
+        });
+
+        function isAuthorized(userRole, requiredContext) {
+            // Admin/SMT can access everything
+            if (['admin', 'smt'].includes(userRole)) return true;
+            
+            // Teachers/Admissions can access Teacher guide
+            if (requiredContext === 'teacher' && ['teacher', 'admissions-team'].includes(userRole)) return true;
+
+            return false;
+        }
+    });
+</script>
+
+</body>
+</html>

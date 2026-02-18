@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Website Navigation Guide - Toronto Primary School</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/theme/league.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        .reveal h1, .reveal h2, .reveal h3 { text-transform: none; }
+        .reveal .slides section { text-align: left; }
+        .reveal .slides section.center { text-align: center; }
+        .highlight { color: #d9534f; font-weight: bold; }
+        .container { display: flex; gap: 20px; }
+        .col { flex: 1; }
+        ul li { margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <div id="start-btn-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;">
+        <button id="start-btn" style="padding: 10px 15px; font-size: 1.2em; background: #2058da; color: white; border: none; border-radius: 5px; cursor: pointer;">Click to Start</button>
+        <button id="dismiss-btn" style="position: absolute; top: -10px; right: -10px; width: 25px; height: 25px; background: #d9534f; color: white; border: 2px solid white; border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);" title="Dismiss">&times;</button>
+    </div>
+    <div class="reveal">
+        <div class="slides">
+
+            <!-- Slide 1: Title -->
+            <section class="center" data-background-gradient="linear-gradient(to bottom, #0f2027, #203a43, #2c5364)">
+                <img src="../../images/Logo.png" alt="School Logo" style="height: 150px; border: none; background: none; box-shadow: none;">
+                <h1 style="font-size: 100px;">Website Navigation Guide</h1>
+                <h3>Finding Your Way Around</h3>
+                <p>A simple guide to Toronto Primary School's online platform.</p>
+            </section>
+
+            <!-- Slide 2: The Homepage -->
+            <section>
+                <h2>The Homepage</h2>
+                <p>Your starting point for everything.</p>
+                <ul>
+                    <li><strong>Navigation Bar:</strong> Located at the top. Use this to jump to any section (About, Academics, Contact).</li>
+                    <li><strong>Hero Section:</strong> The main welcome area with quick links to learn more.</li>
+                    <li><strong>Footer:</strong> Scroll to the bottom for contact info, social media links, and our newsletter subscription.</li>
+                </ul>
+            </section>
+
+            <!-- Slide 3: About & Academics -->
+            <section>
+                <h2>Information Sections</h2>
+                <div class="container">
+                    <div class="col">
+                        <h3>About Us</h3>
+                        <p>Discover our history, mission, vision, and meet our dedicated staff.</p>
+                    </div>
+                    <div class="col">
+                        <h3>Academics</h3>
+                        <p>Explore our curriculum, subject departments, and assessment standards.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 4: Admissions -->
+            <section>
+                <h2>Admissions</h2>
+                <p>Everything you need to join our school:</p>
+                <ul>
+                    <li><strong>How to Apply:</strong> Step-by-step instructions for new parents.</li>
+                    <li><strong>Requirements:</strong> A checklist of documents needed (ID, Birth Certificate, etc.).</li>
+                    <li><strong>Application Form:</strong> Access the digital form to apply online.</li>
+                </ul>
+            </section>
+
+            <!-- Slide 5: Accessing Portals -->
+            <section>
+                <h2>Accessing Portals</h2>
+                <p>To access your private dashboard:</p>
+                <ol>
+                    <li>Click the <strong>"Register / Login"</strong> button in the top right corner of the menu.</li>
+                    <li>Select your role (Learner, Parent, Teacher, etc.).</li>
+                    <li>Enter your credentials to log in.</li>
+                </ol>
+                <small><em>Note: Learners use their Admission Number, and Staff use their Special ID.</em></small>
+            </section>
+
+            <!-- Slide 6: Contact Us -->
+            <section>
+                <h2>Contact Us</h2>
+                <p>Need to get in touch?</p>
+                <ul>
+                    <li><strong>Contact Form:</strong> Send us a message directly from the website.</li>
+                    <li><strong>Map:</strong> View our physical location in Mankweng.</li>
+                    <li><strong>Details:</strong> Find our phone number and email address easily.</li>
+                </ul>
+            </section>
+
+            <!-- Slide 7: Conclusion -->
+            <section class="center">
+                <h2>Explore Our School Online</h2>
+                <p>We hope this guide helps you find what you need.</p>
+                <br>
+                <h3 class="highlight">Welcome to Toronto Primary.</h3>
+            </section>
+
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/reveal.min.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true,
+            transition: 'slide',
+            controls: true,
+            progress: true,
+            center: true,
+        });
+
+        // Voice Over Functionality
+        let voiceOverEnabled = false;
+        const synth = window.speechSynthesis;
+
+        function toggleVoiceOver() {
+            voiceOverEnabled = !voiceOverEnabled;
+            const btn = document.getElementById('voice-over-btn');
+            if (voiceOverEnabled) {
+                btn.style.background = 'rgba(32, 88, 218, 0.9)';
+                btn.innerHTML = '<i class="fas fa-volume-up"></i> Voice Over: ON';
+                readCurrentSlide();
+            } else {
+                btn.style.background = 'rgba(0, 0, 0, 0.6)';
+                btn.innerHTML = '<i class="fas fa-volume-mute"></i> Voice Over: OFF';
+                synth.cancel();
+            }
+        }
+
+        function readCurrentSlide() {
+            if (!voiceOverEnabled) return;
+            synth.cancel();
+            const slide = Reveal.getCurrentSlide();
+            const text = slide.innerText.replace(/\s+/g, ' ').trim();
+            if (text) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                synth.speak(utterance);
+            }
+        }
+
+        Reveal.on('slidechanged', readCurrentSlide);
+
+        const btn = document.createElement('button');
+        btn.id = 'voice-over-btn';
+        btn.innerHTML = '<i class="fas fa-volume-mute"></i> Voice Over: OFF';
+        Object.assign(btn.style, { position: 'fixed', bottom: '20px', left: '20px', zIndex: '1000', padding: '10px 15px', background: 'rgba(0, 0, 0, 0.6)', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontSize: '14px' });
+        btn.onclick = toggleVoiceOver;
+        document.body.appendChild(btn);
+
+        // Start Button Logic
+        const startContainer = document.getElementById('start-btn-container');
+        document.getElementById('start-btn').addEventListener('click', function() {
+            startContainer.style.display = 'none';
+            window.speechSynthesis.cancel();
+        });
+        document.getElementById('dismiss-btn').addEventListener('click', function() {
+            startContainer.style.display = 'none';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Toronto Primary School - Digital Platform Presentation</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/reset.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/theme/league.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom styles for the presentation -->
+    <style>
+        .reveal h1, .reveal h2, .reveal h3 { text-transform: none; }
+        .reveal .slides section { text-align: left; }
+        .reveal .slides section.center { text-align: center; }
+        .feature-icon { font-size: 2em !important; color: #2058da; margin-bottom: 20px !important; }
+        .highlight { color: #d9534f; font-weight: bold; }
+        .container { display: flex; gap: 20px; }
+        .col { flex: 1; }
+        .screenshot-placeholder {
+            background: #f0f0f0;
+            border: 2px dashed #ccc;
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 300px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        ul li { margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <div id="start-btn-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;">
+        <button id="start-btn" style="padding: 15px 30px; font-size: 1.2em; background: #2058da; color: white; border: none; border-radius: 5px; cursor: pointer;">Click to Start</button>
+        <button id="dismiss-btn" style="position: absolute; top: -10px; right: -10px; width: 25px; height: 25px; background: #d9534f; color: white; border: 2px solid white; border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.2);" title="Dismiss">&times;</button>
+    </div>
+    <div class="reveal">
+        <div class="slides">
+
+            <!-- Slide 1: Title -->
+            <section class="center">
+                <img src="../../images/Logo.png" alt="School Logo" style="height: 150px; border: none; background: none; box-shadow: none;">
+                <h1>Toronto Primary School</h1>
+                <h3>Digital School Management Ecosystem</h3>
+                <p>Empowering Educators with Next-Gen Technology</p>
+                <small>Presented by SEALE J.R</small>
+            </section>
+
+            <!-- Slide 2: The Vision -->
+            <section>
+                <h2>The Vision</h2>
+                <p>To transition Toronto Primary School into a fully digital environment that:</p>
+                <ul>
+                    <li><i class="fas fa-check-circle"></i> Reduces administrative paperwork.</li>
+                    <li><i class="fas fa-check-circle"></i> Enhances communication with parents.</li>
+                    <li><i class="fas fa-check-circle"></i> Provides real-time academic insights.</li>
+                    <li><i class="fas fa-check-circle"></i> Uses <strong>Artificial Intelligence</strong> to assist teachers.</li>
+                </ul>
+            </section>
+
+            <!-- Slide 3: The Digital Ecosystem -->
+            <section>
+                <h2>The Digital Ecosystem</h2>
+                <p>A comprehensive platform integrating all aspects of school life:</p>
+                <div class="container" style="font-size: 0.9em;">
+                    <div class="col">
+                        <ul>
+                            <li><i class="fas fa-globe"></i> <strong>Public Website:</strong> Information & News</li>
+                            <li><i class="fas fa-user-plus"></i> <strong>Admissions:</strong> Online Applications</li>
+                            <li><i class="fas fa-user-graduate"></i> <strong>Learners:</strong> Academic Portal</li>
+                        </ul>
+                    </div>
+                    <div class="col">
+                        <!-- Embed AI Avatar Video here -->
+                        <video data-autoplay src="../../video/slide3_explanation.mp4" style="width: 100%; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);"></video>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 4: Public & Admissions -->
+            <section>
+                <h2>Public Presence & Admissions</h2>
+                <div class="container">
+                    <div class="col">
+                        <h3>Public Website</h3>
+                        <ul>
+                            <li>Showcases school identity, academics, and activities.</li>
+                            <li>Announcements and events calendar.</li>
+                            <li>Contact information and location.</li>
+                        </ul>
+                    </div>
+                    <div class="col">
+                        <h3>Admissions Portal</h3>
+                        <ul>
+                            <li><strong>Digital Applications:</strong> Parents apply online.</li>
+                            <li><strong>Workflow:</strong> Review -> Interview -> Offer -> Acceptance.</li>
+                            <li><strong>Database:</strong> Auto-populates learner records.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 5: Learner & Parent Portals -->
+            <section>
+                <h2>Student & Family Engagement</h2>
+                <div class="container">
+                    <div class="col">
+                        <h3>Learner Portal</h3>
+                        <ul>
+                            <li>Access study materials and assignments.</li>
+                            <li>View grades and attendance history.</li>
+                            <li>Personalized dashboard.</li>
+                        </ul>
+                    </div>
+                    <div class="col">
+                        <h3>Parent Portal</h3>
+                        <ul>
+                            <li>Monitor child's academic progress.</li>
+                            <li>Direct communication with teachers.</li>
+                            <li>Access financial statements and reports.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 6: Teacher Portal -->
+            <section>
+                <h2>The Teacher Portal</h2>
+                <p>A powerful toolkit for modern educators:</p>
+                <ul>
+                    <li><strong>Class Management:</strong> Digital attendance and rosters.</li>
+                    <li><strong>Grading:</strong> Automated mark sheets and calculations.</li>
+                    <li><strong>Portfolio:</strong> Digital professional portfolio.</li>
+                    <li><strong>Communication:</strong> WhatsApp-style chat with parents.</li>
+                </ul>
+            </section>
+
+            <!-- Slide 7: AI Innovation -->
+            <section>
+                <h2><i class="fas fa-robot"></i> AI Content Generator</h2>
+                <p class="highlight">Innovation in Lesson Planning</p>
+                <p>Teachers can instantly generate:</p>
+                <ul>
+                    <li><strong>Quizzes & Assessments:</strong> Tailored to grade and subject.</li>
+                    <li><strong>Lesson Plans:</strong> Detailed objectives and activities.</li>
+                </ul>
+                <small><em>Powered by advanced AI to save preparation time.</em></small>
+            </section>
+
+            <!-- Slide 8: Administration & SMT -->
+            <section>
+                <h2>Leadership & Administration</h2>
+                <ul>
+                    <li><strong>Admin Portal:</strong> Centralized control of SA-SAMS data, user accounts, and system configuration.</li>
+                    <li><strong>SMT Portal:</strong>
+                        <ul>
+                            <li><strong>QMS:</strong> Digital Quality Management System for staff appraisals.</li>
+                            <li><strong>Analytics:</strong> Insights into school performance.</li>
+                            <li><strong>Oversight:</strong> Monitoring of curriculum coverage.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- Slide 9: Conclusion -->
+            <section class="center">
+                <h2>Ready for the Future?</h2>
+                <p>This platform is designed to save you time, so you can focus on what matters most:</p>
+                <h3 class="highlight">Teaching.</h3>
+                <br>
+                <p><strong>Questions & Demo</strong></p>
+            </section>
+
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/reveal.min.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true,
+            transition: 'slide', // none/fade/slide/convex/concave/zoom
+            controls: true,
+            progress: true,
+            center: true,
+        });
+
+        // Voice Over Functionality
+        let voiceOverEnabled = false;
+        const synth = window.speechSynthesis;
+
+        function toggleVoiceOver() {
+            voiceOverEnabled = !voiceOverEnabled;
+            const btn = document.getElementById('voice-over-btn');
+            if (voiceOverEnabled) {
+                btn.style.background = 'rgba(32, 88, 218, 0.9)';
+                btn.innerHTML = '<i class="fas fa-volume-up"></i> Voice Over: ON';
+                readCurrentSlide();
+            } else {
+                btn.style.background = 'rgba(0, 0, 0, 0.6)';
+                btn.innerHTML = '<i class="fas fa-volume-mute"></i> Voice Over: OFF';
+                synth.cancel();
+            }
+        }
+
+        function readCurrentSlide() {
+            if (!voiceOverEnabled) return;
+            synth.cancel();
+            const slide = Reveal.getCurrentSlide();
+            const text = slide.innerText.replace(/\s+/g, ' ').trim();
+            if (text) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                synth.speak(utterance);
+            }
+        }
+
+        Reveal.on('slidechanged', readCurrentSlide);
+
+        const btn = document.createElement('button');
+        btn.id = 'voice-over-btn';
+        btn.innerHTML = '<i class="fas fa-volume-mute"></i> Voice Over: OFF';
+        Object.assign(btn.style, { position: 'fixed', bottom: '20px', left: '20px', zIndex: '1000', padding: '10px 15px', background: 'rgba(0, 0, 0, 0.6)', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontSize: '14px' });
+        btn.onclick = toggleVoiceOver;
+        document.body.appendChild(btn);
+
+        // Start Button Logic
+        const startContainer = document.getElementById('start-btn-container');
+        document.getElementById('start-btn').addEventListener('click', function() {
+            startContainer.style.display = 'none';
+            // Initialize speech synthesis (wakes up the engine)
+            window.speechSynthesis.cancel();
+        });
+        document.getElementById('dismiss-btn').addEventListener('click', function() {
+            startContainer.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
+```
+
+<!--
+[PROMPT_SUGGESTION]How can I add actual screenshots of the website into this presentation?[/PROMPT_SUGGESTION]
+[PROMPT_SUGGESTION]Can you help me create a user manual for teachers based on these features?[/PROMPT_SUGGESTION]
