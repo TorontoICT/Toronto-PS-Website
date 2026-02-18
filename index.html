@@ -57,6 +57,7 @@
               </ul>
           </li>
           <li><a href="html/announcements/announcement.html">Announcements</a></li>
+          <li><a href="html/tutorials/tutorials.html">Tutorials</a></li>
           <li><a href="html/contact/contact.html">Contact</a></li>
       </ul>
   </nav>
@@ -132,6 +133,42 @@
     </div>
   </footer>
 
+  <button id="help-trigger" class="help-button" aria-label="Help & FAQs">
+    <i class="fas fa-question"></i>
+  </button>
+
+  <!-- Help Modal -->
+  <div id="help-modal" class="help-modal">
+    <div class="help-modal-content">
+      <div class="help-modal-header">
+        <h2><i class="fas fa-life-ring"></i> How can we help you?</h2>
+        <span class="help-modal-close">&times;</span>
+      </div>
+      <div class="help-modal-body">
+        <div class="faq-item">
+          <span class="faq-question">How do I apply for admission?</span>
+          <p class="faq-answer">Applications are submitted online. <a href="html/admission/admission.html" class="faq-link">Click here to visit Admissions <i class="fas fa-arrow-right"></i></a></p>
+        </div>
+        <div class="faq-item">
+          <span class="faq-question">How do I log in to my portal?</span>
+          <p class="faq-answer">Access your dashboard here. <a href="html/auth/auth.html" class="faq-link">Click here to Login/Register <i class="fas fa-arrow-right"></i></a></p>
+        </div>
+        <div class="faq-item">
+          <span class="faq-question">Where can I find school fees info?</span>
+          <p class="faq-answer">Fee structures are available for parents. <a href="html/parents/parents.html" class="faq-link">Click here for Parent Resources <i class="fas fa-arrow-right"></i></a></p>
+        </div>
+        <div class="faq-item">
+          <span class="faq-question">I need help using this website.</span>
+          <p class="faq-answer">We have step-by-step guides. <a href="html/tutorials/tutorials.html" class="faq-link">Click here to view Tutorials <i class="fas fa-arrow-right"></i></a></p>
+        </div>
+        <div class="faq-item">
+          <span class="faq-question">How do I contact the school?</span>
+          <p class="faq-answer">Reach us via email or phone. <a href="html/contact/contact.html" class="faq-link">Click here for Contact Details <i class="fas fa-arrow-right"></i></a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const heroSection = document.querySelector('.hero-section');
@@ -163,6 +200,19 @@
 
       // Dynamically update the copyright year
       document.getElementById('copyright-year').textContent = new Date().getFullYear();
+
+      // Help Modal Logic
+      const modal = document.getElementById('help-modal');
+      const btn = document.getElementById('help-trigger');
+      const span = document.querySelector('.help-modal-close');
+
+      if (btn && modal && span) {
+        btn.addEventListener('click', () => modal.style.display = 'block');
+        span.addEventListener('click', () => modal.style.display = 'none');
+        window.addEventListener('click', (event) => {
+          if (event.target == modal) modal.style.display = 'none';
+        });
+      }
     });
   </script>
   <script src="js/newsletter.js"></script>

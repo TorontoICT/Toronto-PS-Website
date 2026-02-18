@@ -512,3 +512,63 @@ header nav ul li a.active {
 .image-viewer-close:focus {
     color: #bbb;
 }
+
+/* ==========================================================================
+   Floating Help Button
+   ========================================================================== */
+
+.help-button {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background-color: var(--primary);
+    color: white;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    font-size: 24px;
+    z-index: 2000;
+    transition: transform 0.3s ease, background-color 0.3s;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+}
+
+.help-button:hover {
+    transform: scale(1.1);
+    background-color: var(--accent);
+    color: white;
+}
+
+/* ==========================================================================
+   Help & FAQ Modal
+   ========================================================================== */
+.help-modal { display: none; position: fixed; z-index: 2100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
+.help-modal-content { background-color: #fff; margin: 5% auto; width: 90%; max-width: 600px; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.2); animation: slideIn 0.3s; overflow: hidden; }
+@keyframes slideIn { from {transform: translateY(-20px); opacity: 0;} to {transform: translateY(0); opacity: 1;} }
+.help-modal-header { background: var(--primary); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+.help-modal-header h2 { margin: 0; font-size: 1.25rem; color: white; }
+.help-modal-close { color: white; font-size: 24px; font-weight: bold; cursor: pointer; transition: opacity 0.2s; }
+.help-modal-close:hover { opacity: 0.8; }
+.help-modal-body { padding: 20px; max-height: 70vh; overflow-y: auto; }
+.faq-item { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+.faq-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.faq-question { font-weight: 700; color: #333; margin-bottom: 5px; display: block; font-size: 1rem; }
+.faq-answer { color: #555; font-size: 0.95rem; line-height: 1.5; }
+.faq-link { color: var(--primary); font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; margin-top: 2px; }
+.faq-link:hover { text-decoration: underline; color: var(--accent); }
+.faq-link i { font-size: 0.8em; }
+
+@media (max-width: 768px) {
+    .help-button {
+        bottom: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+}
